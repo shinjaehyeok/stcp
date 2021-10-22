@@ -1,0 +1,14 @@
+Package: EDCP
+Title: E-detector based Online Change-Point detection algorithms
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Jaehyeokt",
+           family = "Shin",
+           role = c("aut", "cre"),
+           email = "shinjaehyeok@gmail.com",
+           comment = c(ORCID = "0000-0003-0464-915X"))
+Description: An implementation of sequential GLRT for sub-psi family distributions: detailed description will be added.
+License: `use_mit_license()`
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2

@@ -3,3 +3,6 @@
 .Rdata
 .httr-oauth
 .DS_Store
+EDCP.Rcheck/
+EDCP*.tar.gz
+EDCP*.tgz

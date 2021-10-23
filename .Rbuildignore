@@ -1,3 +1,6 @@
 ^EDCP\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^EDCP\.Rcheck$
+^EDCP.*\.tar\.gz$
+^EDCP.*\.tgz$

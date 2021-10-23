@@ -25,7 +25,7 @@ compute_baseline <- function(alpha,
                              k_max = 100,
                              tol = 1e-6){
   # Check the sign of delta bounds.
-  # TODO
+  # TODO Add to Rstudio Cloud
   print("Under Construction")
   print(psi_star)
   print(psi_star_div)

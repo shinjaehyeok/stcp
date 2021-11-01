@@ -23,11 +23,11 @@ compute_baseline(
 
 \item{delta_upper}{Upper bound of target Delta. It must have be positive and larger than or equal to \code{delta_lower}.}
 
-\item{psi_star}{R function which computes the convex conjugate of the psi function. Default is \code{function(x)x^2/2}.}
+\item{psi_star}{R function that computes the convex conjugate of the psi function. Default is \code{function(x)x^2/2}.}
 
-\item{psi_star_div}{R function which computes the derivative of \code{psi_star}. Default is \code{function(x)x}.}
+\item{psi_star_div}{R function that computes the derivative of \code{psi_star}. Default is \code{function(x)x}.}
 
-\item{psi_star_inv}{R function which computes the inverse of \code{psi_star}. Default is \code{function(y)sqrt(2*y)}.}
+\item{psi_star_inv}{R function that computes the inverse of \code{psi_star}. Default is \code{function(y)sqrt(2*y)}.}
 
 \item{v_min}{A lower bound of v function in the baseline process. Default is \code{1}.}
 

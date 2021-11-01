@@ -5,9 +5,9 @@
 #' @param alpha ARL parameter in (0,1)
 #' @param delta_lower Lower bound of target Delta. It must have be positive and smaller than or equal to \code{delta_upper}.
 #' @param delta_upper Upper bound of target Delta. It must have be positive and larger than or equal to \code{delta_lower}.
-#' @param psi_star R function which computes the convex conjugate of the psi function. Default is \code{function(x)x^2/2}.
-#' @param psi_star_div R function which computes the derivative of \code{psi_star}. Default is \code{function(x)x}.
-#' @param psi_star_inv R function which computes the inverse of \code{psi_star}. Default is \code{function(y)sqrt(2*y)}.
+#' @param psi_star R function that computes the convex conjugate of the psi function. Default is \code{function(x)x^2/2}.
+#' @param psi_star_div R function that computes the derivative of \code{psi_star}. Default is \code{function(x)x}.
+#' @param psi_star_inv R function that computes the inverse of \code{psi_star}. Default is \code{function(y)sqrt(2*y)}.
 #' @param v_min A lower bound of v function in the baseline process. Default is \code{1}.
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is 100.
 #' @param tol Tolerance of root-finding, positive numeric. Default is 1e-6.
@@ -75,10 +75,10 @@ compute_baseline <- function(alpha,
 
   log_f_u <- log_f(v_min * d_u)
   if (log_f_u <= -log_one_over_alpha){
-    root_out <- uniroot(function(g){log_f(g) + log_one_over_alpha},
+    root_out <- stats::uniroot(function(g){log_f(g) + log_one_over_alpha},
                         c(log_one_over_alpha, v_min * d_u), tol = tol)
   } else {
-    root_out <- uniroot(function(g){log_f_with_exp(g) + log_one_over_alpha},
+    root_out <- stats::uniroot(function(g){log_f_with_exp(g) + log_one_over_alpha},
                         c(v_min * d_u, ratio * log(2/alpha)), tol = tol)
   }
   g_alpha <- root_out$root

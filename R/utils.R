@@ -1,0 +1,92 @@
+# Helper functions
+
+#' Pre-defined psi_star functions for sub-Gaussian family.
+#'
+#' @param sig The sigma parameter of the sub-Gaussian family (default = 1).
+#'
+#' @return A list of pre-defined psi_star functions for sub-Gaussian family.
+#'
+#' @export
+generate_sub_Gaussian_fn <- function(sig = 1){
+  G_fn_list <- list(
+    psi_star = function(x){x^2 / 2 / sig^2},
+    psi_star_div = function(x){x / sig^2},
+    psi_star_inv = function(x){sig * sqrt(2 * x)}
+    )
+  return(G_fn_list)
+}
+
+
+#' Pre-defined psi_star functions for sub-Bernoulli family.
+#'
+#' @param p The boundary of mean space of the pre-change distributions (default = 0.1).
+#'
+#' @return A list of pre-defined Bregman divergence functions for sub-Bernoulli family.
+#'
+#' @export
+generate_sub_B_fn <- function(p = 0.1){
+  B_fn_list <- list(
+    psi_star = function(x){
+      d <- x + p
+      if (!(d > 0 & d < 1)) return(Inf)
+      val <- d * log(d / p) + (1-d) * log((1-d) / (1-p))
+      return(val)
+    },
+    psi_star_div = function(x){
+      d <- x + p
+      if (!(d > 0 & d < 1)) return(Inf)
+      div <- log(d * (1-p) / p / (1-d))
+      return(div)
+    },
+    psi_star_inv = function(y, is_pos = TRUE){
+      tol <- 1e-6
+      right_end <- 1 - tol
+      if (is_pos){
+        bound <- B_fn_list$psi_star(right_end)
+        if (y >= bound) return(right_end)
+        f <- function(x) B_fn_list$psi_star(x) - y
+        x <- stats::uniroot(B_fn_list$psi_star,
+                            c(p, 1),
+                            tol = 1e-6)$root
+        return(x)
+      } else{
+        bound <- B_fn_list$psi_star(tol)
+        if (y >= bound) return(tol)
+        f <- function(x) B_fn_list$psi_star(x) - y
+        x <- stats::uniroot(f,
+                            c(0, p),
+                            tol = 1e-6)$root
+        return(x)
+      }
+    }
+  )
+  return(B_fn_list)
+}
+
+
+#' Pre-defined psi_star functions for sub-exponential family.
+#'
+#' @return A list of pre-defined Bregman divergence functions for sub-Bernoulli family.
+#'
+#' @export
+generate_sub_E_fn <- function(){
+  E_fn_list <- list(
+    psi_star = function(x){
+      val <- x - log(1+x)
+      return(val)
+    },
+    psi_star_div = function(x){
+      div <- x / (1+x)
+      return(div)
+    },
+    psi_star_inv = function(y, max_bound = 100){
+      f <- function(x) E_fn_list$psi_star(x) - y
+      if (f(max_bound) <= 0) return(max_bound)
+      x <- stats::uniroot(f,
+                          c(0, max_bound),
+                          tol = 1e-6)$root
+      return(x)
+    }
+  )
+  return(E_fn_list)
+}

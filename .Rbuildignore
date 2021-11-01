@@ -4,3 +4,4 @@
 ^EDCP\.Rcheck$
 ^EDCP.*\.tar\.gz$
 ^EDCP.*\.tgz$
+^README\.Rmd$

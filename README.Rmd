@@ -52,13 +52,14 @@ lines(x = c(nu,max_sample), y = c(0.4,0.4), col = 2, lwd =2 )
 
 Below, we compute a mixture e-detectors by which we can infer when the change of the mean happened.
 ```{r edcp}
+alpha <- 1e-3 # Inverse of target ARL
 m <- 0.2 # Upper bound of mean of pre-change observations
 d <- 0.1  # Guess on the minimum gap between pre- and post-change means
 E_fn_list <- generate_sub_E_fn()
 
 # Compute parameters
 base_param <- compute_baseline(
-  alpha = 1e-3,
+  alpha = alpha,
   delta_lower = m * d / (1/4 + (1-m)^2), # 0.0225
   delta_upper = m * (1-m) / d^2,  # 16
   psi_fn_list = generate_sub_E_fn(),
@@ -78,13 +79,13 @@ mix_SR <- update_log_mix_e_detectors(x_vec,
 
 # Inferred change-point
 mix_SR_stop <- min(
-  which(mix_SR$log_mix_e_detect_val > base_param$g_alpha)
+  which(mix_SR$log_mix_e_detect_val > log(1/alpha))
   )
 
 # Plot 
 plot(1:max_sample, mix_SR$log_mix_e_detect_val, type = "l",
      xlab = "n", ylab = "log e-detectors", main = paste0("v = ", nu, " v_hat = ",mix_SR_stop))
-abline(h = base_param$g_alpha, col = 2)
+abline(h = log(1/alpha), col = 2)
 abline(v = nu, col = 1, lty = 2)
 abline(v = mix_SR_stop, col = 2, lty = 2)
 

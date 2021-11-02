@@ -62,7 +62,7 @@ run_quick_simulation <- function(
     v_min = v_min,
     k_max = k_max
   )
-  g_alpha_single <- base_param$g_alpha
+  log_one_over_alpha <- log(1/alpha)
 
   # Compute e-detectors
   log_base_fn_list <- sapply(base_param$lambda,
@@ -78,7 +78,7 @@ run_quick_simulation <- function(
 
   plot(1:max_sample, single_e_val$log_mix_e_val, type = "l",
        xlab = "n", ylab = "e-value")
-  graphics::abline(h = g_alpha_single, col = 2)
+  graphics::abline(h = log_one_over_alpha, col = 2)
   graphics::abline(v = v, col = 1, lty = 2)
 
   # e-detector 1. SR-type
@@ -97,7 +97,7 @@ run_quick_simulation <- function(
        xlim = c(0, max_sample),
        ylim = c(min(single_e_val$log_mix_e_val), max(single_SR$log_mix_e_detect_val)),
        xlab = "n", ylab = "log e-val", main = paste0("v = ", v))
-  graphics::abline(h = g_alpha_single, col = 2)
+  graphics::abline(h = log_one_over_alpha, col = 2)
   graphics::abline(v = v, col = 1, lty = 2)
   graphics::lines(1:max_sample, single_SR$log_mix_e_detect_val, type = "l", col = 3)
   graphics::lines(1:max_sample, single_CS$log_mix_e_detect_val, type = "l", col = 4)
@@ -112,8 +112,6 @@ run_quick_simulation <- function(
     k_max = k_max
   )
 
-  g_alpha_mix <- base_param$g_alpha
-
   # Compute e-detectors
   log_base_fn_list <- sapply(base_param$lambda,
                              generate_log_base_fn,
@@ -127,7 +125,7 @@ run_quick_simulation <- function(
 
   plot(1:max_sample, mix_e_val$log_mix_e_val, type = "l",
        xlab = "n", ylab = "e-value")
-  graphics::abline(h = g_alpha_mix, col = 2)
+  graphics::abline(h = log_one_over_alpha, col = 2)
   graphics::abline(v = v, col = 1, lty = 2)
 
   # e-detector 1. SR-type
@@ -145,16 +143,16 @@ run_quick_simulation <- function(
 
 
   single_SR_stop <- min(
-    which(single_SR$log_mix_e_detect_val > g_alpha_single)
+    which(single_SR$log_mix_e_detect_val > log_one_over_alpha)
   )
   single_CS_stop <- min(
-    which(single_CS$log_mix_e_detect_val > g_alpha_single)
+    which(single_CS$log_mix_e_detect_val > log_one_over_alpha)
   )
   mix_SR_stop <- min(
-    which(mix_SR$log_mix_e_detect_val > g_alpha_mix)
+    which(mix_SR$log_mix_e_detect_val > log_one_over_alpha)
   )
   mix_CS_stop <- min(
-    which(mix_CS$log_mix_e_detect_val > g_alpha_mix)
+    which(mix_CS$log_mix_e_detect_val > log_one_over_alpha)
   )
 
   # Plot all
@@ -169,8 +167,8 @@ run_quick_simulation <- function(
   graphics::lines(1:max_sample, mix_CS$log_mix_e_detect_val, type = "l", col = 4)
   graphics::lines(1:max_sample, single_CS$log_mix_e_detect_val, type = "l", col = 4, lty = 2)
 
-  graphics::abline(h = g_alpha_mix, col = 2)
-  graphics::abline(h = g_alpha_single, col = 2, lty = 2)
+  graphics::abline(h = log_one_over_alpha, col = 2)
+  graphics::abline(h = log_one_over_alpha, col = 2, lty = 2)
   graphics::abline(v = v, col = 1, lty = 2)
   graphics::abline(v = mix_SR_stop, col = 3)
   graphics::abline(v = single_SR_stop, col = 3, lty = 2)

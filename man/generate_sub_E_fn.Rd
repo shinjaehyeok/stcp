@@ -7,7 +7,7 @@
 generate_sub_E_fn()
 }
 \value{
-A list of pre-defined Bregman divergence functions for sub-Bernoulli family.
+A list of pre-defined psi_star functions for sub-exponential family.
 }
 \description{
 Pre-defined psi_star functions for sub-exponential family.

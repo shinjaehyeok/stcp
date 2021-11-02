@@ -10,7 +10,7 @@ generate_sub_B_fn(p = 0.1)
 \item{p}{The boundary of mean space of the pre-change distributions (default = 0.1).}
 }
 \value{
-A list of pre-defined Bregman divergence functions for sub-Bernoulli family.
+A list of pre-defined psi_star functions for sub-Bernoulli family.
 }
 \description{
 Pre-defined psi_star functions for sub-Bernoulli family.

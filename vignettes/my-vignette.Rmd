@@ -25,7 +25,7 @@ library(EDCP)
 # Change-point: v = 0 (immediate chane), 200, 500, 1000 (no change)
 
 max_sample <- 1000L
-mu <- .5
+mu <- 1
 sig <- sqrt(2)
 v <- 500
 alpha <- 0.1/max_sample
@@ -67,13 +67,16 @@ g_alpha_single <- base_param$g_alpha
 # Compute e-detectors
 log_base_fn_list <- sapply(base_param$lambda, 
                            generate_log_base_fn,
-                           psi_fn = function(x){x^2/2},
-                           s_fn = function(x){x},
-                           v_fn = function(x){1})
+                           psi_fn = base_param$psi_fn_list$psi)
 
 # e-value for testing (it is not the scope of this package but good for debugging)
-log_e_val_vec <- cumsum(log_base_fn_list[[1]](x_vec))
-plot(1:max_sample, log_e_val_vec, type = "l", 
+# log_e_val_vec <- cumsum(log_base_fn_list[[1]](x_vec))
+single_e_val <- update_log_mix_e_values(x_vec,
+                                        base_param$omega,
+                                        log_base_fn_list)
+
+
+plot(1:max_sample, single_e_val$log_mix_e_val, type = "l", 
      xlab = "n", ylab = "e-value")
 abline(h = g_alpha_single, col = 2)
 abline(v = v, col = 1, lty = 2)
@@ -92,9 +95,9 @@ single_CS <- update_log_mix_e_detectors(x_vec,
                                               is_SR_type = FALSE)
 
 
-plot(1:max_sample, log_e_val_vec, type = "l",
+plot(1:max_sample, single_e_val$log_mix_e_val, type = "l",
      xlim = c(0, max_sample),
-     ylim = c(min(log_e_val_vec), max(single_SR$log_mix_e_detect_val)),
+     ylim = c(min(single_e_val$log_mix_e_val), max(single_SR$log_mix_e_detect_val)),
      xlab = "n", ylab = "log e-val", main = paste0("v = ", v))
 abline(h = g_alpha_single, col = 2)
 abline(v = v, col = 1, lty = 2)
@@ -107,7 +110,8 @@ lines(1:max_sample, single_CS$log_mix_e_detect_val, type = "l", col = 4)
 base_param <- compute_baseline(
   alpha,
   delta_lower = delta_lower,
-  delta_upper = delta_upper
+  delta_upper = delta_upper,
+  k_max = 1000
 )
 
 g_alpha_mix <- base_param$g_alpha
@@ -115,18 +119,20 @@ g_alpha_mix <- base_param$g_alpha
 # Compute e-detectors
 log_base_fn_list <- sapply(base_param$lambda, 
                            generate_log_base_fn,
-                           psi_fn = function(x){x^2/2},
-                           s_fn = function(x){x},
-                           v_fn = function(x){1})
+                           psi_fn = base_param$psi_fn_list$psi)
 
 # e-value for testing (it is not the scope of this package but good for debugging)
-log_e_val_mat <- sapply(log_base_fn_list, function(f) f(x_vec))
-log_omega <- log(base_param$omega)
-log_mix_e_val_vec <-  cumsum(
-  apply(log_e_val_mat, 1, function(log_e_vec){matrixStats::logSumExp(log_e_vec + log_omega)})
-)
+# log_e_val_mat <- sapply(log_base_fn_list, function(f) f(x_vec))
+# log_omega <- log(base_param$omega)
+# log_mix_e_val_vec <-  cumsum(
+#   apply(log_e_val_mat, 1, function(log_e_vec){matrixStats::logSumExp(log_e_vec + log_omega)})
+# )
 
-plot(1:max_sample, log_mix_e_val_vec, type = "l", 
+mix_e_val <- update_log_mix_e_values(x_vec,
+                                  base_param$omega,
+                                  log_base_fn_list)
+
+plot(1:max_sample, mix_e_val$log_mix_e_val, type = "l", 
      xlab = "n", ylab = "e-value")
 abline(h = g_alpha_mix, col = 2)
 abline(v = v, col = 1, lty = 2)
@@ -161,11 +167,12 @@ mix_CS_stop <- min(
   )
 
 # Plot all 
-plot(1:max_sample, log_mix_e_val_vec, type = "l",
+plot(1:max_sample, mix_e_val$log_mix_e_val, type = "l",
      xlab = "n", ylab = "log e-val", main = paste0("v = ", v),
      xlim = c(0, max_sample),
-     ylim = c(min(log_e_val_vec), max(mix_SR$log_mix_e_detect_val)))
-lines(1:max_sample, log_e_val_vec, type = "l", lty = 2)
+     ylim = c(min(single_e_val$log_mix_e_val),
+              max(mix_SR$log_mix_e_detect_val)))
+lines(1:max_sample, single_e_val$log_mix_e_val, type = "l", lty = 2)
 lines(1:max_sample, mix_SR$log_mix_e_detect_val, type = "l", col = 3)
 lines(1:max_sample, single_SR$log_mix_e_detect_val, type = "l", col = 3, lty =2)
 lines(1:max_sample, mix_CS$log_mix_e_detect_val, type = "l", col = 4)

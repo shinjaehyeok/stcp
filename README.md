@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# EDCP: E-Detector-based online Change-Point detections
+# EDCP: E-Detector-based online Change-Point detection algorithms
 
 <!-- badges: start -->
 
@@ -60,9 +60,7 @@ base_param <- compute_baseline(
   alpha = 1e-3,
   delta_lower = m * d / (1/4 + (1-m)^2), # 0.0225
   delta_upper = m * (1-m) / d^2,  # 16
-  psi_star = E_fn_list$psi_star,
-  psi_star_div = E_fn_list$psi_star_div,
-  psi_star_inv = E_fn_list$psi_star_inv,
+  psi_fn_list = generate_sub_E_fn(),
   v_min = 0,
   k_max = 1000
 )

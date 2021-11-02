@@ -5,3 +5,4 @@
 ^EDCP.*\.tar\.gz$
 ^EDCP.*\.tgz$
 ^README\.Rmd$
+^\.github$

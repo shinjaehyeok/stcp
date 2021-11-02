@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # EDCP: E-Detector-based online Change-Point detections
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/shinjaehyeok/EDCP/workflows/R-CMD-check/badge.svg)](https://github.com/shinjaehyeok/EDCP/actions)
 <!-- badges: end -->
 
 EDCP is a R package built to run e-detector-based nonparametric online change-point detection algorithms in [CITE PAPER].
@@ -90,7 +91,7 @@ abline(v = nu, col = 1, lty = 2)
 abline(v = mix_SR_stop, col = 2, lty = 2)
 
 ```
-```{r example with detection line}
+```{r example2}
 plot(1:max_sample, x_vec, pch=20, 
      xlab = "n", ylab = "X_n", main = "Simulated Data with the detected CP")
 lines(x = c(0,nu), y = c(0.2,0.2), col = 2, lwd = 2)

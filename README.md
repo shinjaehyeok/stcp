@@ -4,6 +4,8 @@
 # EDCP: E-Detector-based online Change-Point detections
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/shinjaehyeok/EDCP/workflows/R-CMD-check/badge.svg)](https://github.com/shinjaehyeok/EDCP/actions)
 <!-- badges: end -->
 
 EDCP is a R package built to run e-detector-based nonparametric online
@@ -99,6 +101,6 @@ abline(v = nu, col = 1, lty = 2)
 abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
 ```
 
-<img src="man/figures/README-example with detection line-1.png" width="100%" />
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
+<img src="man/figures/README-example2-1.png" width="100%" /> You’ll
+still need to render `README.Rmd` regularly, to keep `README.md`
 up-to-date. `devtools::build_readme()` is handy for this.

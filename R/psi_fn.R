@@ -49,8 +49,8 @@ generate_sub_B_fn <- function(p = 0.1){
         bound <- B_fn_list$psi_star(right_end)
         if (y >= bound) return(right_end)
         f <- function(x) B_fn_list$psi_star(x) - y
-        x <- stats::uniroot(B_fn_list$psi_star,
-                            c(p, 1),
+        x <- stats::uniroot(f,
+                            c(0, 1-p-tol),
                             tol = 1e-6)$root
         return(x)
       } else{
@@ -58,7 +58,7 @@ generate_sub_B_fn <- function(p = 0.1){
         if (y >= bound) return(tol)
         f <- function(x) B_fn_list$psi_star(x) - y
         x <- stats::uniroot(f,
-                            c(0, p),
+                            c(0, 1-p-tol),
                             tol = 1e-6)$root
         return(x)
       }

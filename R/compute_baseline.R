@@ -32,8 +32,8 @@ compute_baseline <- function(alpha,
   psi_star_div <- psi_fn_list$psi_star_div
   psi_star_inv <- psi_fn_list$psi_star_inv
 
-  if (psi_star(0) != 0) stop("psi_star must be zero at x = 0.")
-  if (psi_star_div(0) != 0) stop("psi_star_div must be zero at x = 0.")
+  if (abs(psi_star(0)) > 1e-8) stop("psi_star must be zero at x = 0.")
+  if (abs(psi_star_div(0)) > 1e-8) stop("psi_star_div must be zero at x = 0.")
   if (!(v_min >= 0)) stop("v_min must be non-negative.")
   k_max_raw <- k_max
   k_max <- as.integer(k_max_raw)

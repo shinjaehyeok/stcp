@@ -2,6 +2,7 @@
 
 export(compute_baseline)
 export(generate_log_base_fn)
+export(generate_log_bounded_base_fn)
 export(generate_sub_B_fn)
 export(generate_sub_E_fn)
 export(generate_sub_Gaussian_fn)

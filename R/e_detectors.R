@@ -52,3 +52,22 @@ generate_log_base_fn <- function(lambda,
   return(log_base_fn)
 }
 
+#' Generate log of baseline function for bounded RVs
+#'
+#' Generate logarithm of the baseline function for bounded RVs in \eqn{[0,1]} given lambda and mean parameters
+#' @param lambda Lambda parameter of the target baseline function.
+#' @param m Mean parameter of the target baseline function.
+#' @return A function compute log of baseline process given an observation.
+#' @export
+#'
+#' @examples
+#' generate_log_bounded_base_fn(1)
+#' generate_log_bounded_base_fn(0.5)
+generate_log_bounded_base_fn <- function(lambda, m = 0.5){
+
+  if (!(m > 0 | m < 1)) stop("Mean parameter must be in (0,1).")
+  log_base_fn <- function(x){
+    log(1 + lambda * (x / m  - 1))
+  }
+  return(log_base_fn)
+}

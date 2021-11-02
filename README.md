@@ -1,12 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# EDCP: Nonparametric Online Chain-Point Detections
+# EDCP: E-Detector-based online Change-Point detections
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of EDCP is to …
+EDCP is a R package built to run e-detector-based nonparametric online
+change-point detection algorithms in \[CITE PAPER\].
 
 ## Installation
 
@@ -20,36 +21,84 @@ devtools::install_github("shinjaehyeok/EDCP")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Suppose we have a stream of observations
+*X*<sub>1</sub>, *X*<sub>2</sub>, … ∈ \[0, 1\]. Before an unknown
+change-point *ν*, each pre-change observation has mean less than or
+equal to 0.2. But after the chagne-point *ν*, each post-change
+observation has mean larger than 0.2.
 
 ``` r
+set.seed(1)
 library(EDCP)
-## basic example code
+# Generate a stream of observations
+# For simplicity, we use beta distributions to generate samples
+max_sample <- 1000L
+nu <- 500L
+x_vec <- numeric(max_sample)
+x_vec[1:nu] <- rbeta(nu, 1, 4)
+x_vec[seq(nu+1, max_sample)] <- rbeta((max_sample - nu), 2, 3)
+plot(1:max_sample, x_vec, pch=20, 
+     xlab = "n", ylab = "X_n", main = "Simulated Data")
+lines(x = c(0,nu), y = c(0.2,0.2), col = 2, lwd = 2)
+lines(x = c(nu,max_sample), y = c(0.4,0.4), col = 2, lwd =2 )
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+<img src="man/figures/README-example-1.png" width="100%" />
+
+Below, we compute a mixture e-detectors by which we can infer when the
+change of the mean happened.
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+m <- 0.2 # Upper bound of mean of pre-change observations
+d <- 0.1  # Guess on the minimum gap between pre- and post-change means
+E_fn_list <- generate_sub_E_fn()
+
+# Compute parameters
+base_param <- compute_baseline(
+  alpha = 1e-3,
+  delta_lower = m * d / (1/4 + (1-m)^2), # 0.0225
+  delta_upper = m * (1-m) / d^2,  # 16
+  psi_star = E_fn_list$psi_star,
+  psi_star_div = E_fn_list$psi_star_div,
+  psi_star_inv = E_fn_list$psi_star_inv,
+  v_min = 0,
+  k_max = 1000
+)
+
+# Compute e-detectors
+log_base_fn_list <- sapply(base_param$lambda, 
+                           generate_log_bounded_base_fn,
+                           m = 0.2)
+
+# Compute mixture of SR-type e-detectors.
+mix_SR <- update_log_mix_e_detectors(x_vec,
+                                     base_param$omega,
+                                     log_base_fn_list)
+
+# Inferred change-point
+mix_SR_stop <- min(
+  which(mix_SR$log_mix_e_detect_val > base_param$g_alpha)
+  )
+
+# Plot 
+plot(1:max_sample, mix_SR$log_mix_e_detect_val, type = "l",
+     xlab = "n", ylab = "log e-detectors", main = paste0("v = ", nu, " v_hat = ",mix_SR_stop))
+abline(h = base_param$g_alpha, col = 2)
+abline(v = nu, col = 1, lty = 2)
+abline(v = mix_SR_stop, col = 2, lty = 2)
 ```
 
+<img src="man/figures/README-edcp-1.png" width="100%" />
+
+``` r
+plot(1:max_sample, x_vec, pch=20, 
+     xlab = "n", ylab = "X_n", main = "Simulated Data with the detected CP")
+lines(x = c(0,nu), y = c(0.2,0.2), col = 2, lwd = 2)
+lines(x = c(nu,max_sample), y = c(0.4,0.4), col = 2, lwd =2 )
+abline(v = nu, col = 1, lty = 2)
+abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
+```
+
+<img src="man/figures/README-example with detection line-1.png" width="100%" />
 You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/v1/examples>.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+up-to-date. `devtools::build_readme()` is handy for this.

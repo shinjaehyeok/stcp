@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# EDCP
+# EDCP: Nonparametric Online Chain-Point Detections
 
 <!-- badges: start -->
 <!-- badges: end -->

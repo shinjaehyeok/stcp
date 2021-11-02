@@ -26,3 +26,29 @@ update_log_e_detector <- function(x_current,
   }
   return(current_log_e_val + update)
 }
+
+#' Generate log of baseline function
+#'
+#' Generate logarithm of the baseline function given lambda parameter, psi_star, sum and variance functions
+#' @param lambda Lambda parameter of the target baseline function.
+#' @param psi_fn R function that compute \eqn{\psi(\lambda)}.
+#' @param s_fn R function that compute the sum process given an observation.
+#' @param v_fn R function that compute the sum process given an observation.
+#'
+#' @return A function compute log of baseline process given an observation.
+#' @export
+#'
+#' @examples
+#' generate_log_base_fn(1)
+#' generate_log_base_fn(1, psi_fn = function(x) x^2)
+generate_log_base_fn <- function(lambda,
+                                 psi_fn = function(x){x^2/2},
+                                 s_fn = function(x){x},
+                                 v_fn = function(x){1}){
+
+  log_base_fn <- function(x){
+    lambda * s_fn(x) - psi_fn(lambda) * v_fn(x)
+  }
+  return(log_base_fn)
+}
+

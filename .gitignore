@@ -6,3 +6,4 @@
 EDCP.Rcheck/
 EDCP*.tar.gz
 EDCP*.tgz
+inst/doc

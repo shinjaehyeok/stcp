@@ -164,16 +164,16 @@ run_quick_simulation <- function(
   graphics::lines(1:max_sample, single_e_val$log_mix_e_val, type = "l", lty = 2)
   graphics::lines(1:max_sample, mix_SR$log_mix_e_detect_val, type = "l", col = 3)
   graphics::lines(1:max_sample, single_SR$log_mix_e_detect_val, type = "l", col = 3, lty =2)
-  graphics::lines(1:max_sample, mix_CS$log_mix_e_detect_val, type = "l", col = 4)
-  graphics::lines(1:max_sample, single_CS$log_mix_e_detect_val, type = "l", col = 4, lty = 2)
+#  graphics::lines(1:max_sample, mix_CS$log_mix_e_detect_val, type = "l", col = 4)
+#  graphics::lines(1:max_sample, single_CS$log_mix_e_detect_val, type = "l", col = 4, lty = 2)
 
   graphics::abline(h = log_one_over_alpha, col = 2)
   graphics::abline(h = log_one_over_alpha, col = 2, lty = 2)
   graphics::abline(v = v, col = 1, lty = 2)
   graphics::abline(v = mix_SR_stop, col = 3)
   graphics::abline(v = single_SR_stop, col = 3, lty = 2)
-  graphics::abline(v = mix_CS_stop, col = 4)
-  graphics::abline(v = single_CS_stop, col = 4, lty = 2)
+#  graphics::abline(v = mix_CS_stop, col = 4)
+#  graphics::abline(v = single_CS_stop, col = 4, lty = 2)
 
   return(
     list(

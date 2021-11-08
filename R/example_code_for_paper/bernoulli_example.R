@@ -5,7 +5,7 @@
 library(EDCP)
 
 # Bounded case ----
-# Pre-change : Beta(0.2)
+# Pre-change : B(0.2)
 # Post-change: B(0.4)
 # Change-point: v = 0 (immediate chane), 200, 500, 1000 (no change)
 
@@ -13,10 +13,11 @@ max_sample <- 1000L
 p_pre <- 0.2
 p_post <- 0.4
 v <- 500
-alpha <- 0.1/max_sample
+alpha <- 1e-4
 
 # Compute optimal delta star
 delta_star <- p_post - p_pre
+#delta_star <- p_post - p_pre
 # delta_star <- 2
 delta_upper <- 0.4
 delta_lower <- 0.05

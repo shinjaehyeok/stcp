@@ -6,17 +6,17 @@ library(EDCP)
 
 # Gaussian case ----
 # Pre-change : N(0,1)
-# Post-change: N(mu, sig)
+# Post-change: N(mu, 1)
 # Change-point: v = 0 (immediate chane), 200, 500, 1000 (no change)
 
 max_sample <- 1000L
-mu <- 1
-sig <- sqrt(2)
+mu <- .5
+sig <- 1
 v <- 500
-alpha <- 0.1/max_sample
+alpha <- 1e-4
 
 # Compute optimal delta star
-delta_star <- mu / sig^2
+delta_star <- mu
 # delta_star <- 2
 delta_upper <- 10
 delta_lower <- 0.001

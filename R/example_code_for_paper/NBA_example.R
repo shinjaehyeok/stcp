@@ -7,14 +7,31 @@ library(tidyverse)
 # Load NBA regular season log from 2011 to 2022
 dat <- read.csv("R/example_code_for_paper/NBA_2011_2020.csv")
 summary(dat$ptsTeam[dat$ptsTeam > 0 ])
+summary(dat$plusminusTeam)
+hist(dat$plusminusTeam)
 
 # Get Cleveland Cavaliers Stats
 CLE_dat <- dat %>% dplyr::filter(slugTeam == "CLE") %>%
-  select(yearSeason, slugSeason, typeSeason, dateGame, nameTeam, slugTeam, isWin, ptsTeam) %>%
-  mutate(monthGame = format(as.Date(dateGame), "%Y-%m"))
+  select(yearSeason, slugSeason, typeSeason, dateGame, nameTeam, slugTeam, isWin, ptsTeam, plusminusTeam) %>%
+  mutate(monthGame = format(as.Date(dateGame), "%Y-%m")) %>%
+  mutate(
+  relative_pm = plusminusTeam / (ptsTeam - plusminusTeam/2)
+)
 
-year_summ <- CLE_dat %>% group_by(yearSeason) %>% summarise(win_rate_year = mean(isWin), pts_year = mean(ptsTeam))
-month_summ <- CLE_dat %>% group_by(monthGame) %>% summarise(win_rate_month = mean(isWin), pts_month = mean(ptsTeam))
+
+year_summ <- CLE_dat %>% group_by(yearSeason) %>%
+  summarise(
+    win_rate_year = mean(isWin),
+    pts_year = mean(ptsTeam),
+    pm_year = mean(plusminusTeam),
+    relative_pm_year = mean(relative_pm)
+    )
+month_summ <- CLE_dat %>% group_by(monthGame) %>%
+  summarise(
+    win_rate_month = mean(isWin),
+    pts_month = mean(ptsTeam),
+    pm_month = mean(plusminusTeam),
+    relative_pm_month = mean(relative_pm))
 
 CLE_dat <- CLE_dat %>% left_join(year_summ, by = "yearSeason") %>% left_join(month_summ, by = "monthGame")
 
@@ -22,7 +39,9 @@ regular_season_start_end_date <- CLE_dat %>%
   group_by(yearSeason) %>%
   summarise(start_date = min(dateGame), end_date = max(dateGame))
 
-year_summ <- year_summ %>% left_join(regular_season_start_end_date, by = "yearSeason")
+# year_summ <- year_summ %>% left_join(regular_season_start_end_date, by = "yearSeason")
+# year_summ %>% summarize( pts_year[-1] / pts_year[-length(pts_year)] * 100)
+# year_summ %>% summarize( (pm_year[-1]- pm_year[-length(pm_year)]) / pm_year[-length(pm_year)] * 100)
 
 
 # NBA data ----
@@ -143,4 +162,153 @@ for (i in 1:nrow(year_summ)){
   pts_year <- year_summ[i, "pts_year"] %>% as.numeric
   lines(x = year_date_range, y = rep(pts_year, 2), col = 2, lwd = 2)
 }
+abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
+
+# 2-2. Score change
+# Pre-change : PTS =< 99
+# Post-change: PTS >= 100
+# Assume points for each game is always between 50 and 200
+year_summ_after_2012 <- year_summ  %>%
+  mutate(
+    pts_pre_year = c(first(pts_year),
+                     pts_year[-length(pts_year)])
+  ) %>%
+  filter(yearSeason > 2011)
+
+CLE_dat_after_2012 <- CLE_dat %>%
+  left_join(year_summ_after_2012 %>%
+                        select(yearSeason, pts_pre_year),
+                      by = "yearSeason") %>%
+  mutate(
+    normalized_PTS_change = (ptsTeam - 50) / (pts_pre_year - 50),
+    pts_year_change = pts_year / pts_pre_year) %>%
+  filter(yearSeason > 2011)
+
+
+
+plot(as.Date(CLE_dat_after_2012$dateGame), CLE_dat_after_2012$normalized_PTS_change, pch=20,
+     xlab = "Date", ylab = "X_n", main = "Game points with seasonal averages")
+for (i in 1:nrow(year_summ_after_2012)){
+  year_date_range <- year_summ_after_2012[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
+  pts_year <- year_summ_after_2012[i, "pts_year"] %>% as.numeric()
+  pts_pre_year <- year_summ_after_2012[i, "pts_pre_year"] %>% as.numeric()
+  lines(x = year_date_range, y = rep(pts_year / pts_pre_year, 2), col = 2, lwd = 2)
+}
+
+alpha <- 1e-3 # Inverse of target ARL
+r_upper <- 1.02 # Upper bound of ratio of pre-change observations
+d <- 0.01  # Guess on the minimum gap between pre- and post-change means
+E_fn_list <- generate_sub_E_fn()
+
+# Compute parameters
+base_param <- compute_baseline(
+  alpha = alpha,
+  delta_lower = 0.01, # 0.003
+  delta_upper = 1,  # 4949
+  psi_fn_list = generate_sub_E_fn(),
+  v_min = 0,
+  k_max = 1000
+)
+
+generate_log_ratio_base_fn <- function(lambda, r = 1.03){
+  if (r <= 0) stop("Ratio parameter must be strictly positive.")
+  log_base_fn <- function(x){
+    log(1 + lambda * (x / r  - 1))
+  }
+  return(log_base_fn)
+}
+
+# Compute e-detectors
+log_base_fn_list <- sapply(base_param$lambda,
+                           generate_log_ratio_base_fn,
+                           r = r_upper)
+
+# Compute mixture of SR-type e-detectors.
+mix_SR <- update_log_mix_e_detectors(CLE_dat_after_2012$normalized_PTS_change,
+                                     base_param$omega,
+                                     log_base_fn_list)
+
+# Inferred change-point
+mix_SR_stop <- min(
+  CLE_dat_after_2012$dateGame[which(mix_SR$log_mix_e_detect_val > log(1/alpha))]
+) %>% as.Date()
+
+plot(as.Date(CLE_dat_after_2012$dateGame), mix_SR$log_mix_e_detect_val, type = "l",
+     xlab = "Date", ylab = "log e-detectors", main = paste0("v_hat = ",mix_SR_stop))
+abline(h = log(1/alpha), col = 2)
+abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
+abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
+abline(v = mix_SR_stop, col = 2, lty = 2)
+
+plot(as.Date(CLE_dat_after_2012$dateGame), CLE_dat_after_2012$ptsTeam, pch=20,
+     xlab = "Date", ylab = "X_n", main = "Game points with the detected CP")
+for (i in 1:nrow(year_summ)){
+  year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
+  pts_year <- year_summ[i, "pts_year"] %>% as.numeric
+  lines(x = year_date_range, y = rep(pts_year, 2), col = 2, lwd = 2)
+}
+abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
+
+
+
+# 2. +/-
+# Pre-change : +/- =< -1
+# Post-change: +/- > 1
+# Assume +/- for each game is always between -100 and 100
+
+plot(as.Date(CLE_dat$dateGame), CLE_dat$plusminusTeam, pch=20,
+     xlab = "Date", ylab = "+/-", main = "+/- with seasonal averages")
+for (i in 1:nrow(year_summ)){
+  year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
+  pm_year <- year_summ[i, "pm_year"] %>% as.numeric
+  lines(x = year_date_range, y = rep(pm_year, 2), col = 2, lwd = 2)
+}
+
+CLE_dat <- CLE_dat %>% dplyr::mutate(normalized_pm = (plusminusTeam + 100) / 200)
+
+alpha <- 1e-3 # Inverse of target ARL
+m <- (-1 + 100) / 200 # Upper bound of mean of pre-change observations
+d <- 2 / 200  # Guess on the minimum gap between pre- and post-change means
+E_fn_list <- generate_sub_E_fn()
+
+# Compute parameters
+base_param <- compute_baseline(
+  alpha = alpha,
+  delta_lower = m * d / (1/4 + (1-m)^2), # 0.0098
+  delta_upper = m * (1-m) / d^2,  # 2499.8
+  psi_fn_list = generate_sub_E_fn(),
+  v_min = 0,
+  k_max = 1000
+)
+
+# Compute e-detectors
+log_base_fn_list <- sapply(base_param$lambda,
+                           generate_log_bounded_base_fn,
+                           m = m)
+
+# Compute mixture of SR-type e-detectors.
+mix_SR <- update_log_mix_e_detectors(CLE_dat$normalized_pm,
+                                     base_param$omega,
+                                     log_base_fn_list)
+
+# Inferred change-point
+mix_SR_stop <- min(
+  CLE_dat$dateGame[which(mix_SR$log_mix_e_detect_val > log(1/alpha))]
+) %>% as.Date()
+
+plot(as.Date(CLE_dat$dateGame), mix_SR$log_mix_e_detect_val, type = "l",
+     xlab = "Date", ylab = "log e-detectors", main = paste0("v_hat = ",mix_SR_stop))
+abline(h = log(1/alpha), col = 2)
+abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
+abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
+abline(v = mix_SR_stop, col = 2, lty = 2)
+
+plot(as.Date(CLE_dat$dateGame), CLE_dat$plusminusTeam, pch=20,
+     xlab = "Date", ylab = "+/-", main = "+/- with detected CP")
+for (i in 1:nrow(year_summ)){
+  year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
+  pm_year <- year_summ[i, "pm_year"] %>% as.numeric
+  lines(x = year_date_range, y = rep(pm_year, 2), col = 2, lwd = 2)
+}
+
 abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)

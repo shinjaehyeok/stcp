@@ -6,7 +6,6 @@ library(EDCP)
 library(tidyverse)
 # Load NBA regular season log from 2011 to 2022
 dat <- read.csv("R/example_code_for_paper/NBA_2011_2020.csv")
-str(dat)
 summary(dat$ptsTeam[dat$ptsTeam > 0 ])
 
 # Get Cleveland Cavaliers Stats
@@ -28,8 +27,8 @@ year_summ <- year_summ %>% left_join(regular_season_start_end_date, by = "yearSe
 
 # NBA data ----
 # 1. Win rate
-# Pre-change : win_rate < 0.5
-# post_change: win_rate > 0.51
+# Pre-change : win_rate <= 0.49
+# post_change: win_rate >= 0.51
 
 plot(as.Date(CLE_dat$dateGame), CLE_dat$win_rate_month, pch=20,
      xlab = "Date", ylab = "win rate", main = "Monthly win rate with seasonaly average")

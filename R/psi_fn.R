@@ -86,7 +86,7 @@ generate_sub_E_fn <- function(){
       div <- x / (1+x)
       return(div)
     },
-    psi_star_inv = function(y, max_bound = 100){
+    psi_star_inv = function(y, max_bound = 1000){
       f <- function(x) E_fn_list$psi_star(x) - y
       if (f(max_bound) <= 0) return(max_bound)
       x <- stats::uniroot(f,

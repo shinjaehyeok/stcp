@@ -5,7 +5,7 @@ library(EDCP)
 # In this analysis, we use tidyverse to handle NBA data
 library(tidyverse)
 # Load NBA regular season log from 2011 to 2022
-dat <- read.csv("R/example_code_for_paper/NBA_2011_2020.csv")
+dat <- read.csv("R/example_code_for_paper/NBA_2010_2020.csv")
 summary(dat$ptsTeam[dat$ptsTeam > 0 ])
 summary(dat$plusminusTeam)
 hist(dat$plusminusTeam)
@@ -18,20 +18,24 @@ CLE_dat <- dat %>% dplyr::filter(slugTeam == "CLE") %>%
   relative_pm = plusminusTeam / (ptsTeam - plusminusTeam/2)
 )
 
+CLE_dat_2010 <- CLE_dat %>% filter(yearSeason == 2010)
+CLE_dat <- CLE_dat %>% filter(yearSeason > 2010)
+
 
 year_summ <- CLE_dat %>% group_by(yearSeason) %>%
   summarise(
     win_rate_year = mean(isWin),
     pts_year = mean(ptsTeam),
     pm_year = mean(plusminusTeam),
-    relative_pm_year = mean(relative_pm)
+#    relative_pm_year = mean(relative_pm)
     )
 month_summ <- CLE_dat %>% group_by(monthGame) %>%
   summarise(
     win_rate_month = mean(isWin),
     pts_month = mean(ptsTeam),
     pm_month = mean(plusminusTeam),
-    relative_pm_month = mean(relative_pm))
+#    relative_pm_month = mean(relative_pm)
+)
 
 CLE_dat <- CLE_dat %>% left_join(year_summ, by = "yearSeason") %>% left_join(month_summ, by = "monthGame")
 
@@ -39,10 +43,7 @@ regular_season_start_end_date <- CLE_dat %>%
   group_by(yearSeason) %>%
   summarise(start_date = min(dateGame), end_date = max(dateGame))
 
-# year_summ <- year_summ %>% left_join(regular_season_start_end_date, by = "yearSeason")
-# year_summ %>% summarize( pts_year[-1] / pts_year[-length(pts_year)] * 100)
-# year_summ %>% summarize( (pm_year[-1]- pm_year[-length(pm_year)]) / pm_year[-length(pm_year)] * 100)
-
+year_summ <- year_summ %>% left_join(regular_season_start_end_date, by = "yearSeason")
 
 # NBA data ----
 # 1. Win rate
@@ -264,22 +265,41 @@ for (i in 1:nrow(year_summ)){
   lines(x = year_date_range, y = rep(pm_year, 2), col = 2, lwd = 2)
 }
 
-CLE_dat <- CLE_dat %>% dplyr::mutate(normalized_pm = (plusminusTeam + 100) / 200)
+lower <- -80
+upper <- 80
+
+CLE_dat <- CLE_dat %>% dplyr::mutate(normalized_pm = (plusminusTeam - lower) / (upper - lower))
 
 alpha <- 1e-3 # Inverse of target ARL
-m <- (-1 + 100) / 200 # Upper bound of mean of pre-change observations
-d <- 2 / 200  # Guess on the minimum gap between pre- and post-change means
+m <- (-1 - lower) / (upper - lower) # Upper bound of mean of pre-change observations
+d <- 2 / (upper - lower)  # Guess on the minimum gap between pre- and post-change means
 E_fn_list <- generate_sub_E_fn()
 
 # Compute parameters
 base_param <- compute_baseline(
   alpha = alpha,
-  delta_lower = m * d / (1/4 + (1-m)^2), # 0.0098
-  delta_upper = m * (1-m) / d^2,  # 2499.8
+  delta_lower = m * d / (1/4 + (1-m)^2), # 0.012
+  delta_upper = m * (1-m) / d^2,  # 1599.8
   psi_fn_list = generate_sub_E_fn(),
   v_min = 0,
   k_max = 1000
 )
+
+# Use 2009-10 season data to get an estimate of variance
+x_pre <- (CLE_dat_2010$plusminusTeam - lower) / (upper - lower)
+v_hat <- mean((x_pre / m - 1)^2)
+delta_hat <- d / m / v_hat
+
+base_param <- compute_baseline(
+  alpha = alpha,
+  delta_lower = delta_hat / 2,
+  delta_upper = delta_hat * 10,
+  psi_fn_list = generate_sub_E_fn(),
+  v_min = 0,
+  k_max = 1000
+)
+
+
 
 # Compute e-detectors
 log_base_fn_list <- sapply(base_param$lambda,

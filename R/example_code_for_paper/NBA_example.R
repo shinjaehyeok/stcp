@@ -19,7 +19,9 @@ CLE_dat <- dat %>% dplyr::filter(slugTeam == "CLE") %>%
 )
 
 CLE_dat_2010 <- CLE_dat %>% filter(yearSeason == 2010)
-CLE_dat <- CLE_dat %>% filter(yearSeason > 2010)
+CLE_dat <- CLE_dat %>% filter(yearSeason > 2010 & yearSeason <= 2018)
+
+hist(CLE_dat$plusminusTeam)
 
 
 year_summ <- CLE_dat %>% group_by(yearSeason) %>%
@@ -258,11 +260,11 @@ abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
 # Assume +/- for each game is always between -100 and 100
 
 plot(as.Date(CLE_dat$dateGame), CLE_dat$plusminusTeam, pch=20,
-     xlab = "Date", ylab = "+/-", main = "+/- with seasonal averages")
+     xlab = "Game Date", ylab = "+/-", main = "Plus-Minus of the Cavaliers")
 for (i in 1:nrow(year_summ)){
   year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
   pm_year <- year_summ[i, "pm_year"] %>% as.numeric
-  lines(x = year_date_range, y = rep(pm_year, 2), col = 2, lwd = 2)
+  lines(x = year_date_range, y = rep(pm_year, 2), col = 2, lwd = 3)
 }
 
 lower <- -80
@@ -285,19 +287,19 @@ base_param <- compute_baseline(
   k_max = 1000
 )
 
-# Use 2009-10 season data to get an estimate of variance
-x_pre <- (CLE_dat_2010$plusminusTeam - lower) / (upper - lower)
-v_hat <- mean((x_pre / m - 1)^2)
-delta_hat <- d / m / v_hat
-
-base_param <- compute_baseline(
-  alpha = alpha,
-  delta_lower = delta_hat / 2,
-  delta_upper = delta_hat * 10,
-  psi_fn_list = generate_sub_E_fn(),
-  v_min = 0,
-  k_max = 1000
-)
+# # Use 2009-10 season data to get an estimate of variance
+# x_pre <- (CLE_dat_2010$plusminusTeam - lower) / (upper - lower)
+# v_hat <- mean((x_pre / m - 1)^2)
+# delta_hat <- d / m / v_hat
+#
+# base_param <- compute_baseline(
+#   alpha = alpha,
+#   delta_lower = delta_hat / 2,
+#   delta_upper = delta_hat * 10,
+#   psi_fn_list = generate_sub_E_fn(),
+#   v_min = 0,
+#   k_max = 1000
+# )
 
 
 
@@ -317,10 +319,10 @@ mix_SR_stop <- min(
 ) %>% as.Date()
 
 plot(as.Date(CLE_dat$dateGame), mix_SR$log_mix_e_detect_val, type = "l",
-     xlab = "Date", ylab = "log e-detectors", main = paste0("v_hat = ",mix_SR_stop))
+     xlab = "Game Date", ylab = "log e-detectors", main = paste0("Change-Point: ",mix_SR_stop))
 abline(h = log(1/alpha), col = 2)
-abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
-abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
+# abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
+# abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
 abline(v = mix_SR_stop, col = 2, lty = 2)
 
 plot(as.Date(CLE_dat$dateGame), CLE_dat$plusminusTeam, pch=20,

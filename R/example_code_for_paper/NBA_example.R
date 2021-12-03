@@ -66,7 +66,7 @@ p_pre <- 0.49
 base_param <- compute_baseline(
   alpha = alpha,
   delta_lower = 0.02,
-  delta_upper = 0.3,
+  delta_upper = 0.41,
   psi_fn_list = generate_sub_B_fn(p = p_pre),
   v_min = 1,
   k_max = 1000

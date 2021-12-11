@@ -13,8 +13,8 @@ compute_baseline_bounded(
   bound_upper = 1,
   k_max = 1000,
   tol = 1e-06,
-  delta_lower_explicit = NULL,
-  delta_upper_explicit = NULL
+  var_lower = 0,
+  var_upper = 0.25
 )
 }
 \arguments{
@@ -34,9 +34,9 @@ compute_baseline_bounded(
 
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 
-\item{delta_lower_explicit}{Specified delta_lower replacing the default formula.}
+\item{var_lower}{Lower bounds of variance of scaled post-change observations. Default is \code{0}.}
 
-\item{delta_upper_explicit}{Specified delta_upper replacing the default formula.}
+\item{var_upper}{Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.}
 }
 \value{
 A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter

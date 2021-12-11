@@ -20,8 +20,10 @@ alpha <- 1e-4
 # Compute optimal delta star
 # Note delta_star for bounded case is not the same scale of delta_lower and delta_upper
 # In the future, it may be better to use different terminology to avoid confusion.
-delta_star <-
-  (m_pre - bound_lower) * (m_post - m_pre) / ((m_post - m_pre) ^ 2 + 1)
+# delta_star <-
+#   (m_pre - bound_lower) * (m_post - m_pre) / ((m_post - m_pre) ^ 2 + 1)
+delta_star <- m_post - m_pre
+var_star <- 1 / 6 ^ 2
 delta_upper <- bound_upper - m_pre
 delta_lower <- 0.1
 
@@ -66,14 +68,14 @@ graphics::lines(
 baseline_star <- compute_baseline_bounded(
   alpha,
   m_pre,
-  delta_lower,
-  delta_upper,
+  delta_star,
+  delta_star,
   bound_lower,
   bound_upper,
   k_max = 1000,
   tol = 1e-6,
-  delta_lower_explicit = delta_star,
-  delta_upper_explicit = delta_star
+  var_lower = var_star,
+  var_upper = var_star
 )
 
 # When delta_lower < delta_star < delta_upper

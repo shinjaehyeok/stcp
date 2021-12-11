@@ -233,8 +233,8 @@ compute_baseline_simple_exp <- function(alpha,
 #' @param bound_upper Upper bound of observations.
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
 #' @param tol Tolerance of root-finding, positive numeric. Default is 1e-6.
-#' @param delta_lower_explicit Specified delta_lower replacing the default formula.
-#' @param delta_upper_explicit Specified delta_upper replacing the default formula.
+#' @param var_lower Lower bounds of variance of scaled post-change observations. Default is \code{0}.
+#' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
 #'
 #' @return A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
 #' @export
@@ -249,8 +249,8 @@ compute_baseline_bounded <- function(alpha,
                                      bound_upper = 1,
                                      k_max = 1000,
                                      tol = 1e-6,
-                                     delta_lower_explicit = NULL,
-                                     delta_upper_explicit = NULL) {
+                                     var_lower = 0,
+                                     var_upper = 0.25) {
   if (!(m_pre > bound_lower & m_pre < bound_upper)) {
     stop("m_pre must be between bound_lower and bound_upper.")
   }
@@ -259,27 +259,18 @@ compute_baseline_bounded <- function(alpha,
     stop("delta_lower and delta_upper must be positive with delta_lower <= delta_upper.")
   }
 
+  if (!(var_lower >= 0 & var_upper >=  var_lower)) {
+    stop("var_lower and var_upper must be positive with var_lower <= var_upper.")
+  }
+
   # Compute parameters
   bound_range <- bound_upper - bound_lower
   m <- (m_pre - bound_lower) / bound_range # scaled m_pre
   d_l <- delta_lower / bound_range  # scaled delta_lower
   d_u <- delta_upper / bound_range # scaled_delta_upper
 
-  if (is.null(delta_lower_explicit)) {
-    delta_lower_val <- m * d_l / (1 / 4 + d_u ^ 2)
-  } else {
-    delta_lower_val <- delta_lower_explicit
-  }
-
-  if (is.null(delta_upper_explicit)) {
-    delta_upper_val <-  m * d_u / d_l ^ 2
-  } else {
-    delta_upper_val <- delta_upper_explicit
-  }
-
-  if (delta_lower_val > delta_upper_val) {
-    stop("delta_lower_explicit or delta_upper_explict is invalid.")
-  }
+  delta_lower_val <- m * d_l / (var_upper + d_u ^ 2)
+  delta_upper_val <-  m * d_u / (var_lower + d_l ^ 2)
 
   base_param <- compute_baseline(
     alpha,

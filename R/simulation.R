@@ -145,10 +145,14 @@ run_quick_simulation <- function(x_vec,
   #  graphics::lines(1:max_sample, single_CS$log_mix_e_val, type = "l", col = 4, lty = 2)
 
   graphics::abline(h = mix_e_val$threshold, col = 2)
-  graphics::abline(h = mix_e_val$threshold, col = 2, lty = 2)
+  graphics::abline(h = mix_e_val$threshold,
+                   col = 2,
+                   lty = 2)
   graphics::abline(v = v, col = 1, lty = 2)
   graphics::abline(v = mix_SR$stopped_ind, col = 3)
-  graphics::abline(v = single_SR$stopped_ind, col = 3, lty = 2)
+  graphics::abline(v = single_SR$stopped_ind,
+                   col = 3,
+                   lty = 2)
   #  graphics::abline(v = mix_CS_stop, col = 4)
   #  graphics::abline(v = single_CS_stop, col = 4, lty = 2)
 

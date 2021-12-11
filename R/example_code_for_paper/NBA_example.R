@@ -51,7 +51,7 @@ year_summ <- year_summ %>% left_join(regular_season_start_end_date, by = "yearSe
 # post_change: win_rate >= 0.51
 
 plot(as.Date(CLE_dat$dateGame), CLE_dat$win_rate_month, pch=20,
-     xlab = "Date", ylab = "win rate", main = "Monthly win rate with seasonaly average")
+     xlab = "Date", ylab = "win rate", main = "Monthly win rates with seasonal averages")
 for (i in 1:nrow(year_summ)){
   year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
   win_rate_year <- year_summ[i, "win_rate_year"] %>% as.numeric
@@ -66,7 +66,7 @@ p_pre <- 0.49
 base_param <- compute_baseline(
   alpha = alpha,
   delta_lower = 0.02,
-  delta_upper = 0.3,
+  delta_upper = 0.41,
   psi_fn_list = generate_sub_B_fn(p = p_pre),
   v_min = 1,
   k_max = 1000
@@ -87,15 +87,18 @@ mix_SR_stop <- min(
   CLE_dat$dateGame[which(mix_SR$log_mix_e_detect_val > log(1/alpha))]
 ) %>% as.Date()
 
+
+# Plot size 600 * 450
+
 plot(as.Date(CLE_dat$dateGame), mix_SR$log_mix_e_detect_val, type = "l",
      xlab = "Date", ylab = "log e-detectors", main = paste0("CP detected at ",mix_SR_stop))
 abline(h = log(1/alpha), col = 2)
-abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
-abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
+# abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
+# abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
 abline(v = mix_SR_stop, col = 2, lty = 2)
 
 plot(as.Date(CLE_dat$dateGame), CLE_dat$win_rate_month, pch=20,
-     xlab = "Date", ylab = "win rate", main = "Monthly win rate with seasonaly average")
+     xlab = "Date", ylab = "win rate", main = "Monthly win rates with seasonal averages")
 for (i in 1:nrow(year_summ)){
   year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
   win_rate_year <- year_summ[i, "win_rate_year"] %>% as.numeric

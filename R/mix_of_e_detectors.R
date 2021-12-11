@@ -6,7 +6,7 @@
 #' @param weight_vec A vector of mixing weights.
 #' @param log_base_fn_list R function that compute the log of baseline process based on each observation.
 #' @param prev_log_e_vec A vector of logarithms of mixtures of e-detectors in the previous step. Default is \code{numeric(length(log_base_fn_list))}.
-#' @param is_SR_type A Boolean indicator whether the process use SR-type update. If not, the function uses the CUSUM-type update instead of SR-type one.
+#' @param is_SR_type A Boolean to indicator whether the process use SR-type update. If not, the function uses the CUSUM-type update instead of SR-type one.
 #'
 #' @return Updated logarithm of mixture of SR- or CUSUM-type e-detectors and a vector of each component for the next iteration.
 #' @export
@@ -55,7 +55,8 @@ update_log_mix_e_detectors <- function(new_x_list,
     updater()
   }
 
-  updated_list <- list(log_mix_e_detect_val = log_mix_e_detect_val,
-                       log_e_val_vec = prev_log_e_vec)
+  updated_list <- list(log_mix_e_val = log_mix_e_detect_val,
+                       last_log_e_vec = prev_log_e_vec)
+
   return(updated_list)
 }

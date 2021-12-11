@@ -4,24 +4,27 @@
 
 library(EDCP)
 
-# Bernoulli case ----
-# Pre-change : B(0.2)
-# Post-change: B(0.4)
+# Bounded case ----
+# Pre-change : 5 * Beta(1, 4) - 1 (m = 0, sig^2 = 5^2 * 4 / (5^2 * 6) = 2/3)
+# Post-change: 5 * Beta(2, 3) - 1 (m = 1, sig^2 = 5^2 * 6 / (5^2 * 6) = 1)
 # Change-point: v = 0 (immediate change), 200, 500, 1000 (no change)
 
 max_sample <- 1000L
-m_pre <- 0.2
-m_post <- 0.4
+m_pre <- 0
+m_post <- 1
+bound_lower <- -1
+bound_upper <- 5
 v <- 500
 alpha <- 1e-4
 
 # Compute optimal delta star
-delta_star <- m_post - m_pre
-delta_upper <- 0.4
-delta_lower <- 0.05
+# Note delta_star for bounded case is not the same scale of delta_lower and delta_upper
+# In the future, it may be better to use different terminology to avoid confusion.
+delta_star <-
+  (m_pre - bound_lower) * (m_post - m_pre) / ((m_post - m_pre) ^ 2 + 1)
+delta_upper <- bound_upper - m_pre
+delta_lower <- 0.1
 
-psi_fn_list <- generate_sub_B_fn(p = m_pre)
-v_min <- 1
 k_max <- 1e+3
 
 
@@ -30,10 +33,10 @@ x_vec <- generator(
   max_sample,
   v,
   pre_sampler = function(n) {
-    rbinom(n, 1, m_pre)
+    5 * rbeta(n, 1, 4) - 1
   },
   post_sampler = function(n) {
-    rbinom(n, 1, m_post)
+    5 * rbeta(n, 2, 3) - 1
   }
 )
 
@@ -60,38 +63,28 @@ graphics::lines(
 
 # Build CP detectors
 # When delta_lower = delta_upper = delta_star
-baseline_star <- compute_baseline_simple_exp(
-  alpha,
-  m_pre,
-  delta_star,
-  delta_star,
-  psi_fn_list,
-  s_fn = function(x) {
-    x - m_pre
-  },
-  v_fn = function(x) {
-    1
-  },
-  v_min,
-  k_max,
-  tol = 1e-6
-)
-
-# When delta_lower < delta_star < delta_upper
-baseline_mix <- compute_baseline_simple_exp(
+baseline_star <- compute_baseline_bounded(
   alpha,
   m_pre,
   delta_lower,
   delta_upper,
-  psi_fn_list,
-  s_fn = function(x) {
-    x - m_pre
-  },
-  v_fn = function(x) {
-    1
-  },
-  v_min,
-  k_max,
+  bound_lower,
+  bound_upper,
+  k_max = 1000,
+  tol = 1e-6,
+  delta_lower_explicit = delta_star,
+  delta_upper_explicit = delta_star
+)
+
+# When delta_lower < delta_star < delta_upper
+baseline_mix <- compute_baseline_bounded(
+  alpha,
+  m_pre,
+  delta_lower,
+  delta_upper,
+  bound_lower,
+  bound_upper,
+  k_max = 1000,
   tol = 1e-6
 )
 

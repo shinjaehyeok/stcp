@@ -4,12 +4,14 @@
 \alias{generate_log_bounded_base_fn}
 \title{Generate log of baseline function for bounded RVs}
 \usage{
-generate_log_bounded_base_fn(lambda, m = 0.5)
+generate_log_bounded_base_fn(lambda, m = 0.5, bound_lower = 0)
 }
 \arguments{
 \item{lambda}{Lambda parameter of the target baseline function.}
 
-\item{m}{Mean parameter of the target baseline function.}
+\item{m}{Mean parameter of the target baseline function. It must be strictly larger than \code{bound_lower}.}
+
+\item{bound_lower}{Lower bound of observations. Default is \code{0}.}
 }
 \value{
 A function compute log of baseline process given an observation.

@@ -21,7 +21,7 @@ update_log_mix_e_detectors(
 
 \item{prev_log_e_vec}{A vector of logarithms of mixtures of e-detectors in the previous step. Default is \code{numeric(length(log_base_fn_list))}.}
 
-\item{is_SR_type}{A Boolean indicator whether the process use SR-type update. If not, the function uses the CUSUM-type update instead of SR-type one.}
+\item{is_SR_type}{A Boolean to indicator whether the process use SR-type update. If not, the function uses the CUSUM-type update instead of SR-type one.}
 }
 \value{
 Updated logarithm of mixture of SR- or CUSUM-type e-detectors and a vector of each component for the next iteration.

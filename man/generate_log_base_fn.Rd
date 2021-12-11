@@ -18,7 +18,7 @@ generate_log_base_fn(
 
 \item{s_fn}{R function that compute the sum process given an observation.}
 
-\item{v_fn}{R function that compute the sum process given an observation.}
+\item{v_fn}{R function that compute the variance process given an observation.}
 }
 \value{
 A function compute log of baseline process given an observation.

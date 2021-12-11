@@ -1,120 +1,45 @@
-# TODO:: Capsulate ComputeBaseline algorithm separately.
-# base_param <- compute_baseline(
-#   alpha,
-#   delta_lower = delta_lower,
-#   delta_upper = delta_upper,
-#   psi_fn_list = psi_fn_list,
-#   v_min = v_min,
-#   k_max = k_max
-# )
-#
-# # Compute e-detectors
-# log_base_fn_list <- sapply(base_param$lambda,
-#                            generate_log_base_fn,
-#                            psi_fn = base_param$psi_fn_list$psi)
-# Return omega, log_base_fn_list
-
-
-#' E-Detector based Change-Point detection
+#' E-Detector based Change-Point detection and sequential tests.
 #'
-#' Run mixtures of e-detectors to detect the change-point.
+#' Run mixtures of e-detectors / e-values to detect the change-point or run a sequential test.
 #'
 #' @param x_vec Observations
-#' @param alpha Inverse of ARL. It must be between (0,1).
-#' @param delta_upper Upper bound of delta_star
-#' @param delta_lower Lower bound of delta_star
-#' @param psi_fn_list psi and psi star functions
-#' @param v_min Minimum of variance process
-#' @param k_max Maximum of non-trivial baselines
+#' @param baseline_obj Baseline object returned by compute_baseline functions.
+#' @param is_test A Boolean to indicate whether to compute sequential test or not.
+#' @inheritParams update_log_mix_e_detectors
 #'
 #' @return logarithm of mixture of e-detectors and the first stopped point.
 #' @export
-#'
-EDCP <- function(
-  x_vec,
-  alpha,
-  delta_upper,
-  delta_lower,
-  psi_fn_list,
-  v_min,
-  k_max,
-  is_SR_type = TRUE,
-  is_test = FALSE
-){
-  # Compute baseline function parameters
-  base_param <- compute_baseline(
-    alpha,
-    delta_lower = delta_lower,
-    delta_upper = delta_upper,
-    psi_fn_list = psi_fn_list,
-    v_min = v_min,
-    k_max = k_max
-  )
+edcp <- function(x_vec,
+                 baseline_obj,
+                 prev_log_e_vec = numeric(length(baseline_obj$log_base_fn_list)),
+                 is_SR_type = TRUE,
+                 is_test = FALSE) {
+  # Compute threshold
+  log_one_over_alpha <- log(1 / baseline_star$alpha)
 
-  # Compute e-detectors
-  log_base_fn_list <- sapply(base_param$lambda,
-                             generate_log_base_fn,
-                             psi_fn = base_param$psi_fn_list$psi)
+  if (!is_test) {
+    # CP detection
+    mix_e_list <- update_log_mix_e_detectors(
+      x_vec,
+      baseline_obj$omega,
+      baseline_obj$log_base_fn_list,
+      prev_log_e_vec,
+      is_SR_type
+    )
 
-  # e-value for testing (it is not the scope of this package but good for debugging)
+  } else{
+    # Sequential test
+    mix_e_list <- update_log_mix_e_values(x_vec,
+                                          baseline_obj$omega,
+                                          baseline_obj$log_base_fn_list)
+  }
 
-  mix_e_val <- update_log_mix_e_values(x_vec,
-                                       base_param$omega,
-                                       log_base_fn_list)
+  # Update stopped index
+  upcrossed_ind <-
+    which(mix_e_list$log_mix_e_val > log_one_over_alpha)
+  mix_e_list$stopped_ind <-
+    ifelse(length(upcrossed_ind) == 0, Inf, min(upcrossed_ind))
+  mix_e_list$threshold <- log_one_over_alpha
 
-  # e-detector 1. SR-type
-  mix_SR <- update_log_mix_e_detectors(x_vec,
-                                       base_param$omega,
-                                       log_base_fn_list)
-
-
-  # e-detector 2. CUSUM-type
-  mix_CS <- update_log_mix_e_detectors(x_vec,
-                                       base_param$omega,
-                                       log_base_fn_list,
-                                       is_SR_type = FALSE)
-
-
-
-  single_SR_stop <- min(
-    which(single_SR$log_mix_e_detect_val > log_one_over_alpha)
-  )
-  single_CS_stop <- min(
-    which(single_CS$log_mix_e_detect_val > log_one_over_alpha)
-  )
-  mix_SR_stop <- min(
-    which(mix_SR$log_mix_e_detect_val > log_one_over_alpha)
-  )
-  mix_CS_stop <- min(
-    which(mix_CS$log_mix_e_detect_val > log_one_over_alpha)
-  )
-
-  # Plot all
-  plot(1:max_sample, mix_e_val$log_mix_e_val, type = "l",
-       xlab = "n", ylab = "log e-val", main = paste0("v = ", v),
-       xlim = c(0, max_sample),
-       ylim = c(min(single_e_val$log_mix_e_val),
-                max(mix_SR$log_mix_e_detect_val)))
-  graphics::lines(1:max_sample, single_e_val$log_mix_e_val, type = "l", lty = 2)
-  graphics::lines(1:max_sample, mix_SR$log_mix_e_detect_val, type = "l", col = 3)
-  graphics::lines(1:max_sample, single_SR$log_mix_e_detect_val, type = "l", col = 3, lty =2)
-#  graphics::lines(1:max_sample, mix_CS$log_mix_e_detect_val, type = "l", col = 4)
-#  graphics::lines(1:max_sample, single_CS$log_mix_e_detect_val, type = "l", col = 4, lty = 2)
-
-  graphics::abline(h = log_one_over_alpha, col = 2)
-  graphics::abline(h = log_one_over_alpha, col = 2, lty = 2)
-  graphics::abline(v = v, col = 1, lty = 2)
-  graphics::abline(v = mix_SR_stop, col = 3)
-  graphics::abline(v = single_SR_stop, col = 3, lty = 2)
-#  graphics::abline(v = mix_CS_stop, col = 4)
-#  graphics::abline(v = single_CS_stop, col = 4, lty = 2)
-
-  return(
-    list(
-      single_SR_stop = single_SR_stop,
-      single_CS_stop = single_CS_stop,
-      mix_SR_stop = mix_SR_stop,
-      mix_CS_stop = mix_CS_stop
-      )
-  )
+  return(mix_e_list)
 }

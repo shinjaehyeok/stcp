@@ -51,6 +51,6 @@ update_log_mix_e_values <- function(new_x_vec,
                                 })
 
   updated_list <- list(log_mix_e_val = log_mix_e_val_vec,
-                       log_each_e_val = prev_log_e_vec)
+                       last_log_e_vec = prev_log_e_vec)
   return(updated_list)
 }

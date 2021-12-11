@@ -4,36 +4,16 @@
 \alias{run_quick_simulation}
 \title{Run a quick simulation for debuging}
 \usage{
-run_quick_simulation(
-  x_vec,
-  v,
-  alpha,
-  delta_star,
-  delta_upper,
-  delta_lower,
-  psi_fn_list,
-  v_min,
-  k_max
-)
+run_quick_simulation(x_vec, v, baseline_star, baseline_mix)
 }
 \arguments{
 \item{x_vec}{Simulated observations}
 
 \item{v}{change-point}
 
-\item{alpha}{Inverse of ARL}
+\item{baseline_star}{baseline object for the delta_star}
 
-\item{delta_star}{delta for sinlge e-value / e-detetor}
-
-\item{delta_upper}{Upper bound of \code{delta_star}}
-
-\item{delta_lower}{Lower bound of \code{delta_star}}
-
-\item{psi_fn_list}{psi and psi star functions}
-
-\item{v_min}{Minimum of variance process}
-
-\item{k_max}{Maximum of non-trivial baselines.}
+\item{baseline_mix}{baseline object for the mixture case}
 }
 \value{
 Stopped point for single and mixtures of SR- and CUSUM-type e-detectors.

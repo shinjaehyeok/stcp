@@ -15,7 +15,7 @@ edcp <- function(x_vec,
                  is_SR_type = TRUE,
                  is_test = FALSE) {
   # Compute threshold
-  log_one_over_alpha <- log(1 / baseline_star$alpha)
+  log_one_over_alpha <- log(1 / baseline_obj$alpha)
 
   if (!is_test) {
     # CP detection

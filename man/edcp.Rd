@@ -2,7 +2,7 @@
 % Please edit documentation in R/EDCP.R
 \name{edcp}
 \alias{edcp}
-\title{E-Detector based Change-Point detection}
+\title{E-Detector based Change-Point detection and sequential tests.}
 \usage{
 edcp(
   x_vec,
@@ -27,5 +27,5 @@ edcp(
 logarithm of mixture of e-detectors and the first stopped point.
 }
 \description{
-Run mixtures of e-detectors to detect the change-point.
+Run mixtures of e-detectors / e-values to detect the change-point or run a sequential test.
 }

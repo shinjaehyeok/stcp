@@ -24,9 +24,9 @@ devtools::install_github("shinjaehyeok/EDCP")
 ## Example
 
 Suppose we have a stream of observations
-*X*<sub>1</sub>, *X*<sub>2</sub>, … ∈ \[0, 1\]. Before an unknown
+*X*<sub>1</sub>, *X*<sub>2</sub>, … ∈ \[0,1\]. Before an unknown
 change-point *ν*, each pre-change observation has mean less than or
-equal to 0.2. But after the chagne-point *ν*, each post-change
+equal to 0.2. But after the change-point *ν*, each post-change
 observation has mean larger than 0.2.
 
 ``` r
@@ -52,39 +52,21 @@ change of the mean happened.
 
 ``` r
 alpha <- 1e-3 # Inverse of target ARL
-m <- 0.2 # Upper bound of mean of pre-change observations
-d <- 0.1  # Guess on the minimum gap between pre- and post-change means
-E_fn_list <- generate_sub_E_fn()
-
-# Compute parameters
-base_param <- compute_baseline(
-  alpha = alpha,
-  delta_lower = m * d / (1/4 + (1-m)^2), # 0.0225
-  delta_upper = m * (1-m) / d^2,  # 16
-  psi_fn_list = generate_sub_E_fn(),
-  v_min = 0,
-  k_max = 1000
-)
-
-# Compute e-detectors
-log_base_fn_list <- sapply(base_param$lambda, 
-                           generate_log_bounded_base_fn,
-                           m = 0.2)
+m_pre <- 0.2 # Upper bound of mean of pre-change observations
+delta_lower <- 0.01  # Guess on the minimum gap between pre- and post-change means
+baseline_bounded <- compute_baseline_bounded(alpha,
+                                             m_pre,
+                                             delta_lower)
 
 # Compute mixture of SR-type e-detectors.
-mix_SR <- update_log_mix_e_detectors(x_vec,
-                                     base_param$omega,
-                                     log_base_fn_list)
-
-# Inferred change-point
-mix_SR_stop <- min(
-  which(mix_SR$log_mix_e_detect_val > log(1/alpha))
-  )
+mix_SR_bounded <- edcp(x_vec, baseline_bounded)
+mix_SR_stop <- mix_SR_bounded$stopped_ind
+threshold <- mix_SR_bounded$threshold # = log(1/alpha)
 
 # Plot 
-plot(1:max_sample, mix_SR$log_mix_e_detect_val, type = "l",
+plot(1:max_sample, mix_SR_bounded$log_mix_e_val, type = "l",
      xlab = "n", ylab = "log e-detectors", main = paste0("v = ", nu, " v_hat = ",mix_SR_stop))
-abline(h = log(1/alpha), col = 2)
+abline(h = threshold, col = 2)
 abline(v = nu, col = 1, lty = 2)
 abline(v = mix_SR_stop, col = 2, lty = 2)
 ```

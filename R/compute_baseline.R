@@ -1,4 +1,4 @@
-#' Compute baseline processes
+#' Compute baseline processes.
 #'
 #' Compuate parameters to build baseline processes.
 #'
@@ -21,10 +21,12 @@ compute_baseline <- function(alpha,
                              psi_fn_list = generate_sub_G_fn(),
                              v_min = 1,
                              k_max = 200,
-                             tol = 1e-6){
+                             tol = 1e-6) {
   # Type checks
-  if (!(alpha > 0 | alpha < 1)) stop("alpha must be a number in (0,1).")
-  if (!(delta_lower > 0 & delta_upper >=  delta_lower)){
+  if (!(alpha > 0 |
+        alpha < 1))
+    stop("alpha must be a number in (0,1).")
+  if (!(delta_lower > 0 & delta_upper >=  delta_lower)) {
     stop("delta_lower and delta_upper must be positive with delta_lower <= delta_upper.")
   }
 
@@ -32,16 +34,21 @@ compute_baseline <- function(alpha,
   psi_star_div <- psi_fn_list$psi_star_div
   psi_star_inv <- psi_fn_list$psi_star_inv
 
-  if (abs(psi_star(0)) > 1e-8) stop("psi_star must be zero at x = 0.")
-  if (abs(psi_star_div(0)) > 1e-8) stop("psi_star_div must be zero at x = 0.")
-  if (!(v_min >= 0)) stop("v_min must be non-negative.")
+  if (abs(psi_star(0)) > 1e-8)
+    stop("psi_star must be zero at x = 0.")
+  if (abs(psi_star_div(0)) > 1e-8)
+    stop("psi_star_div must be zero at x = 0.")
+  if (!(v_min >= 0))
+    stop("v_min must be non-negative.")
   k_max_raw <- k_max
   k_max <- as.integer(k_max_raw)
-  if (k_max != k_max_raw) warning("k_max is coverted to an integer.")
-  if (k_max < 1) stop("k_max must be larger than or equal to 1.")
+  if (k_max != k_max_raw)
+    warning("k_max is coverted to an integer.")
+  if (k_max < 1)
+    stop("k_max must be larger than or equal to 1.")
 
   # Compute constants
-  log_one_over_alpha <- log(1/alpha)
+  log_one_over_alpha <- log(1 / alpha)
   d_l <- psi_star(delta_lower)
   d_u <- psi_star(delta_upper)
   ratio <- d_u / d_l
@@ -50,7 +57,8 @@ compute_baseline <- function(alpha,
 
   # If delta_lower is small enough or equal to delta_upper
   # Return trivial single baseline
-  if (log_one_over_alpha <= v_min * d_l | delta_lower == delta_upper){
+  if (log_one_over_alpha <= v_min * d_l |
+      delta_lower == delta_upper) {
     baseline_list <- list(
       lambda = lambda_l,
       omega = 1,
@@ -59,60 +67,76 @@ compute_baseline <- function(alpha,
       eta_alpha = 1,
       w = alpha,
       psi_fn_list = psi_fn_list
-        )
+    )
     return(baseline_list)
   }
 
   # Compute the threshold g_alpha
-  log_f <- function(g){
+  log_f <- function(g) {
     k_vec <- 1:k_max
-    log_f_val <- sapply(k_vec, function(k) log(k) - g * ratio^(-1/k))
+    log_f_val <-
+      sapply(k_vec, function(k)
+        log(k) - g * ratio ^ (-1 / k))
     return(min(log_f_val))
   }
 
-  log_f_with_exp <- function(g){
+  log_f_with_exp <- function(g) {
     exp_vec <- c(-g, log_f(g))
     return(matrixStats::logSumExp(exp_vec))
   }
 
   log_f_u <- log_f(v_min * d_u)
-  if (log_f_u <= -log_one_over_alpha){
-    root_out <- stats::uniroot(function(g){log_f(g) + log_one_over_alpha},
-                        c(log_one_over_alpha, v_min * d_u), tol = tol)
+  if (log_f_u <= -log_one_over_alpha) {
+    root_out <-
+      stats::uniroot(function(g) {
+        log_f(g) + log_one_over_alpha
+      },
+      c(log_one_over_alpha, v_min * d_u), tol = tol)
   } else {
-    root_out <- stats::uniroot(function(g){log_f_with_exp(g) + log_one_over_alpha},
-                        c(v_min * d_u, ratio * log(2/alpha)), tol = tol)
+    root_out <-
+      stats::uniroot(function(g) {
+        log_f_with_exp(g) + log_one_over_alpha
+      },
+      c(v_min * d_u, ratio * log(2 / alpha)), tol = tol)
   }
   g_alpha <- root_out$root
 
   # Compute the number of non-trival baselines k_alpha
   k_vec <- 1:k_max
-  log_f_val <- sapply(k_vec, function(k) log(k) - g_alpha * ratio^(-1/k))
+  log_f_val <-
+    sapply(k_vec, function(k)
+      log(k) - g_alpha * ratio ^ (-1 / k))
   k_alpha <- which.min(log_f_val)
 
   # Compute the spacing parameter eta_alpha
-  eta_alpha <- ratio^(1/k_alpha)
+  eta_alpha <- ratio ^ (1 / k_alpha)
 
   # Compute lambdas and mixing weights
-  if (g_alpha > v_min * d_u){
+  if (g_alpha > v_min * d_u) {
     # Compute lambdas
     lambda_vec <- numeric(k_alpha + 1)
     lambda_vec[1] <- lambda_u
     lambda_vec[k_alpha +  1] <- lambda_l
-    if (k_alpha >= 2){
+    if (k_alpha >= 2) {
       k_candidate <- seq(1, k_alpha - 1)
-      delta_vec <- sapply(k_candidate, function(k) psi_star_inv(d_u / eta_alpha^k))
-      lambda_vec[-c(1,k_alpha+1)] <- sapply(delta_vec, psi_star_div)
+      delta_vec <-
+        sapply(k_candidate, function(k)
+          psi_star_inv(d_u / eta_alpha ^ k))
+      lambda_vec[-c(1, k_alpha + 1)] <-
+        sapply(delta_vec, psi_star_div)
     }
     # Compute weights
-    omega_vec <- c(exp(-g_alpha), rep(exp(-g_alpha / eta_alpha), k_alpha))
+    omega_vec <-
+      c(exp(-g_alpha), rep(exp(-g_alpha / eta_alpha), k_alpha))
   } else {
     # Compute lambdas
     lambda_vec <- numeric(k_alpha)
     lambda_vec[k_alpha] <- lambda_l
-    if (k_alpha >= 2){
+    if (k_alpha >= 2) {
       k_candidate <- seq(1, k_alpha - 1)
-      delta_vec <- sapply(k_candidate, function(k) psi_star_inv(d_u / eta_alpha^k))
+      delta_vec <-
+        sapply(k_candidate, function(k)
+          psi_star_inv(d_u / eta_alpha ^ k))
       lambda_vec[-k_alpha] <- sapply(delta_vec, psi_star_div)
     }
     # Compute weights
@@ -134,4 +158,134 @@ compute_baseline <- function(alpha,
     psi_fn_list = psi_fn_list
   )
   return(baseline_list)
+}
+
+#' Compute baseline processes for simple exponential e-detectors.
+#'
+#' Build baseline processes for simple exponential e-detectors to detect up-crossing mean-shift.
+#'
+#' @param alpha ARL parameter in (0,1)
+#' @param m_pre Upper bound of mean of pre-change observations
+#' @param delta_lower Lower bound of target Delta. It must have be positive and smaller than or equal to \code{delta_upper}.
+#' @param delta_upper Upper bound of target Delta. It must have be positive and larger than or equal to \code{delta_lower}.
+#' @param psi_fn_list A list of R functions that computes psi and psi_star functions. Can be generated by \code{generate_sub_G_fn()} or counterparts for sub_B and sub_E.
+#' @param s_fn R function that compute the sum process given an observation.
+#' @param v_fn R function that compute the variance process given an observation.
+#' @param v_min A lower bound of v function in the baseline process. Default is \code{1}.
+#' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{200}.
+#' @param tol Tolerance of root-finding, positive numeric. Default is 1e-6.
+#'
+#' @return A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
+#' @export
+#'
+#' @examples
+#' compute_baseline_simple_exp(0.01, 1, 2)
+compute_baseline_simple_exp <- function(alpha,
+                                        m_pre,
+                                        delta_lower,
+                                        delta_upper,
+                                        psi_fn_list = generate_sub_G_fn(sig = 1),
+                                        s_fn = function(x) {
+                                          x - m_pre
+                                        },
+                                        v_fn = function(x) {
+                                          1
+                                        },
+                                        v_min = 1,
+                                        k_max = 200,
+                                        tol = 1e-6) {
+  # Compute parameters
+  base_param <- compute_baseline(alpha,
+                                 delta_lower,
+                                 delta_upper,
+                                 psi_fn_list,
+                                 v_min,
+                                 k_max,
+                                 tol)
+
+  # Compute e-detectors
+  log_base_fn_list <- sapply(
+    base_param$lambda,
+    generate_log_base_fn,
+    psi_fn = base_param$psi_fn_list$psi,
+    s_fn = s_fn,
+    v_fn = v_fn
+  )
+
+  out <- list(
+    omega = base_param$omega,
+    log_base_fn_list =  log_base_fn_list,
+    alpha = alpha
+  )
+
+  return(out)
+}
+
+#' Compute baseline processes for e-detectors of bounded random variables.
+#'
+#' Build baseline processes for e-detectors of bounded random variables to detect up-crossing mean-shift.
+#'
+#' @param alpha ARL parameter in (0,1)
+#' @param m_pre Upper bound of mean of pre-change observations. Must be between \code{bound_lower} and \code{bound_upper}.
+#' @param delta_lower Lower bound of target Delta. It must have be positive and smaller than or equal to \code{delta_upper}.
+#' @param delta_upper Upper bound of target Delta. It must have be positive and larger than or equal to \code{delta_lower}.
+#' @param bound_lower Lower bound of observations.
+#' @param bound_upper Upper bound of observations.
+#' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
+#' @param tol Tolerance of root-finding, positive numeric. Default is 1e-6.
+#'
+#' @return A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
+#' @export
+#'
+#' @examples
+#' compute_baseline_simple_exp(0.01, 1, 2)
+compute_baseline_bounded <- function(alpha,
+                                     m_pre,
+                                     delta_lower,
+                                     delta_upper = bound_upper - m_pre,
+                                     bound_lower = 0,
+                                     bound_upper = 1,
+                                     k_max = 1000,
+                                     tol = 1e-6) {
+  if (!(m_pre > bound_lower & m_pre < bound_upper)) {
+    stop("m_pre must be between bound_lower and bound_upper.")
+  }
+
+  if (!(delta_lower > 0 & delta_upper >=  delta_lower)) {
+    stop("delta_lower and delta_upper must be positive with delta_lower <= delta_upper.")
+  }
+
+  # Compute parameters
+  bound_range <- bound_upper - bound_lower
+  m <- (m_pre - bound_lower) / bound_range # scaled m_pre
+  d_l <- delta_lower / bound_range  # scaled delta_lower
+  d_u <- delta_upper / bound_range # scaled_delta_upper
+
+  # Compute parameters
+  base_param <- compute_baseline(
+    alpha,
+    delta_lower = m * d_l / (1 / 4 + d_u ^
+                               2),
+    delta_upper = m * d_u / d_l ^ 2,
+    psi_fn_list = generate_sub_E_fn(),
+    v_min = 0,
+    k_max,
+    tol
+  )
+
+  # Compute e-detectors
+  log_base_fn_list <- sapply(
+    base_param$lambda,
+    generate_log_bounded_base_fn,
+    m = m_pre,
+    bound_lower = bound_lower
+  )
+
+  out <- list(
+    omega = base_param$omega,
+    log_base_fn_list =  log_base_fn_list,
+    alpha = alpha
+  )
+
+  return(out)
 }

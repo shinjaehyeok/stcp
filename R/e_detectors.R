@@ -33,7 +33,7 @@ update_log_e_detector <- function(x_current,
 #' @param lambda Lambda parameter of the target baseline function.
 #' @param psi_fn R function that compute \eqn{\psi(\lambda)}.
 #' @param s_fn R function that compute the sum process given an observation.
-#' @param v_fn R function that compute the sum process given an observation.
+#' @param v_fn R function that compute the variance process given an observation.
 #'
 #' @return A function compute log of baseline process given an observation.
 #' @export
@@ -56,18 +56,23 @@ generate_log_base_fn <- function(lambda,
 #'
 #' Generate logarithm of the baseline function for bounded RVs in \eqn{[0,1]} given lambda and mean parameters
 #' @param lambda Lambda parameter of the target baseline function.
-#' @param m Mean parameter of the target baseline function.
+#' @param m Mean parameter of the target baseline function. It must be strictly larger than \code{bound_lower}.
+#' @param bound_lower Lower bound of observations. Default is \code{0}.
 #' @return A function compute log of baseline process given an observation.
 #' @export
 #'
 #' @examples
 #' generate_log_bounded_base_fn(1)
 #' generate_log_bounded_base_fn(0.5)
-generate_log_bounded_base_fn <- function(lambda, m = 0.5){
-
-  if (!(m > 0 | m < 1)) stop("Mean parameter must be in (0,1).")
+generate_log_bounded_base_fn <- function(lambda,
+                                         m = 0.5,
+                                         bound_lower = 0){
+  if (m <= bound_lower){
+    stop("Mean parameter must strictly larger than bound_lower.")
+  }
+  m_gap <- m - bound_lower
   log_base_fn <- function(x){
-    log(1 + lambda * (x / m  - 1))
+    log(1 + lambda * ( (x - bound_lower) / m_gap  - 1))
   }
   return(log_base_fn)
 }

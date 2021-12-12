@@ -206,10 +206,21 @@ compute_baseline_simple_exp <- function(alpha,
     v_fn = v_fn
   )
 
+  # Make helper function for CI computation
+  log_weight_vec <- log(base_param$omega)
+  psi_lambda_vec <- sapply(base_param$lambda, psi_fn_list$psi)
+  threshold <- log(1/alpha)
+  ci_helper <- function(d, n) {
+    inner <- n * (base_param$lambda * d - psi_lambda_vec)
+    out <- matrixStats::logSumExp(inner + log_weight_vec) - threshold
+    return(out)
+  }
+
   out <- list(
     omega = base_param$omega,
     log_base_fn_list =  log_base_fn_list,
-    alpha = alpha
+    alpha = alpha,
+    ci_helper = ci_helper
   )
 
   return(out)
@@ -281,10 +292,20 @@ compute_baseline_bounded <- function(alpha,
     bound_lower = bound_lower
   )
 
+  # Make helper function for CI computation
+  log_weight_vec <- log(base_param$omega)
+  threshold <- log(1/alpha)
+  ci_helper <- function(r, n) {
+    inner <- n * log(1 + base_param$lambda * (r - 1))
+    out <- matrixStats::logSumExp(inner + log_weight_vec) - threshold
+    return(out)
+  }
+
   out <- list(
     omega = base_param$omega,
     log_base_fn_list =  log_base_fn_list,
-    alpha = alpha
+    alpha = alpha,
+    ci_helper = ci_helper
   )
 
   return(out)

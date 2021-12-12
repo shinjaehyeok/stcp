@@ -33,10 +33,10 @@ update_log_mix_e_values <- function(new_x_vec,
   }
 
   # Compute each L_i
-  log_e_val_mat <- as.matrix(sapply(log_base_fn_list, function(f) f(new_x_vec)))
+  log_e_val_mat <- matrix(sapply(log_base_fn_list, function(f) f(new_x_vec)), ncol = length(log_base_fn_list))
 
   # Compute increment to prod L_i
-  log_e_val_mat <- apply(log_e_val_mat, 2, cumsum)
+  log_e_val_mat <- matrix(apply(log_e_val_mat, 2, cumsum), ncol = length(log_base_fn_list))
 
   # Add prev prod L_i
   log_e_val_mat <- sweep(log_e_val_mat, 2, prev_log_e_vec, "+")

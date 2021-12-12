@@ -106,7 +106,7 @@ mix_SR_ber_stop <-
 # Plot size 600 * 450
 plot(
   as.Date(CLE_dat$dateGame),
-  mix_SR$log_mix_e_val,
+  mix_SR_ber$log_mix_e_val,
   type = "l",
   xlab = "Date",
   ylab = "log e-detectors",

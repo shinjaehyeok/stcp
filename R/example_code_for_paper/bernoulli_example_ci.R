@@ -4,18 +4,24 @@
 
 library(EDCP)
 
-# Gaussian case ----
-# N(mu, 1)
+# Bernoulli case ----
+# Ber(p)
+
 max_sample <- 1000L
-mu <- -1
-sig <- 1
+pre_sample <- 10L
+p <- 0.1
 alpha <- 0.025
 
-psi_fn_list <- generate_sub_G_fn()
+# For simplicity, we use some historical data to build psi function
+# We may build more accurate CS by using the method in SGLRT paper.
+p_hat_pre <- mean(rbinom(pre_sample, 1, p))
+p_hat_pre <- min(0.999, max(p_hat_pre, 0.001))
+
+psi_fn_list <- generate_sub_B_fn(p = p)
 v_min <- 1
 k_max <- 1e+3
 
-check_bf_test <- FALSE
+check_bf_test <- TRUE
 
 # Compute optimal delta star
 n_target <- round(max_sample / 2)
@@ -40,9 +46,8 @@ delta_mix <- convert_time_to_delta_bound(
   k_max
 )
 
-
 # Generate data
-x_vec <- rnorm(max_sample, mu)
+x_vec <-  rbinom(max_sample, 1, p)
 x_bar <- cumsum(x_vec) / seq_along(x_vec)
 
 plot(
@@ -52,9 +57,9 @@ plot(
   xlab = "n",
   ylab = "X_bar",
   main = "Running average",
-  ylim = c(-0.5, 0.5) + mu,
+  ylim = c(0,1),
 )
-graphics::abline(h = mu,
+graphics::abline(h = p,
                  col = 2,
                  lwd = 2)
 
@@ -83,7 +88,7 @@ baseline_mix <- compute_baseline_simple_exp(alpha,
 ci_mix <- compute_ci_width(x_vec,
                            baseline_mix$ci_helper)
 
-ci_fixed <- qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
+ci_fixed <- sqrt(p * (1-p)) * qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
 
 # Plot CI
 graphics::lines(1:max_sample,

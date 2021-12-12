@@ -5,8 +5,8 @@
 library(EDCP)
 
 # Bernoulli case ----
-# Pre-change : B(0.2)
-# Post-change: B(0.4)
+# Pre-change : Ber(0.2)
+# Post-change: Ber(0.4)
 # Change-point: v = 0 (immediate change), 200, 500, 1000 (no change)
 
 max_sample <- 1000L

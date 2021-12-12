@@ -99,11 +99,11 @@ convert_time_to_delta_bound <- function(alpha,
   if (n_lower == n_upper){
     g_alpha <- log(1/alpha)
   } else {
-    delta_init <-
-      psi_fn_list$psi_star_inv(log(1 / alpha)  / c(n_lower, n_upper))
+    delta_init_upper <- psi_fn_list$psi_star_inv(log(1 / alpha)  / n_lower)
+    delta_init_lower <- psi_fn_list$psi_star_inv(log(1 / alpha)  / n_upper)
     baseline_init <- compute_baseline(alpha,
-                                      delta_init[2],
-                                      delta_init[1],
+                                      delta_init_lower,
+                                      delta_init_upper,
                                       psi_fn_list,
                                       v_min,
                                       k_max)

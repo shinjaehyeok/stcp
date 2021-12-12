@@ -236,6 +236,8 @@ compute_baseline_simple_exp <- function(alpha,
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
 #' @param var_lower Lower bounds of variance of scaled post-change observations. Default is \code{0}.
 #' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
+#' @param delta_lower_sub_E Lower bounds of delta of sub-E class. Default is \code{NULL}.
+#' @param delta_upper_sub_E Upper bounds of delta of sub-E class. Default is \code{NULL}.
 #' @inheritParams compute_baseline
 #'
 #' @return A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
@@ -252,7 +254,9 @@ compute_baseline_bounded <- function(alpha,
                                      k_max = 1000,
                                      tol = 1e-6,
                                      var_lower = 0,
-                                     var_upper = 0.25) {
+                                     var_upper = 0.25,
+                                     delta_lower_sub_E = NULL,
+                                     delta_upper_sub_E = NULL) {
   if (!(m_pre > bound_lower & m_pre < bound_upper)) {
     stop("m_pre must be between bound_lower and bound_upper.")
   }
@@ -272,8 +276,13 @@ compute_baseline_bounded <- function(alpha,
   d_u <- delta_upper / bound_range # scaled_delta_upper
 
   delta_lower_val <- m * d_l / (var_upper + d_u ^ 2)
+  if (!is.null(delta_lower_sub_E)){
+    delta_lower_val <- delta_lower_sub_E
+  }
   delta_upper_val <-  m * d_u / (var_lower + d_l ^ 2)
-
+  if (!is.null(delta_upper_sub_E)){
+    delta_upper_val <- delta_upper_sub_E
+  }
   base_param <- compute_baseline(
     alpha,
     delta_lower = delta_lower_val,

@@ -75,7 +75,6 @@ ci_bf <-
   })
 
 # Plot CI
-
 plot(
   1:max_sample,
   x_bar,

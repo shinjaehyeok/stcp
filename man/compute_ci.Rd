@@ -8,6 +8,7 @@ compute_ci(
   x_vec,
   ci_helper,
   width_upper = 100,
+  ci_lower_trivial = -Inf,
   x_bar_pre = 0,
   n_pre = 0,
   tol = 1e-06
@@ -19,6 +20,8 @@ compute_ci(
 \item{ci_helper}{R function from \code{compute_baseline_simple_exp} used to compute the width.}
 
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
+
+\item{ci_lower_trivial}{A trivial lower bound of confidence interval. Default is \code{-Inf}.}
 
 \item{x_bar_pre}{Sample mean of previous observations. Default is \code{0} (No pre-samples)}
 

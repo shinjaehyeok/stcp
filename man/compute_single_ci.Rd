@@ -4,7 +4,14 @@
 \alias{compute_single_ci}
 \title{Compute the lower bound of confidence interval for simple exponential e-values.}
 \usage{
-compute_single_ci(n, x_bar, ci_helper, width_upper = 100, tol = 1e-06)
+compute_single_ci(
+  n,
+  x_bar,
+  ci_helper,
+  width_upper = 100,
+  ci_lower_trivial = -Inf,
+  tol = 1e-06
+)
 }
 \arguments{
 \item{n}{Number of samples}
@@ -14,6 +21,8 @@ compute_single_ci(n, x_bar, ci_helper, width_upper = 100, tol = 1e-06)
 \item{ci_helper}{R function from \code{compute_baseline_simple_exp} used to compute the width.}
 
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
+
+\item{ci_lower_trivial}{A trivial lower bound of confidence interval. Default is \code{-Inf}.}
 
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }

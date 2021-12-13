@@ -8,6 +8,7 @@ compute_brute_force_ci(
   x_vec,
   bruth_force_ci_helper,
   width_upper = 100,
+  ci_lower_trivial = -Inf,
   tol = 1e-06
 )
 }
@@ -17,6 +18,8 @@ compute_brute_force_ci(
 \item{bruth_force_ci_helper}{R function used to compute the lower bound of confidence interval.}
 
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
+
+\item{ci_lower_trivial}{A trivial lower bound of confidence interval. Default is \code{-Inf}.}
 
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }

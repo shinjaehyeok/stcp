@@ -1,4 +1,5 @@
 
+
 #' Compute baseline parameters given target sample size bounds.
 #'
 #' Given target sample size bounds interval for confidence sequences, compute  baseline parameters.
@@ -107,6 +108,7 @@ generate_ci_helper <- function(alpha,
 #' @param x_bar Sample mean of \code{n} observations
 #' @param ci_helper R function from \code{compute_baseline_simple_exp} used to compute the width.
 #' @param width_upper Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.
+#' @param ci_lower_trivial A trivial lower bound of confidence interval. Default is \code{-Inf}.
 #' @param tol Tolerance of root-finding, positive numeric. Default is 1e-6.
 #'
 #' @return A lower bound of confidence interval given the sample size.
@@ -116,6 +118,7 @@ compute_single_ci <- function(n,
                               x_bar,
                               ci_helper,
                               width_upper = 100,
+                              ci_lower_trivial = -Inf,
                               tol = 1e-6) {
   #TODO::IMPLETMENT check whether ci_helper is simple_exp class.
 
@@ -123,10 +126,17 @@ compute_single_ci <- function(n,
     ci_helper(m, n, x_bar)
   }
 
-  ci_lower_bound <- x_bar - width_upper / sqrt(n)
+  if (f(ci_lower_trivial) <= 0) {
+    # We have no parameter to be able to reject.
+    # Hence CI must be as large as possible.
+    return(ci_lower_trivial)
+  }
+
+  ci_lower_bound <-
+    max(c(x_bar - width_upper / sqrt(n), ci_lower_trivial))
 
   if (f(ci_lower_bound) <= 0) {
-    stop("width_upper is too small to compute CI.")
+    stop("width_upper is too small to compute CI")
   }
 
   ci_lower <- stats::uniroot(f,
@@ -150,6 +160,7 @@ compute_single_ci <- function(n,
 compute_ci <- function(x_vec,
                        ci_helper,
                        width_upper = 100,
+                       ci_lower_trivial = -Inf,
                        x_bar_pre = 0,
                        n_pre = 0,
                        tol = 1e-6) {
@@ -167,6 +178,7 @@ compute_ci <- function(x_vec,
                         x_bar_vec[i],
                         ci_helper,
                         width_upper,
+                        ci_lower_trivial,
                         tol)
     })
 
@@ -189,20 +201,26 @@ compute_ci <- function(x_vec,
 #' @export
 #'
 compute_brute_force_ci <- function(x_vec,
-                                 bruth_force_ci_helper,
-                                 width_upper = 100,
-                                 tol = 1e-6) {
+                                   bruth_force_ci_helper,
+                                   width_upper = 100,
+                                   ci_lower_trivial = -Inf,
+                                   tol = 1e-6) {
   f <- function(m) {
     bruth_force_ci_helper(m, x_vec)
   }
+  if (f(ci_lower_trivial) <= 0) {
+    # We have no parameter to be able to reject.
+    # Hence CI must be as large as possible.
+    return(ci_lower_trivial)
+  }
   n <- length(x_vec)
   x_bar <- mean(x_vec)
-  ci_lower_bound <- x_bar - width_upper / sqrt(n)
+  ci_lower_bound <-
+    max(c(x_bar - width_upper / sqrt(n), ci_lower_trivial))
 
   if (f(ci_lower_bound) <= 0) {
     stop("width_upper is too small to compute CI.")
   }
-
   ci_lower <- stats::uniroot(f,
                              c(ci_lower_bound, x_bar), tol = tol)
 

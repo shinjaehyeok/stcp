@@ -31,11 +31,13 @@ baseline_ci_star <- compute_baseline_for_sample_size(alpha,
                                                      psi_fn_list,
                                                      v_min,
                                                      k_max)
-ci_helper_star <- generate_ci_helper(baseline_ci_star$alpha,
-                                     baseline_ci_star$omega,
-                                     baseline_ci_star$lambda,
-                                     generate_psi_fn_list = generate_sub_G_fn,
-                                     is_psi_depend_on_m = FALSE)
+ci_helper_star <- generate_ci_helper(
+  baseline_ci_star$alpha,
+  baseline_ci_star$omega,
+  baseline_ci_star$lambda,
+  generate_psi_fn_list = generate_sub_G_fn,
+  is_psi_depend_on_m = FALSE
+)
 ci_star <- compute_ci(x_vec, ci_helper_star)
 
 # When delta_lower < delta_star < delta_upper
@@ -49,14 +51,17 @@ baseline_ci_mix <- compute_baseline_for_sample_size(alpha,
                                                     v_min,
                                                     k_max)
 
-ci_helper_mix <- generate_ci_helper(baseline_ci_mix$alpha,
-                                    baseline_ci_mix$omega,
-                                    baseline_ci_mix$lambda,
-                                     generate_psi_fn_list = generate_sub_G_fn,
-                                     is_psi_depend_on_m = FALSE)
+ci_helper_mix <- generate_ci_helper(
+  baseline_ci_mix$alpha,
+  baseline_ci_mix$omega,
+  baseline_ci_mix$lambda,
+  generate_psi_fn_list = generate_sub_G_fn,
+  is_psi_depend_on_m = FALSE
+)
 ci_mix <- compute_ci(x_vec, ci_helper_mix)
 
-ci_fixed <- x_bar - qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
+ci_fixed <-
+  x_bar - qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
 
 # Plot CI
 
@@ -87,10 +92,12 @@ graphics::lines(1:max_sample,
                 col = 3)
 
 # Compare width
-plot(1:max_sample,
-     (x_bar - ci_star$ci_lower) / (x_bar - ci_fixed),
-     type = "l",
-     ylim = c(1, 2))
+plot(
+  1:max_sample,
+  (x_bar - ci_star$ci_lower) / (x_bar - ci_fixed),
+  type = "l",
+  ylim = c(1, 2)
+)
 graphics::lines(1:max_sample, (x_bar - ci_mix$ci_lower) / (x_bar - ci_fixed), col = 2)
 
 # Check correctness via brute-force method
@@ -119,8 +126,8 @@ if (check_bf_test) {
   ci_bf <-
     sapply(n_bf_vec, function(n) {
       compute_brute_force_ci(x_vec[1:n],
-                           bruth_force_ci_helper,
-                           width_upper = 100)
+                             bruth_force_ci_helper,
+                             width_upper = 100)
     })
 
   ratio_vec <- ci_mix$ci_lower[n_bf_vec] / ci_bf

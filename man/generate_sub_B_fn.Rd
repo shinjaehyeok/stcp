@@ -4,10 +4,12 @@
 \alias{generate_sub_B_fn}
 \title{Pre-defined psi_star functions for sub-Bernoulli family.}
 \usage{
-generate_sub_B_fn(p = 0.1)
+generate_sub_B_fn(p = 0.5, tol = 1e-06)
 }
 \arguments{
-\item{p}{The boundary of mean space of the pre-change distributions (default = 0.1).}
+\item{p}{The boundary of mean space of the pre-change distributions (default = 0.5).}
+
+\item{tol}{A small number to use truncate \code{p} into (\code{tol}, \code{1-tol}) range.}
 }
 \value{
 A list of pre-defined psi_star functions for sub-Bernoulli family.

@@ -21,12 +21,19 @@ generate_sub_G_fn <- function(sig = 1){
 
 #' Pre-defined psi_star functions for sub-Bernoulli family.
 #'
-#' @param p The boundary of mean space of the pre-change distributions (default = 0.1).
+#' @param p The boundary of mean space of the pre-change distributions (default = 0.5).
+#' @param tol A small number to use truncate \code{p} into (\code{tol}, \code{1-tol}) range.
 #'
 #' @return A list of pre-defined psi_star functions for sub-Bernoulli family.
 #'
 #' @export
-generate_sub_B_fn <- function(p = 0.1){
+generate_sub_B_fn <- function(p = 0.5, tol = 1e-6){
+  if (p <= 0){
+    p <- tol
+  }
+  if (p >= 1){
+    p <- 1- tol
+  }
   B_fn_list <- list(
     family_name = "sub-B",
     psi = function(x){

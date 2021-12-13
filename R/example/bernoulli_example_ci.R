@@ -17,7 +17,7 @@ check_bf_test <- FALSE # Use it only for debugging purpose.
 
 # Compute target interval
 n_target <- round(max_sample / 2)
-n_lower <- max_sample / 10
+n_lower <- max_sample / 5
 n_upper <- max_sample * 2
 
 # Generate data
@@ -63,8 +63,8 @@ ci_mix <- compute_ci(x_vec, ci_helper_mix, ci_lower_trivial = 0)
 
 # If we want to treat this example as an additive sub-psi case
 # then set is_psi_depend_on_m = FALSE and ci_lower_trivial = -Inf
-# It will return  more conservative CI but the width now does not depend on x_bar (so you can pre-compute).
-# The additional conservatives depends on the gap between true p and the parameter used in CI construction.
+# It will return  more conservative CI but the width now does not depend on x_bar (so you can pre-compute it).
+# The degree of conservative depends on the gap between true p and the parameter used in CI construction.
 # This is because by treating it as an additive sub-psi, we no longer adaptively track the variance term.
 # Hence, use it only if you have a good prior knowledge on it.
 ci_helper_mix2 <- generate_ci_helper(
@@ -121,7 +121,9 @@ plot(
   col = 2
 )
 graphics::lines(1:max_sample, (x_bar - ci_mix$ci_lower) / (x_bar - ci_fixed), col = 3)
-graphics::lines(1:max_sample, (x_bar - ci_mix2$ci_lower) / (x_bar - ci_fixed), col = 4)
+graphics::lines(1:max_sample,
+                (x_bar - ci_mix2$ci_lower) / (x_bar - ci_fixed),
+                col = 4)
 
 # Check correctness via brute-force method
 # For the Bernoulli case,

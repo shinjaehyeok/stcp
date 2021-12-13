@@ -42,7 +42,7 @@ ci_star <- compute_ci(x_vec, ci_helper_star)
 
 # When delta_lower < delta_star < delta_upper
 # Compute target interval
-n_lower <- max_sample / 10
+n_lower <- max_sample / 5
 n_upper <- max_sample * 2
 baseline_ci_mix <- compute_baseline_for_sample_size(alpha,
                                                     n_upper,

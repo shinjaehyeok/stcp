@@ -14,9 +14,7 @@ compute_baseline_bounded(
   k_max = 1000,
   tol = 1e-06,
   var_lower = 0,
-  var_upper = 0.25,
-  delta_lower_sub_E = NULL,
-  delta_upper_sub_E = NULL
+  var_upper = 0.25
 )
 }
 \arguments{
@@ -39,10 +37,6 @@ compute_baseline_bounded(
 \item{var_lower}{Lower bounds of variance of scaled post-change observations. Default is \code{0}.}
 
 \item{var_upper}{Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.}
-
-\item{delta_lower_sub_E}{Lower bounds of delta of sub-E class. Default is \code{NULL}.}
-
-\item{delta_upper_sub_E}{Upper bounds of delta of sub-E class. Default is \code{NULL}.}
 }
 \value{
 A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter

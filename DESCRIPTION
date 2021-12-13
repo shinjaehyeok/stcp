@@ -1,5 +1,5 @@
 Package: EDCP
-Title: E-detector based Online Change-Point detection algorithms
+Title: E-Detector based Online Change-Point detection algorithms (EDCP)
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Jaehyeokt",

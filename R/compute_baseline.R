@@ -1,6 +1,6 @@
 #' Compute baseline processes.
 #'
-#' Compuate parameters to build baseline processes.
+#' Compute parameters to build baseline processes.
 #'
 #' @param alpha ARL parameter in (0,1)
 #' @param delta_lower Lower bound of target Delta. It must have be positive and smaller than or equal to \code{delta_upper}.

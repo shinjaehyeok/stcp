@@ -117,24 +117,24 @@ compute_ci_width <- function(x_vec,
   ))
 }
 
-#' Convert target sample interval to delta bounds
+#' Compute baseline parameters given target sample size bounds.
 #'
-#' Given a vector of observations, compute widths of confidence sequence.
+#' Given target sample size bounds interval for confidence sequences, compute  baseline parameters.
 #'
 #' @param n_upper Upper bound of the target sample interval
 #' @param n_lower Lower bound of the target sample interval. Default is \code{1}.
 #' @inheritParams compute_baseline
 #'
-#' @return \code{delta_lower}, \code{delta_upper} in compute_baseline for CI computation.
+#' @return A list of baseline parameters to build \code{ci_helper}
 #' @export
 #'
-convert_time_to_delta_bound <- function(alpha,
-                                        n_upper,
-                                        n_lower,
-                                        psi_fn_list = generate_sub_G_fn(),
-                                        v_min = 1,
-                                        k_max = 200,
-                                        tol = 1e-6) {
+compute_baseline_for_sample_size <- function(alpha,
+                                             n_upper,
+                                             n_lower,
+                                             psi_fn_list = generate_sub_G_fn(),
+                                             v_min = 1,
+                                             k_max = 200,
+                                             tol = 1e-6) {
   if (!(n_lower > 0 & n_upper >=  n_lower)) {
     stop("n_lower and n_upper must be positive with n_lower <= n_upper.")
   }
@@ -161,7 +161,15 @@ convert_time_to_delta_bound <- function(alpha,
   delta_upper <-
     psi_fn_list$psi_star_inv(g_alpha  / n_lower)
 
-  return(list(delta_lower = delta_lower, delta_upper = delta_upper))
+  # Compute baseline parameters
+  baseline_param <- compute_baseline(alpha,
+                                     delta_lower,
+                                     delta_init_upper,
+                                     delta_upper,
+                                     v_min,
+                                     k_max)
+
+  return(baseline_param)
 }
 
 

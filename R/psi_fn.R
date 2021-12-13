@@ -9,6 +9,7 @@
 #' @export
 generate_sub_G_fn <- function(sig = 1){
   G_fn_list <- list(
+    family_name = "sub-G",
     psi = function(x){x^2 * sig^2 / 2},
     psi_star = function(x){x^2 / 2 / sig^2},
     psi_star_div = function(x){x / sig^2},
@@ -27,6 +28,7 @@ generate_sub_G_fn <- function(sig = 1){
 #' @export
 generate_sub_B_fn <- function(p = 0.1){
   B_fn_list <- list(
+    family_name = "sub-B",
     psi = function(x){
       log(1-p + p * exp(x)) - x * p
     },
@@ -75,6 +77,7 @@ generate_sub_B_fn <- function(p = 0.1){
 #' @export
 generate_sub_E_fn <- function(){
   E_fn_list <- list(
+    family_name = "sub-E",
     psi = function(x){
       -log(1-x) - x
     },

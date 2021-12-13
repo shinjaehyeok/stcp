@@ -206,21 +206,12 @@ compute_baseline_simple_exp <- function(alpha,
     v_fn = v_fn
   )
 
-  # Make helper function for CI computation
-  log_weight_vec <- log(base_param$omega)
-  psi_lambda_vec <- sapply(base_param$lambda, psi_fn_list$psi)
-  threshold <- log(1/alpha)
-  ci_helper <- function(d, n) {
-    inner <- n * (base_param$lambda * d - psi_lambda_vec)
-    out <- matrixStats::logSumExp(inner + log_weight_vec) - threshold
-    return(out)
-  }
-
   out <- list(
     omega = base_param$omega,
     log_base_fn_list =  log_base_fn_list,
     alpha = alpha,
-    ci_helper = ci_helper
+    lambda = base_param$lambda,
+    g_alpha = base_param$g_alpha
   )
 
   return(out)
@@ -236,8 +227,6 @@ compute_baseline_simple_exp <- function(alpha,
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
 #' @param var_lower Lower bounds of variance of scaled post-change observations. Default is \code{0}.
 #' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
-#' @param delta_lower_sub_E Lower bounds of delta of sub-E class. Default is \code{NULL}.
-#' @param delta_upper_sub_E Upper bounds of delta of sub-E class. Default is \code{NULL}.
 #' @inheritParams compute_baseline
 #'
 #' @return A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
@@ -254,9 +243,7 @@ compute_baseline_bounded <- function(alpha,
                                      k_max = 1000,
                                      tol = 1e-6,
                                      var_lower = 0,
-                                     var_upper = 0.25,
-                                     delta_lower_sub_E = NULL,
-                                     delta_upper_sub_E = NULL) {
+                                     var_upper = 0.25) {
   if (!(m_pre > bound_lower & m_pre < bound_upper)) {
     stop("m_pre must be between bound_lower and bound_upper.")
   }
@@ -276,13 +263,8 @@ compute_baseline_bounded <- function(alpha,
   d_u <- delta_upper / bound_range # scaled_delta_upper
 
   delta_lower_val <- m * d_l / (var_upper + d_u ^ 2)
-  if (!is.null(delta_lower_sub_E)){
-    delta_lower_val <- delta_lower_sub_E
-  }
   delta_upper_val <-  m * d_u / (var_lower + d_l ^ 2)
-  if (!is.null(delta_upper_sub_E)){
-    delta_upper_val <- delta_upper_sub_E
-  }
+
   base_param <- compute_baseline(
     alpha,
     delta_lower = delta_lower_val,
@@ -301,20 +283,12 @@ compute_baseline_bounded <- function(alpha,
     bound_lower = bound_lower
   )
 
-  # Make helper function for CI computation
-  log_weight_vec <- log(base_param$omega)
-  threshold <- log(1/alpha)
-  ci_helper <- function(r, n) {
-    inner <- n * log(1 + base_param$lambda * (r - 1))
-    out <- matrixStats::logSumExp(inner + log_weight_vec) - threshold
-    return(out)
-  }
-
   out <- list(
     omega = base_param$omega,
     log_base_fn_list =  log_base_fn_list,
     alpha = alpha,
-    ci_helper = ci_helper
+    lambda = base_param$lambda,
+    g_alpha = base_param$g_alpha
   )
 
   return(out)

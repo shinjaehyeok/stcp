@@ -1,3 +1,47 @@
+#' Generate ci_helper function for CI computation.
+#'
+#' Given baseline parameters, generate ci_helper function for CI computation.
+#'
+#' @param alpha Confidence level in (0,1)
+#' @param omega A vector of omega parameters from \code{compute_baseline}, which is a mixing weights.
+#' @param lambda A vector of lambda parameters from \code{compute_baseline}, which is a set of model parameters.
+#' @param generate_psi_fn_list Function operator generating \code{psi_fn_list}
+#' @param is_psi_depend_on_m Indicator whether the psi function depends on the target parameter.
+#'
+#' @return \code{ci_helper} function to compute confidence intervals
+#' @export
+#'
+generate_ci_helper <- function(alpha,
+                               omega,
+                               lambda,
+                               generate_psi_fn_list,
+                               is_psi_depend_on_m = FALSE) {
+  # Make helper function for CI computation
+  log_weight_vec <- log(omega)
+  threshold <- log(1 / alpha)
+
+  if (is_psi_depend_on_m) {
+    ci_helper <- function(d, n) {
+      psi_fn_list <- generate_psi_fn_list(d)
+      psi_lambda_vec <- sapply(lambda, psi_fn_list$psi)
+      inner <- n * (lambda * d - psi_lambda_vec)
+      out <-
+        matrixStats::logSumExp(inner + log_weight_vec) - threshold
+      return(out)
+    }
+  } else {
+    psi_fn_list <- generate_psi_fn_list()
+    psi_lambda_vec <- sapply(lambda, psi_fn_list$psi)
+    ci_helper <- function(d, n) {
+      inner <- n * (lambda * d - psi_lambda_vec)
+      out <-
+        matrixStats::logSumExp(inner + log_weight_vec) - threshold
+      return(out)
+    }
+  }
+  return(ci_helper)
+}
+
 #' Compute the width of confidence interval for simple exponential e-values.
 #'
 #' Given the number of samples n, compute the width of confidence interval for simple exponential e-values.
@@ -91,16 +135,17 @@ convert_time_to_delta_bound <- function(alpha,
                                         v_min = 1,
                                         k_max = 200,
                                         tol = 1e-6) {
-
   if (!(n_lower > 0 & n_upper >=  n_lower)) {
     stop("n_lower and n_upper must be positive with n_lower <= n_upper.")
   }
 
-  if (n_lower == n_upper){
-    g_alpha <- log(1/alpha)
+  if (n_lower == n_upper) {
+    g_alpha <- log(1 / alpha)
   } else {
-    delta_init_upper <- psi_fn_list$psi_star_inv(log(1 / alpha)  / n_lower)
-    delta_init_lower <- psi_fn_list$psi_star_inv(log(1 / alpha)  / n_upper)
+    delta_init_upper <-
+      psi_fn_list$psi_star_inv(log(1 / alpha)  / n_lower)
+    delta_init_lower <-
+      psi_fn_list$psi_star_inv(log(1 / alpha)  / n_upper)
     baseline_init <- compute_baseline(alpha,
                                       delta_init_lower,
                                       delta_init_upper,

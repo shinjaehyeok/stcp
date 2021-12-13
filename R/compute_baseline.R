@@ -60,6 +60,9 @@ compute_baseline <- function(alpha,
   if (log_one_over_alpha <= v_min * d_l |
       delta_lower == delta_upper) {
     baseline_list <- list(
+      alpha = alpha,
+      delta_lower = delta_lower,
+      delta_upper = delta_upper,
       lambda = lambda_l,
       omega = 1,
       g_alpha = log_one_over_alpha,
@@ -149,6 +152,9 @@ compute_baseline <- function(alpha,
 
   # Collect all computed parameters
   baseline_list <- list(
+    alpha = alpha,
+    delta_lower = delta_lower,
+    delta_upper = delta_upper,
     lambda = lambda_vec,
     omega = omega_normal_vec,
     g_alpha = g_alpha,

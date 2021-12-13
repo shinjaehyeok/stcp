@@ -3,12 +3,12 @@
 # devtools::install_github("shinjaehyeok/EDCP")
 
 library(EDCP)
-
+set.seed(1)
 # Bernoulli case ----
 # Ber(p)
 max_sample <- 1000L
 pre_sample <- 10L
-p <- 0.5
+p <- 0.3
 alpha <- 0.025
 v_min <- 1
 k_max <- 1e+3
@@ -34,6 +34,7 @@ baseline_ci_star <- compute_baseline_for_sample_size(alpha,
                                                      generate_sub_B_fn(0.5),
                                                      v_min,
                                                      k_max)
+
 ci_helper_star <- generate_ci_helper(
   baseline_ci_star$alpha,
   baseline_ci_star$omega,
@@ -59,6 +60,22 @@ ci_helper_mix <- generate_ci_helper(
   is_psi_depend_on_m = TRUE
 )
 ci_mix <- compute_ci(x_vec, ci_helper_mix, ci_lower_trivial = 0)
+
+# If we want to treat this example as an additive sub-psi case
+# then set is_psi_depend_on_m = FALSE and ci_lower_trivial = -Inf
+# It will return  more conservative CI but the width now does not depend on x_bar (so you can pre-compute).
+# The additional conservatives depends on the gap between true p and the parameter used in CI construction.
+# This is because by treating it as an additive sub-psi, we no longer adaptively track the variance term.
+# Hence, use it only if you have a good prior knowledge on it.
+ci_helper_mix2 <- generate_ci_helper(
+  baseline_ci_mix$alpha,
+  baseline_ci_mix$omega,
+  baseline_ci_mix$lambda,
+  generate_psi_fn_list = generate_sub_B_fn,
+  is_psi_depend_on_m = FALSE
+)
+ci_mix2 <- compute_ci(x_vec, ci_helper_mix2)
+
 
 ci_fixed <-
   x_bar - sqrt(p * (1 - p)) * qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
@@ -89,15 +106,22 @@ graphics::lines(1:max_sample,
                 ci_mix$ci_lower,
                 lty = 2,
                 col = 3)
+graphics::lines(1:max_sample,
+                ci_mix2$ci_lower,
+                lty = 2,
+                col = 4)
+
 
 # Compare width
 plot(
   1:max_sample,
   (x_bar - ci_star$ci_lower) / (x_bar - ci_fixed),
   type = "l",
-  ylim = c(1, 2)
+  ylim = c(1, 2),
+  col = 2
 )
-graphics::lines(1:max_sample, (x_bar - ci_mix$ci_lower) / (x_bar - ci_fixed), col = 2)
+graphics::lines(1:max_sample, (x_bar - ci_mix$ci_lower) / (x_bar - ci_fixed), col = 3)
+graphics::lines(1:max_sample, (x_bar - ci_mix2$ci_lower) / (x_bar - ci_fixed), col = 4)
 
 # Check correctness via brute-force method
 # For the Bernoulli case,

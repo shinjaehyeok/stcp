@@ -43,8 +43,6 @@ m_pre <- 0.3
 m_post <- 0.4
 plot(1:max_sample, x_vec, pch=20, 
      xlab = "n", ylab = "X_n", main = "Simulated Data")
-lines(x = c(0,nu), y = c(0.3,0.3), col = 2, lwd = 2)
-lines(x = c(nu,max_sample), y = c(0.4,0.4), col = 2, lwd =2 )
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />

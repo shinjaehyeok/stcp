@@ -33,7 +33,7 @@ compute_baseline(
 A list of 1. Parameters of baseline processes, 2. Mixing weights, 3. Auxiliary values for computation.
 }
 \description{
-Compuate parameters to build baseline processes.
+Compute parameters to build baseline processes.
 }
 \examples{
 compute_baseline(0.01, 1, 2)

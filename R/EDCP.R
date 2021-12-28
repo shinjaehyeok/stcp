@@ -31,7 +31,8 @@ edcp <- function(x_vec,
     # Sequential test
     mix_e_list <- update_log_mix_e_values(x_vec,
                                           baseline_obj$omega,
-                                          baseline_obj$log_base_fn_list)
+                                          baseline_obj$log_base_fn_list,
+                                          prev_log_e_vec)
   }
 
   # Update stopped index

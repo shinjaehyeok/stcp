@@ -39,7 +39,7 @@ compute_baseline_simple_exp(
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }
 \value{
-A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
+A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 }
 \description{
 Build baseline processes for simple exponential e-detectors to detect up-crossing mean-shift.

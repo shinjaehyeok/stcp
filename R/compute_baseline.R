@@ -1,6 +1,9 @@
 #' Compute baseline processes.
 #'
-#' Compute parameters to build baseline processes.
+#' Compute parameters to build baseline processes. Use this function when
+#' building a custom model. Recommend to use \code{compute_baseline_simple_exp}
+#' for simple exponential models or \code{compute_baseline_bounded} for bounded
+#' random variable cases rather than build a custom model.
 #'
 #' @param alpha ARL parameter in (0,1)
 #' @param delta_lower Lower bound of target Delta. It must have be positive and smaller than or equal to \code{delta_upper}.
@@ -175,7 +178,7 @@ compute_baseline <- function(alpha,
 #' @param v_fn R function that compute the variance process given an observation.
 #' @inheritParams compute_baseline
 #'
-#' @return A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
+#' @return A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
 #' @examples
@@ -213,13 +216,21 @@ compute_baseline_simple_exp <- function(alpha,
   )
 
   out <- list(
+    # Model parameters
     omega = base_param$omega,
     log_base_fn_list =  log_base_fn_list,
     alpha = alpha,
+    # Memory for log e-detectors / values
+    log_e_detectors = numeric(length(log_base_fn_list)),
+    log_e_vals = numeric(length(log_base_fn_list)),
+    s_over_v_n = 0,
+    v_n = 0,
+    n = 0,
+    # Auxiliaries for debugging
     lambda = base_param$lambda,
     g_alpha = base_param$g_alpha
   )
-
+  class(out) <- c("SimpleExp", "EDCP")
   return(out)
 }
 
@@ -235,7 +246,7 @@ compute_baseline_simple_exp <- function(alpha,
 #' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
 #' @inheritParams compute_baseline
 #'
-#' @return A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
+#' @return A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
 #' @examples
@@ -290,12 +301,19 @@ compute_baseline_bounded <- function(alpha,
   )
 
   out <- list(
+    # Model parameters
     omega = base_param$omega,
     log_base_fn_list =  log_base_fn_list,
     alpha = alpha,
+    # Memory for log e-detectors / values
+    log_e_detectors = numeric(length(log_base_fn_list)),
+    log_e_vals = numeric(length(log_base_fn_list)),
+    x_bar_n = 0,
+    n = 0,
+    # Auxiliaries for debugging
     lambda = base_param$lambda,
     g_alpha = base_param$g_alpha
   )
-
+  class(out) <- c("Bounded", "EDCP")
   return(out)
 }

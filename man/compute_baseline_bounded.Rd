@@ -39,7 +39,7 @@ compute_baseline_bounded(
 \item{var_upper}{Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.}
 }
 \value{
-A list of 1. Mixing weights, 2. log baseline functions, 3. ARL parameter
+A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 }
 \description{
 Build baseline processes for e-detectors of bounded random variables to detect up-crossing mean-shift.

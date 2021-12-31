@@ -33,7 +33,10 @@ compute_baseline(
 A list of 1. Parameters of baseline processes, 2. Mixing weights, 3. Auxiliary values for computation.
 }
 \description{
-Compute parameters to build baseline processes.
+Compute parameters to build baseline processes. Use this function when
+building a custom model. Recommend to use \code{compute_baseline_simple_exp}
+for simple exponential models or \code{compute_baseline_bounded} for bounded
+random variable cases rather than build a custom model.
 }
 \examples{
 compute_baseline(0.01, 1, 2)

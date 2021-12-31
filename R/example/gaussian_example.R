@@ -62,11 +62,12 @@ graphics::lines(
 
 # Build CP detectors
 # When delta_lower = delta_upper = delta_star
-baseline_star <- compute_baseline_simple_exp(
+edcp_star <- build_edcp_exp(
   alpha,
   m_pre,
   delta_star,
   delta_star,
+  is_test = FALSE,
   psi_fn_list,
   s_fn = function(x) {
     x - m_pre
@@ -80,11 +81,12 @@ baseline_star <- compute_baseline_simple_exp(
 )
 
 # When delta_lower < delta_star < delta_upper
-baseline_mix <- compute_baseline_simple_exp(
+edcp_mix <- build_edcp_exp(
   alpha,
   m_pre,
   delta_lower,
   delta_upper,
+  is_test = FALSE,
   psi_fn_list,
   s_fn = function(x) {
     x - m_pre
@@ -100,8 +102,8 @@ baseline_mix <- compute_baseline_simple_exp(
 
 stopped_time <- run_quick_simulation(x_vec,
                                      v,
-                                     baseline_star,
-                                     baseline_mix)
+                                     edcp_star,
+                                     edcp_mix)
 print(stopped_time)
 
 

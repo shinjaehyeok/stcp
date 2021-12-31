@@ -55,7 +55,7 @@ update_log_mix_e_detectors <- function(new_x_list,
     updater()
   }
 
-  updated_list <- list(log_mix_e_val = log_mix_e_detect_val,
+  updated_list <- list(log_mix_e_vec = log_mix_e_detect_val,
                        last_log_e_vec = prev_log_e_vec)
 
   return(updated_list)

@@ -50,7 +50,7 @@ update_log_mix_e_values <- function(new_x_vec,
                                 matrixStats::logSumExp(log_e_vec + log_weight_vec)
                                 })
 
-  updated_list <- list(log_mix_e_val = log_mix_e_val_vec,
+  updated_list <- list(log_mix_e_vec = log_mix_e_val_vec,
                        last_log_e_vec = prev_log_e_vec)
   return(updated_list)
 }

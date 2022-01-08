@@ -55,17 +55,17 @@ Below, we compute a mixture e-detectors by which we can infer when the change of
 alpha <- 1e-3 # Inverse of target ARL
 m_pre <- 0.3 # Upper bound of mean of pre-change observations
 delta_lower <- 0.01  # Guess on the minimum gap between pre- and post-change means
-baseline_bounded <- compute_baseline_bounded(alpha,
-                                             m_pre,
-                                             delta_lower)
+edcp_model <- build_edcp_bounded(alpha,
+                                       m_pre,
+                                       delta_lower)
 
 # Compute mixture of SR-type e-detectors.
-mix_SR_bounded <- edcp(x_vec, baseline_bounded)
+mix_SR_bounded <- run_edcp(x_vec, edcp_model)
 mix_SR_stop <- mix_SR_bounded$stopped_ind
-threshold <- mix_SR_bounded$threshold # = log(1/alpha)
+threshold <- mix_SR_bounded$edcp_obj$log_one_over_alpha # = log(1/alpha)
 
 # Plot 
-plot(1:max_sample, mix_SR_bounded$log_mix_e_val, type = "l",
+plot(1:max_sample, mix_SR_bounded$log_mix_e_vec, type = "l",
      xlab = "n", ylab = "log e-detectors", main = paste0("v = ", nu, " v_hat = ",mix_SR_stop))
 abline(h = threshold, col = 2)
 abline(v = nu, col = 1, lty = 2)

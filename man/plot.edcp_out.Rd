@@ -4,14 +4,24 @@
 \alias{plot.edcp_out}
 \title{Plot observed e-value / e-detectors}
 \usage{
-\method{plot}{edcp_out}(edcp_out, n = seq_along(edcp_out$log_mix_e_vec), add = FALSE, ...)
+\method{plot}{edcp_out}(
+  x,
+  y = seq_along(x$log_mix_e_vec),
+  draw_detect_line = TRUE,
+  add = FALSE,
+  ...
+)
 }
 \arguments{
-\item{edcp_out}{edcp_out object}
+\item{x}{edcp_out object}
 
-\item{n}{A numeric vector of time indices}
+\item{y}{A numeric vector of time indices}
+
+\item{draw_detect_line}{If true then draw a vertical line to indicate the detection time.}
 
 \item{add}{Indicator whether to make an overlay on the existing plot or not}
+
+\item{...}{Graphical parameters can be passed except \code{type} and \code{ylab}, which are pre-defined.}
 }
 \description{
 Plot observed e-value / e-detectors

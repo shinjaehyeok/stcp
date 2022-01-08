@@ -101,9 +101,9 @@ edcp_mix <- build_edcp_exp(
 
 
 stopped_time <- run_quick_simulation(x_vec,
+                                     edcp_mix,
                                      v,
-                                     edcp_star,
-                                     edcp_mix)
+                                     edcp_star)
 print(stopped_time)
 
 

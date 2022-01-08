@@ -65,11 +65,12 @@ graphics::lines(
 
 # Build CP detectors
 # When delta_lower = delta_upper = delta_star
-baseline_star <- compute_baseline_bounded(
+edcp_star <- build_edcp_bounded(
   alpha,
   m_pre,
   delta_star,
   delta_star,
+  is_test = FALSE,
   bound_lower,
   bound_upper,
   k_max = 1000,
@@ -79,11 +80,12 @@ baseline_star <- compute_baseline_bounded(
 )
 
 # When delta_lower < delta_star < delta_upper
-baseline_mix <- compute_baseline_bounded(
+edcp_mix <- build_edcp_bounded(
   alpha,
   m_pre,
   delta_lower,
   delta_upper,
+  is_test = FALSE,
   bound_lower,
   bound_upper,
   k_max = 1000,
@@ -91,7 +93,7 @@ baseline_mix <- compute_baseline_bounded(
 )
 
 stopped_time <- run_quick_simulation(x_vec,
+                                     edcp_mix,
                                      v,
-                                     baseline_star,
-                                     baseline_mix)
+                                     edcp_star)
 print(stopped_time)

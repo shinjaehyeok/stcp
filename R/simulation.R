@@ -29,48 +29,53 @@ generator <- function(max_sample = 1000L,
 #' Run single and mixtures of e-val, e-detectors for given simulation setting.
 #'
 #' @param x_vec Simulated observations
-#' @param v change-point
-#' @param edcp_star edcp object for the delta_star
 #' @param edcp_mix  edcp object for the mixture case
+#' @param v Change-point
+#' @param edcp_star edcp object for the delta_star (optional)
 #'
 #' @return Stopped point for single and mixtures of SR- and CUSUM-type e-detectors.
 #' @export
 #'
 run_quick_simulation <- function(x_vec,
-                                 v,
-                                 edcp_star,
-                                 edcp_mix) {
+                                 edcp_mix,
+                                 v = Inf,
+                                 edcp_star = NULL) {
   # Make test edcp obj
-  edcp_test_star <- edcp_star
-  edcp_test_star$is_test <- TRUE
   edcp_test_mix <- edcp_mix
   edcp_test_mix$is_test <- TRUE
+  if (!is.null(edcp_star)){
+    edcp_test_star <- edcp_star
+    edcp_test_star$is_test <- TRUE
+  }
 
-  # When delta_lower = delta_upper = delta_star
-  # e-value for testing
-  test_star_out <- run_edcp(x_vec, edcp_test_star)
+  if (!is.null(edcp_star)){
+    # When delta_lower = delta_upper = delta_star
 
-  # e-detector 1. SR-type
-  edcp_star_SR_out <- run_edcp(x_vec, edcp_star)
+    # e-value for testing
+    test_star_out <- run_edcp(x_vec, edcp_test_star)
 
-  # e-detector 2. CUSUM-type
-  edcp_star_CS_out <- run_edcp(x_vec, edcp_star, is_SR_type = FALSE)
+    # e-detector 1. SR-type
+    edcp_star_SR_out <- run_edcp(x_vec, edcp_star)
 
-  plot(edcp_star_SR_out,
-       col = 2,
-       ylim = c(
-    min(test_star_out$log_mix_e_vec),
-    max(edcp_star_SR_out$log_mix_e_vec)
-  ))
-  graphics::abline(v = v, col = 1, lty = 3)
-  plot(test_star_out, add = TRUE, col = 1)
-  plot(edcp_star_CS_out, add = TRUE, col = 3)
+    # e-detector 2. CUSUM-type
+    edcp_star_CS_out <- run_edcp(x_vec, edcp_star, is_SR_type = FALSE)
 
+    plot(edcp_star_SR_out,
+         xlab = "n",
+         col = 2,
+         ylim = c(
+           min(test_star_out$log_mix_e_vec),
+           max(edcp_star_SR_out$log_mix_e_vec)
+         ))
+    graphics::abline(v = v, col = 1, lty = 3)
+    plot(test_star_out, add = TRUE, col = 1)
+    plot(edcp_star_CS_out, add = TRUE, col = 3)
+  }
 
   # When delta_lower < delta_star < delta_upper
   # e-value for testing
   test_mix_out <- run_edcp(x_vec,
-                       edcp_test_mix)
+                           edcp_test_mix)
 
   # e-detector 1. SR-type
   edcp_mix_SR_out <- run_edcp(x_vec, edcp_mix)
@@ -79,20 +84,9 @@ run_quick_simulation <- function(x_vec,
   edcp_mix_CS_out <- run_edcp(x_vec, edcp_mix, is_SR_type = FALSE)
 
   plot(edcp_mix_SR_out,
+       xlab = "n",
        ylim = c(
          min(test_mix_out$log_mix_e_vec),
-         max(edcp_mix_SR_out$log_mix_e_vec)
-    ),
-    col = 2
-  )
-  graphics::abline(v = v, col = 1, lty = 3)
-  plot(test_mix_out, add = TRUE, col = 1)
-  plot(edcp_mix_CS_out, add = TRUE, col = 3)
-
-  # Plot all
-  plot(edcp_mix_SR_out,
-       ylim = c(
-         min(test_star_out$log_mix_e_vec),
          max(edcp_mix_SR_out$log_mix_e_vec)
        ),
        col = 2
@@ -101,16 +95,33 @@ run_quick_simulation <- function(x_vec,
   plot(test_mix_out, add = TRUE, col = 1)
   plot(edcp_mix_CS_out, add = TRUE, col = 3)
 
-  plot(test_star_out, add = TRUE, col = 1, lty = 2)
-  plot(edcp_star_SR_out, add = TRUE, col = 2, lty = 2)
-  plot(edcp_star_CS_out, add = TRUE, col = 3, lty = 2)
-
-  return(
-    list(
-      star_SR_stop = edcp_star_SR_out$stopped_ind,
-      star_CS_stop = edcp_star_CS_out$stopped_ind,
-      mix_SR_stop = edcp_mix_SR_out$stopped_ind,
-      mix_CS_stop = edcp_mix_CS_out$stopped_ind
+  if (!is.null(edcp_star)){
+    # Plot all
+    plot(edcp_mix_SR_out,
+         xlab = "n",
+         ylim = c(
+           min(test_star_out$log_mix_e_vec),
+           max(edcp_mix_SR_out$log_mix_e_vec)
+         ),
+         col = 2
     )
+    graphics::abline(v = v, col = 1, lty = 3)
+    plot(test_mix_out, add = TRUE, col = 1)
+    plot(edcp_mix_CS_out, add = TRUE, col = 3)
+
+    plot(test_star_out, add = TRUE, col = 1, lty = 2)
+    plot(edcp_star_SR_out, add = TRUE, col = 2, lty = 2)
+    plot(edcp_star_CS_out, add = TRUE, col = 3, lty = 2)
+  }
+
+  out <-   list(
+    mix_SR_stop = edcp_mix_SR_out$stopped_ind,
+    mix_CS_stop = edcp_mix_CS_out$stopped_ind
   )
+
+  if (!is.null(edcp_star)){
+    out$star_SR_stop <- edcp_star_SR_out$stopped_ind
+    out$star_CS_stop <- edcp_star_CS_out$stopped_ind
+  }
+  return(out)
 }

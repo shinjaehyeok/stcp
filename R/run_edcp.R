@@ -41,8 +41,9 @@ run_edcp <- function(new_x,
 
   # Update log_e_vec
   edcp_obj$log_e_vec <- mix_e_list$last_log_e_vec
+  edcp_obj$n <- edcp_obj$n + length(new_x)
   mix_e_list$last_log_e_vec <- NULL
   mix_e_list$edcp_obj <- edcp_obj
-  class(mix_e_list) <- c("edcp_out", class(edcp_obj))
+  class(mix_e_list) <- c("EDCP_RUNNED", class(edcp_obj))
   return(mix_e_list)
 }

@@ -55,8 +55,6 @@ build_edcp_exp <- function(alpha,
     is_test = is_test,
     # Memory for log e-detectors / values
     log_e_vec = numeric(length(log_base_fn_list)),
-    s_over_v_n = 0,
-    v_n = 0,
     n = 0,
     # Auxiliaries for debugging
     lambda = base_param$lambda,
@@ -144,7 +142,6 @@ build_edcp_bounded <- function(alpha,
     is_test = is_test,
     # Memory for log e-detectors / values
     log_e_vec = numeric(length(log_base_fn_list)),
-    x_bar_n = 0,
     n = 0,
     # Auxiliaries for debugging
     lambda = base_param$lambda,

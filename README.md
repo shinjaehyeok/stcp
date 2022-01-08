@@ -54,21 +54,26 @@ change of the mean happened.
 alpha <- 1e-3 # Inverse of target ARL
 m_pre <- 0.3 # Upper bound of mean of pre-change observations
 delta_lower <- 0.01  # Guess on the minimum gap between pre- and post-change means
-edcp_model <- build_edcp_bounded(alpha,
-                                       m_pre,
-                                       delta_lower)
+edcp_model <- build_edcp_bounded(alpha, m_pre, delta_lower)
 
 # Compute mixture of SR-type e-detectors.
 mix_SR_bounded <- run_edcp(x_vec, edcp_model)
 mix_SR_stop <- mix_SR_bounded$stopped_ind
-threshold <- mix_SR_bounded$edcp_obj$log_one_over_alpha # = log(1/alpha)
+
+# Printing summary
+print(mix_SR_bounded)
+#> EDCP Run:
+#> - Num. of new obs:  1000 
+#> - Stopped index:  512 
+#> 
+#> EDCP Model:
+#> - alpha:  0.001 
+#> - is_test:  FALSE 
+#> - Num. of mixing components:  241 
+#> - Obs. have been passed:  1000
 
 # Plot 
-plot(1:max_sample, mix_SR_bounded$log_mix_e_vec, type = "l",
-     xlab = "n", ylab = "log e-detectors", main = paste0("v = ", nu, " v_hat = ",mix_SR_stop))
-abline(h = threshold, col = 2)
-abline(v = nu, col = 1, lty = 2)
-abline(v = mix_SR_stop, col = 2, lty = 2)
+plot(mix_SR_bounded, main = paste0("v = ", nu, "; v_hat = ",mix_SR_stop))
 ```
 
 <img src="man/figures/README-edcp-1.png" width="100%" />
@@ -82,6 +87,5 @@ abline(v = nu, col = 1, lty = 2)
 abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
 ```
 
-<img src="man/figures/README-example2-1.png" width="100%" /> You’ll
-still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+<img src="man/figures/README-example2-1.png" width="100%" />
+<!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.  -->

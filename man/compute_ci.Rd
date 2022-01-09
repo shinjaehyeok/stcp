@@ -17,7 +17,7 @@ compute_ci(
 \arguments{
 \item{x_vec}{A vector of observations}
 
-\item{edcp_ci_obj}{EDCP_CI object, output of \code{build_edcp_exp}}
+\item{edcp_ci_obj}{EDCP_CI object, output of \code{build_ci_exp}}
 
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
 

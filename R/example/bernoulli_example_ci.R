@@ -156,7 +156,7 @@ if (check_bf_test) {
   n_bf_vec <- c(seq(1, length(x_vec), by = 10L), length(x_vec))
   ci_bf <-
     sapply(n_bf_vec, function(n) {
-      compute_brute_force_ci(
+      compute_bf_ci_single(
         x_vec[1:n],
         brute_force_ci_helper,
         width_upper = 100,

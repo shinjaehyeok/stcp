@@ -111,5 +111,22 @@ print.EDCP_CI <- function(x,...) {
   invisible(x)
 }
 
+#' Print EDCP_BF_CI model summary
+#'
+#' @param x edcp_bf_ci object
+#' @param ... Placeholder for formatting options - not yet implemented.
+#'
+#' @export
+#'
+print.EDCP_BF_CI <- function(x,...) {
+  cat("EDCP_BF_CI Model:\n",...)
+  cat("- Family: ", x$family_name, "\n")
+  cat("- alpha: ", x$baseline_obj$alpha, "\n")
+  cat("- Num. of mixing components: ", length(x$baseline_obj$lambda), "\n")
+  cat("- n_upper: ", x$n_upper, "\n")
+  cat("- n_lower: ", x$n_lower, "\n")
+  cat("- bound_lower: ", x$bound_lower, "\n")
+  invisible(x)
+}
 
 

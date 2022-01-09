@@ -16,7 +16,7 @@ psi_fn_list_generator <- function() {
   generate_sub_G_fn(sig)
 }
 
-check_bf_test <- TRUE
+check_bf_test <- FALSE
 
 # Generate data
 x_vec <- rnorm(max_sample, mu, sig)
@@ -114,7 +114,7 @@ if (check_bf_test) {
   n_bf_vec <- c(seq(1, length(x_vec), by = 10L), length(x_vec))
   ci_bf <-
     sapply(n_bf_vec, function(n) {
-      compute_brute_force_ci(x_vec[1:n],
+      compute_bf_ci_single(x_vec[1:n],
                              bruth_force_ci_helper,
                              width_upper = 100)
     })

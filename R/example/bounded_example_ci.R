@@ -10,69 +10,60 @@ set.seed(1)
 max_sample <- 1000L
 a <- 2
 b <- 3
-m <- 1
-sig <- 1
-bound_lower <- -1
-bound_upper <- 5
+const <- 1
+shift <- 0
+m <- const * a / (a + b) + shift
+sig <- const * sqrt(a * b / (a + b)^2 / (a + b + 1))
+bound_lower <- shift
+bound_upper <- const + shift
 alpha <- 0.025
 
-psi_fn_list <- generate_sub_E_fn()
-v_min <- 0
-k_max <- 1e+3
-
-check_bf_test <- TRUE
 
 # Compute target interval
-n_lower <- max_sample / 5
-n_upper <- max_sample * 2
+n_lower <- max_sample / 10
+n_upper <- max_sample
 
 # Generate data
-x_vec <-  5 * rbeta(max_sample, a, b) - 1
+x_vec <-  const * rbeta(max_sample, a, b) + shift
 x_bar <- cumsum(x_vec) / seq_along(x_vec)
 
 # Build CI
+# 0. Baseline: z-score based CI
 ci_fixed <-
   sig * qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
 
-base_param <- compute_baseline_for_sample_size(alpha,
-                                               n_upper,
-                                               n_lower,
-                                               psi_fn_list,
-                                               v_min,
-                                               k_max)
-
-
-brute_force_ci_helper <- function(m, x_vec, tol = 1e-6) {
-  log_base_fn_list <- sapply(
-    base_param$lambda,
-    generate_log_base_fn,
-    psi_fn = base_param$psi_fn_list$psi,
-    s_fn = function(x) {
-      x - m
-    }
-  )
-
-  baseline_m <- list(
-    omega = base_param$omega,
-    log_base_fn_list =  log_base_fn_list,
-    alpha = alpha,
-    lambda = base_param$lambda,
-    g_alpha = base_param$g_alpha
-  )
-
-  e_val <- edcp(x_vec,
-                baseline_m,
-                is_test = TRUE)
-  return(e_val$log_mix_e_val[length(e_val$log_mix_e_val)] - e_val$threshold)
+# 1. Use sub-G and sub-B. They are sub-optimal but can be computed in the online way.
+sub_G_sig <- (bound_upper - bound_lower) / 2
+psi_fn_list_generator <- function() {
+  generate_sub_G_fn(sub_G_sig)
 }
-# Warning::This code is very slow O(n^2)
-n_bf_vec <- c(seq(1, length(x_vec), by = 10L), length(x_vec))
-ci_bf <-
-  sapply(n_bf_vec, function(n) {
-    compute_brute_force_ci(x_vec[1:n],
-                           brute_force_ci_helper,
-                           width_upper = 100)
-  })
+ci_model_G <- build_ci_exp(alpha,
+                           n_upper,
+                           n_lower,
+                           psi_fn_list_generator)
+
+ci_G <- compute_ci(x_vec, ci_model_G, width_upper = sub_G_sig * 100, ci_lower_trivial = bound_lower)
+
+ci_model_Ber <- build_ci_exp(alpha,
+                             n_upper,
+                             n_lower,
+                             generate_sub_B_fn)
+
+ci_Ber <- compute_ci((x_vec - shift) / const, ci_model_Ber, ci_lower_trivial = 0)
+ci_Ber$x_bar <- ci_Ber$x_bar * const + shift
+ci_Ber$ci_lower <- ci_Ber$ci_lower * const + shift
+
+#2. Brute-force based on Bounded-EDCP model. Slower but tighter in general.
+bf_ci_model <- build_bf_ci_bounded (alpha,
+                                    n_upper,
+                                    n_lower,
+                                    bound_lower)
+
+bf_ci <- compute_bf_ci(x_vec,
+                       bf_ci_model,
+                       ci_lower_trivial = bound_lower,
+                       max_num_ci = 100)
+
 
 # Plot CI
 plot(
@@ -82,7 +73,7 @@ plot(
   xlab = "n",
   ylab = "X_bar",
   main = "Running average",
-  ylim = c(-0.5, 0.5) + m,
+  ylim = c(bound_lower, bound_upper),
 )
 graphics::abline(h = m,
                  col = 2,
@@ -92,12 +83,24 @@ graphics::lines(1:max_sample,
                 x_bar - ci_fixed,
                 lty = 2,
                 col = 1)
-graphics::lines(n_bf_vec, ci_bf, lty = 2, col = 2)
-
+graphics::lines(1:max_sample,
+                ci_G$ci_lower,
+                lty = 2,
+                col = 2)
+graphics::lines(1:max_sample,
+                ci_Ber$ci_lower,
+                lty = 2,
+                col = 3)
+graphics::lines(bf_ci$n, bf_ci$ci_lower, lty = 2, col = 4)
 
 # Compare width
-plot(n_bf_vec,
-     (x_bar[n_bf_vec] - ci_bf) / ci_fixed[n_bf_vec],
+plot(bf_ci$n,
+     (bf_ci$x_bar - bf_ci$ci_lower) / ci_fixed[bf_ci$n],
      type = "l",
-     ylim = c(1, 2))
-# graphics::lines(n_bf_vec, (x_bar[n_bf_vec] - ci_bf_mix) / ci_fixed[n_bf_vec], lty = 2, col = 2)
+     ylim = c(1, 2),
+     col = 4)
+graphics::lines(1:max_sample, (x_bar - ci_Ber$ci_lower) / ci_fixed, lty = 2, col = 3)
+graphics::lines(1:max_sample, (x_bar - ci_G$ci_lower) / ci_fixed, lty = 2, col = 2)
+
+bf_ci_model
+(bf_ci$x_bar - bf_ci$ci_lower) / ci_fixed[bf_ci$n]

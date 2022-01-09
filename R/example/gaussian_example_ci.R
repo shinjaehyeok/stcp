@@ -8,60 +8,45 @@ library(EDCP)
 # N(mu, 1)
 max_sample <- 1000L
 mu <- -1
-sig <- 1
+sig <- 5
 alpha <- 0.025
-
-psi_fn_list <- generate_sub_G_fn()
-v_min <- 1
-k_max <- 1e+3
+# v_min <- 1
+# k_max <- 1e+3
+psi_fn_list_generator <- function() {
+  generate_sub_G_fn(sig)
+}
 
 check_bf_test <- FALSE
 
 # Generate data
-x_vec <- rnorm(max_sample, mu)
+x_vec <- rnorm(max_sample, mu, sig)
 x_bar <- cumsum(x_vec) / seq_along(x_vec)
 
 # Build CI
 # When delta_lower = delta_upper = delta_star
 # Compute optimal delta star
 n_target <- round(max_sample / 2)
-baseline_ci_star <- compute_baseline_for_sample_size(alpha,
-                                                     n_target,
-                                                     n_target,
-                                                     psi_fn_list,
-                                                     v_min,
-                                                     k_max)
-ci_helper_star <- generate_ci_helper(
-  baseline_ci_star$alpha,
-  baseline_ci_star$omega,
-  baseline_ci_star$lambda,
-  generate_psi_fn_list = generate_sub_G_fn,
-  is_psi_depend_on_m = FALSE
-)
-ci_star <- compute_ci(x_vec, ci_helper_star)
+ci_model_star <- build_ci_exp(alpha,
+                              n_target,
+                              n_target,
+                              psi_fn_list_generator)
+
+ci_star <- compute_ci(x_vec, ci_model_star, width_upper = sig * 100)
+
 
 # When delta_lower < delta_star < delta_upper
 # Compute target interval
 n_lower <- max_sample / 5
 n_upper <- max_sample * 2
-baseline_ci_mix <- compute_baseline_for_sample_size(alpha,
-                                                    n_upper,
-                                                    n_lower,
-                                                    psi_fn_list,
-                                                    v_min,
-                                                    k_max)
+ci_model_mix <- build_ci_exp(alpha,
+                              n_upper,
+                              n_lower,
+                              psi_fn_list_generator)
 
-ci_helper_mix <- generate_ci_helper(
-  baseline_ci_mix$alpha,
-  baseline_ci_mix$omega,
-  baseline_ci_mix$lambda,
-  generate_psi_fn_list = generate_sub_G_fn,
-  is_psi_depend_on_m = FALSE
-)
-ci_mix <- compute_ci(x_vec, ci_helper_mix)
+ci_mix <- compute_ci(x_vec, ci_model_mix, width_upper = sig * 100)
 
 ci_fixed <-
-  x_bar - qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
+  x_bar - sig * qnorm(alpha, lower.tail = FALSE) / sqrt(1:max_sample)
 
 # Plot CI
 
@@ -72,7 +57,7 @@ plot(
   xlab = "n",
   ylab = "X_bar",
   main = "Running average",
-  ylim = c(-0.5, 0.5) + mu,
+  ylim = c(-0.5, 0.5) * sig + mu,
 )
 graphics::abline(h = mu,
                  col = 2,
@@ -103,7 +88,7 @@ graphics::lines(1:max_sample, (x_bar - ci_mix$ci_lower) / (x_bar - ci_fixed), co
 # Check correctness via brute-force method
 if (check_bf_test) {
   bruth_force_ci_helper <- function(m, x_vec) {
-    baseline_m <- compute_baseline_simple_exp(
+    baseline_m <- build_edcp_exp(
       alpha,
       m,
       baseline_ci_mix$delta_lower,

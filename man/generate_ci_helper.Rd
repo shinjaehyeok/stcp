@@ -8,7 +8,7 @@ generate_ci_helper(
   alpha,
   omega,
   lambda,
-  generate_psi_fn_list,
+  psi_fn_list_generator,
   is_psi_depend_on_m = FALSE
 )
 }
@@ -19,7 +19,7 @@ generate_ci_helper(
 
 \item{lambda}{A vector of lambda parameters from \code{compute_baseline}, which is a set of model parameters.}
 
-\item{generate_psi_fn_list}{Function operator generating \code{psi_fn_list}}
+\item{psi_fn_list_generator}{Function operator generating \code{psi_fn_list}}
 
 \item{is_psi_depend_on_m}{Indicator whether the psi function depends on the target parameter.}
 }

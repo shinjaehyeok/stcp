@@ -2,7 +2,9 @@
 
 S3method(plot,EDCP_RUNNED)
 S3method(print,EDCP)
+S3method(print,EDCP_CI)
 S3method(print,EDCP_RUNNED)
+export(build_ci_exp)
 export(build_edcp_bounded)
 export(build_edcp_exp)
 export(compute_baseline)

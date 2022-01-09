@@ -1,5 +1,3 @@
-
-
 #' Compute baseline parameters given target sample size bounds.
 #'
 #' Given target sample size bounds interval for confidence sequences, compute  baseline parameters.
@@ -63,7 +61,7 @@ compute_baseline_for_sample_size <- function(alpha,
 #' @param alpha Confidence level in (0,1)
 #' @param omega A vector of omega parameters from \code{compute_baseline}, which is a mixing weights.
 #' @param lambda A vector of lambda parameters from \code{compute_baseline}, which is a set of model parameters.
-#' @param generate_psi_fn_list Function operator generating \code{psi_fn_list}
+#' @param psi_fn_list_generator Function operator generating \code{psi_fn_list}
 #' @param is_psi_depend_on_m Indicator whether the psi function depends on the target parameter.
 #'
 #' @return \code{ci_helper} function to compute confidence intervals
@@ -72,7 +70,7 @@ compute_baseline_for_sample_size <- function(alpha,
 generate_ci_helper <- function(alpha,
                                omega,
                                lambda,
-                               generate_psi_fn_list,
+                               psi_fn_list_generator,
                                is_psi_depend_on_m = FALSE) {
   # Make helper function for CI computation
   log_weight_vec <- log(omega)
@@ -80,7 +78,7 @@ generate_ci_helper <- function(alpha,
 
   if (is_psi_depend_on_m) {
     ci_helper <- function(m, n, x_bar) {
-      psi_fn_list <- generate_psi_fn_list(m)
+      psi_fn_list <- psi_fn_list_generator(m)
       psi_lambda_vec <- sapply(lambda, psi_fn_list$psi)
       inner <- n * (lambda * (x_bar - m) - psi_lambda_vec)
       out <-
@@ -88,7 +86,7 @@ generate_ci_helper <- function(alpha,
       return(out)
     }
   } else {
-    psi_fn_list <- generate_psi_fn_list()
+    psi_fn_list <- psi_fn_list_generator()
     psi_lambda_vec <- sapply(lambda, psi_fn_list$psi)
     ci_helper <- function(m, n, x_bar) {
       inner <- n * (lambda * (x_bar - m) - psi_lambda_vec)
@@ -150,6 +148,7 @@ compute_single_ci <- function(n,
 #' Given a vector of observations, compute lower bounds of confidence sequence.
 #'
 #' @param x_vec A vector of observations
+#' @param edcp_ci_obj EDCP_CI object, output of \code{build_edcp_exp}
 #' @param x_bar_pre Sample mean of previous observations. Default is \code{0} (No pre-samples)
 #' @param n_pre Number of pre-samples. Default is \code{0}.
 #' @inheritParams compute_single_ci
@@ -158,13 +157,18 @@ compute_single_ci <- function(n,
 #' @export
 #'
 compute_ci <- function(x_vec,
-                       ci_helper,
+                       edcp_ci_obj,
                        width_upper = 100,
                        ci_lower_trivial = -Inf,
                        x_bar_pre = 0,
                        n_pre = 0,
                        tol = 1e-6) {
-  #TODO::IMPLETMENT check whether ci_helper is simple_exp class.
+  if (class(edcp_ci_obj) != "EDCP_CI") {
+    stop("ci_helper must be an output of generate_ci_helper function.")
+  }
+
+  ci_helper <- edcp_ci_obj$ci_helper
+
   if (n_pre < 0) {
     stop("Pre-sample size must be nonnegative.")
   }

@@ -53,14 +53,25 @@ build_edcp_exp <- function(alpha,
     log_one_over_alpha = log(1/alpha),
     alpha = alpha,
     is_test = is_test,
+    family_name = base_param$psi_fn_list$family_name,
     # Memory for log e-detectors / values
     log_e_vec = numeric(length(log_base_fn_list)),
     n = 0,
     # Auxiliaries for debugging
     lambda = base_param$lambda,
-    g_alpha = base_param$g_alpha
+    g_alpha = base_param$g_alpha,
+    # Input Details
+    delta_lower = delta_lower,
+    delta_upper = delta_upper,
+    s_fn = function(x) {
+      x - m_pre
+    },
+    v_fn = function(x) {
+      1
+    },
+    v_min = 1
   )
-  class(out) <- c("simple_exp", "EDCP")
+  class(out) <- c("SimpleExp", "EDCP")
   return(out)
 }
 
@@ -140,13 +151,21 @@ build_edcp_bounded <- function(alpha,
     log_one_over_alpha = log(1/alpha),
     alpha = alpha,
     is_test = is_test,
+    family_name = "Bounded (sub-E based)",
     # Memory for log e-detectors / values
     log_e_vec = numeric(length(log_base_fn_list)),
     n = 0,
     # Auxiliaries for debugging
     lambda = base_param$lambda,
-    g_alpha = base_param$g_alpha
+    g_alpha = base_param$g_alpha,
+    # Input Details
+    delta_lower = delta_lower,
+    delta_upper = delta_upper,
+    bound_lower = bound_lower,
+    bound_upper = bound_upper,
+    var_lower = var_lower,
+    var_upper = var_upper
   )
-  class(out) <- c("bounded", "EDCP")
+  class(out) <- c("Bounded", "EDCP")
   return(out)
 }

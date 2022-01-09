@@ -6,7 +6,7 @@
 \usage{
 compute_ci(
   x_vec,
-  ci_helper,
+  edcp_ci_obj,
   width_upper = 100,
   ci_lower_trivial = -Inf,
   x_bar_pre = 0,
@@ -17,7 +17,7 @@ compute_ci(
 \arguments{
 \item{x_vec}{A vector of observations}
 
-\item{ci_helper}{R function from \code{compute_baseline_simple_exp} used to compute the width.}
+\item{edcp_ci_obj}{EDCP_CI object, output of \code{build_edcp_exp}}
 
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
 

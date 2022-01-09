@@ -39,7 +39,7 @@ ci_helper_star <- generate_ci_helper(
   baseline_ci_star$alpha,
   baseline_ci_star$omega,
   baseline_ci_star$lambda,
-  generate_psi_fn_list = generate_sub_B_fn,
+  psi_fn_list_generator = generate_sub_B_fn,
   is_psi_depend_on_m = TRUE
 )
 ci_star <- compute_ci(x_vec, ci_helper_star, ci_lower_trivial = 0)
@@ -56,7 +56,7 @@ ci_helper_mix <- generate_ci_helper(
   baseline_ci_mix$alpha,
   baseline_ci_mix$omega,
   baseline_ci_mix$lambda,
-  generate_psi_fn_list = generate_sub_B_fn,
+  psi_fn_list_generator = generate_sub_B_fn,
   is_psi_depend_on_m = TRUE
 )
 ci_mix <- compute_ci(x_vec, ci_helper_mix, ci_lower_trivial = 0)
@@ -71,7 +71,7 @@ ci_helper_mix2 <- generate_ci_helper(
   baseline_ci_mix$alpha,
   baseline_ci_mix$omega,
   baseline_ci_mix$lambda,
-  generate_psi_fn_list = generate_sub_B_fn,
+  psi_fn_list_generator = generate_sub_B_fn,
   is_psi_depend_on_m = FALSE
 )
 ci_mix2 <- compute_ci(x_vec, ci_helper_mix2)

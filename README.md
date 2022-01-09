@@ -67,10 +67,17 @@ print(mix_SR_bounded)
 #> - Stopped index:  512 
 #> 
 #> EDCP Model:
+#> - Family:  Bounded (sub-E based) 
 #> - alpha:  0.001 
 #> - is_test:  FALSE 
 #> - Num. of mixing components:  241 
-#> - Obs. have been passed:  1000
+#> - Obs. have been passed:  1000 
+#> - delta_lower:  0.01 
+#> - delta_upper:  0.7 
+#> - bound_lower:  0 
+#> - bound_upper:  1 
+#> - var_lower:  0 
+#> - var_upper:  0.25
 
 # Plot 
 plot(mix_SR_bounded, main = paste0("v = ", nu, "; v_hat = ",mix_SR_stop))

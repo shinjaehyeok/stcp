@@ -10,13 +10,13 @@ max_sample <- 1000L
 mu <- -1
 sig <- 5
 alpha <- 0.025
-# v_min <- 1
-# k_max <- 1e+3
+v_min <- 1
+k_max <- 1e+3
 psi_fn_list_generator <- function() {
   generate_sub_G_fn(sig)
 }
 
-check_bf_test <- FALSE
+check_bf_test <- TRUE
 
 # Generate data
 x_vec <- rnorm(max_sample, mu, sig)
@@ -29,7 +29,9 @@ n_target <- round(max_sample / 2)
 ci_model_star <- build_ci_exp(alpha,
                               n_target,
                               n_target,
-                              psi_fn_list_generator)
+                              psi_fn_list_generator,
+                              v_min = v_min,
+                              k_max = k_max)
 
 ci_star <- compute_ci(x_vec, ci_model_star, width_upper = sig * 100)
 
@@ -39,9 +41,11 @@ ci_star <- compute_ci(x_vec, ci_model_star, width_upper = sig * 100)
 n_lower <- max_sample / 5
 n_upper <- max_sample * 2
 ci_model_mix <- build_ci_exp(alpha,
-                              n_upper,
-                              n_lower,
-                              psi_fn_list_generator)
+                             n_upper,
+                             n_lower,
+                             psi_fn_list_generator,
+                             v_min = v_min,
+                             k_max = k_max)
 
 ci_mix <- compute_ci(x_vec, ci_model_mix, width_upper = sig * 100)
 
@@ -87,23 +91,23 @@ graphics::lines(1:max_sample, (x_bar - ci_mix$ci_lower) / (x_bar - ci_fixed), co
 
 # Check correctness via brute-force method
 if (check_bf_test) {
+  ci_model <- ci_model_mix
   bruth_force_ci_helper <- function(m, x_vec) {
-    baseline_m <- build_edcp_exp(
+    edcp_model <- build_edcp_exp(
       alpha,
       m,
-      baseline_ci_mix$delta_lower,
-      baseline_ci_mix$delta_upper,
-      baseline_ci_mix$psi_fn_list,
+      ci_model$baseline_obj$delta_lower,
+      ci_model$baseline_obj$delta_upper,
+      is_test = TRUE,
+      ci_model$baseline_obj$psi_fn_list,
       s_fn = function(x) {
         x - m
       },
       v_min = v_min,
       k_max = k_max
     )
-    e_val <- edcp(x_vec,
-                  baseline_m,
-                  is_test = TRUE)
-    return(e_val$log_mix_e_val[length(e_val$log_mix_e_val)] - e_val$threshold)
+    e_val <- run_edcp(x_vec, edcp_model)
+    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$edcp_obj$log_one_over_alpha)
   }
 
   # Warning::This code is very slow O(n^2)

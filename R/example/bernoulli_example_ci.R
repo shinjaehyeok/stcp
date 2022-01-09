@@ -9,9 +9,14 @@ set.seed(1)
 max_sample <- 1000L
 pre_sample <- 10L
 p <- 0.3
+p_guess <- 0.5
 alpha <- 0.025
 v_min <- 1
 k_max <- 1e+3
+# Make a wrapper to change default value.
+psi_fn_list_generator <- function(p = p_guess) {
+  generate_sub_B_fn(p)
+}
 
 check_bf_test <- FALSE # Use it only for debugging purpose.
 
@@ -26,40 +31,30 @@ x_bar <- cumsum(x_vec) / seq_along(x_vec)
 
 # Build CI
 # When delta_lower = delta_upper = delta_star
-# We can use sub_B fn of different p. Here, we use 0.5. Ideally, it should be similar to the true underlying p.
+# We can use sub_B fn of different p. Here, we use p_guess. Ideally, it should be similar to the true underlying p.
 # This make CI computation efficient as we use fixed parameters but it makes potentially wider CI compared to the brute-force.
-baseline_ci_star <- compute_baseline_for_sample_size(alpha,
-                                                     n_target,
-                                                     n_target,
-                                                     generate_sub_B_fn(0.5),
-                                                     v_min,
-                                                     k_max)
+ci_model_star <- build_ci_exp(alpha,
+                              n_target,
+                              n_target,
+                              psi_fn_list_generator,
+                              v_min = v_min,
+                              k_max = k_max)
 
-ci_helper_star <- generate_ci_helper(
-  baseline_ci_star$alpha,
-  baseline_ci_star$omega,
-  baseline_ci_star$lambda,
-  psi_fn_list_generator = generate_sub_B_fn,
-  is_psi_depend_on_m = TRUE
-)
-ci_star <- compute_ci(x_vec, ci_helper_star, ci_lower_trivial = 0)
+ci_star <- compute_ci(x_vec, ci_model_star, ci_lower_trivial = 0)
+
+
 
 # When delta_lower < delta_star < delta_upper
-baseline_ci_mix <- compute_baseline_for_sample_size(alpha,
-                                                    n_upper,
-                                                    n_lower,
-                                                    generate_sub_B_fn(0.5),
-                                                    v_min,
-                                                    k_max)
+ci_model_mix <- build_ci_exp(alpha,
+                             n_upper,
+                             n_lower,
+                             psi_fn_list_generator,
+                             v_min = v_min,
+                             k_max = k_max)
 
-ci_helper_mix <- generate_ci_helper(
-  baseline_ci_mix$alpha,
-  baseline_ci_mix$omega,
-  baseline_ci_mix$lambda,
-  psi_fn_list_generator = generate_sub_B_fn,
-  is_psi_depend_on_m = TRUE
-)
-ci_mix <- compute_ci(x_vec, ci_helper_mix, ci_lower_trivial = 0)
+ci_mix <- compute_ci(x_vec, ci_model_mix, ci_lower_trivial = 0)
+
+
 
 # If we want to treat this example as an additive sub-psi case
 # then set is_psi_depend_on_m = FALSE and ci_lower_trivial = -Inf
@@ -67,14 +62,19 @@ ci_mix <- compute_ci(x_vec, ci_helper_mix, ci_lower_trivial = 0)
 # The degree of conservative depends on the gap between true p and the parameter used in CI construction.
 # This is because by treating it as an additive sub-psi, we no longer adaptively track the variance term.
 # Hence, use it only if you have a good prior knowledge on it.
+
+# This procedure is not officially supported by this package.
 ci_helper_mix2 <- generate_ci_helper(
-  baseline_ci_mix$alpha,
-  baseline_ci_mix$omega,
-  baseline_ci_mix$lambda,
-  psi_fn_list_generator = generate_sub_B_fn,
+  ci_model_mix$baseline_obj$alpha,
+  ci_model_mix$baseline_obj$omega,
+  ci_model_mix$baseline_obj$lambda,
+  psi_fn_list_generator = psi_fn_list_generator,
   is_psi_depend_on_m = FALSE
 )
-ci_mix2 <- compute_ci(x_vec, ci_helper_mix2)
+tmp <- list(ci_helper = ci_helper_mix2)
+class(tmp) <- "EDCP_CI"
+ci_mix2 <- compute_ci(x_vec, tmp)
+
 
 
 ci_fixed <-
@@ -128,40 +128,29 @@ graphics::lines(1:max_sample,
 # Check correctness via brute-force method
 # For the Bernoulli case,
 if (check_bf_test) {
+  ci_model <- ci_model_mix
   brute_force_ci_helper <- function(m, x_vec, tol = 1e-6) {
-    if (m <= 0)
+    if (m <= 0) {
       m <- tol
-    if (m + baseline_ci_mix$delta_upper >= 1)
-      m <- 1 - baseline_ci_mix$delta_upper - tol
-
-    base_param <- compute_baseline_for_sample_size(alpha,
-                                                   n_upper,
-                                                   n_lower,
-                                                   generate_sub_B_fn(m),
-                                                   v_min,
-                                                   k_max)
-
-    log_base_fn_list <- sapply(
-      base_param$lambda,
-      generate_log_base_fn,
-      psi_fn = base_param$psi_fn_list$psi,
+    }
+    if (m + ci_model$baseline_obj$delta_upper >= 1) {
+      m <- 1 - ci_model$baseline_obj$delta_upper - tol
+    }
+    edcp_model <- build_edcp_exp(
+      alpha,
+      m,
+      ci_model$baseline_obj$delta_lower,
+      ci_model$baseline_obj$delta_upper,
+      is_test = TRUE,
+      psi_fn_list_generator(m),
       s_fn = function(x) {
         x - m
-      }
+      },
+      v_min = v_min,
+      k_max = k_max
     )
-
-    baseline_m <- list(
-      omega = base_param$omega,
-      log_base_fn_list =  log_base_fn_list,
-      alpha = alpha,
-      lambda = base_param$lambda,
-      g_alpha = base_param$g_alpha
-    )
-
-    e_val <- edcp(x_vec,
-                  baseline_m,
-                  is_test = TRUE)
-    return(e_val$log_mix_e_val[length(e_val$log_mix_e_val)] - e_val$threshold)
+    e_val <- run_edcp(x_vec, edcp_model)
+    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$edcp_obj$log_one_over_alpha)
   }
   # Warning::This code is very slow O(n^2)
   n_bf_vec <- c(seq(1, length(x_vec), by = 10L), length(x_vec))

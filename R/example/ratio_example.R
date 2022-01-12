@@ -13,7 +13,7 @@ library(EDCP)
 
 max_sample <- 1000L
 unit <- 10
-sig <- 0.02
+sig <- 0.01
 #1 - 0.68 / 0.8 = 0.15
 m_pre <- 0.68
 m_pre_model <- 0.685
@@ -27,7 +27,7 @@ k_max <- 1e+3
 
 
 # Generate sample
-x_vec <- unit * exp(rnorm(max_sample))
+x_vec <- unit * exp(rnorm(max_sample, 0,0.1))
 r_pre <- filter(rnorm(v, 0, 0.001), filter=rep(1,24), circular=TRUE) +  m_pre
 r_post <- filter(rnorm(max_sample-v, 0, 0.001), filter=rep(1,24), circular=TRUE) +  m_post
 # r_post <- filter(rnorm(max_sample-v, 0, 0.001), filter=rep(1,24), circular=TRUE) +

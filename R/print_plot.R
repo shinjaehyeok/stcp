@@ -125,7 +125,13 @@ print.EDCP_BF_CI <- function(x,...) {
   cat("- Num. of mixing components: ", length(x$baseline_obj$lambda), "\n")
   cat("- n_upper: ", x$n_upper, "\n")
   cat("- n_lower: ", x$n_lower, "\n")
-  cat("- bound_lower: ", x$bound_lower, "\n")
+  if(!is.null(x$bound_lower)){
+    cat("- bound_lower: ", x$bound_lower, "\n")
+  }
+  if(!is.null(x$v_min)){
+    cat("- v_min: ", x$v_min, "\n")
+  }
+
   invisible(x)
 }
 

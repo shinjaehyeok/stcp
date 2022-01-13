@@ -42,7 +42,7 @@ build_edcp_exp(
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }
 \value{
-A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+\code{EDCP} Object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 }
 \description{
 Build EDCP model for simple exponential e-detectors to detect up-crossing mean-shift.

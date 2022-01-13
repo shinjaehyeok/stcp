@@ -16,7 +16,7 @@ psi_fn_list_generator <- function() {
   generate_sub_G_fn(sig)
 }
 
-check_bf_test <- FALSE
+check_bf_test <- TRUE
 
 # Generate data
 x_vec <- rnorm(max_sample, mu, sig)
@@ -91,35 +91,19 @@ graphics::lines(1:max_sample, (x_bar - ci_mix$ci_lower) / (x_bar - ci_fixed), co
 
 # Check correctness via brute-force method
 if (check_bf_test) {
-  ci_model <- ci_model_mix
-  bruth_force_ci_helper <- function(m, x_vec) {
-    edcp_model <- build_edcp_exp(
-      alpha,
-      m,
-      ci_model$baseline_obj$delta_lower,
-      ci_model$baseline_obj$delta_upper,
-      is_test = TRUE,
-      ci_model$baseline_obj$psi_fn_list,
-      s_fn = function(x) {
-        x - m
-      },
-      v_min = v_min,
-      k_max = k_max
-    )
-    e_val <- run_edcp(x_vec, edcp_model)
-    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$edcp_obj$log_one_over_alpha)
-  }
+  bf_ci_model <- build_bf_ci_exp(alpha,
+                                 n_upper,
+                                 n_lower,
+                                 psi_fn_list_generator,
+                                 v_min = v_min,
+                                 k_max = k_max)
 
-  # Warning::This code is very slow O(n^2)
-  n_bf_vec <- c(seq(1, length(x_vec), by = 10L), length(x_vec))
-  ci_bf <-
-    sapply(n_bf_vec, function(n) {
-      compute_bf_ci_single(x_vec[1:n],
-                             bruth_force_ci_helper,
-                             width_upper = 100)
-    })
+  bf_ci <- compute_bf_ci(x_vec,
+                         bf_ci_model,
+                         max_num_ci = 100)
 
-  ratio_vec <- ci_mix$ci_lower[n_bf_vec] / ci_bf
+
+  ratio_vec <- ci_mix$ci_lower[bf_ci$n] / bf_ci$ci_lower
   if (abs(mean(ratio_vec) - 1) > 1e-8)
     stop("BF test failed")
   if (var(ratio_vec) > 1e-8)

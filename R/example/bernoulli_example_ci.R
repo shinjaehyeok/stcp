@@ -18,7 +18,7 @@ psi_fn_list_generator <- function(p = p_guess) {
   generate_sub_B_fn(p)
 }
 
-check_bf_test <- FALSE # Use it only for debugging purpose.
+check_bf_test <- TRUE # Use it only for debugging purpose.
 
 # Compute target interval
 n_target <- round(max_sample / 2)
@@ -128,44 +128,24 @@ graphics::lines(1:max_sample,
 # Check correctness via brute-force method
 # For the Bernoulli case,
 if (check_bf_test) {
-  ci_model <- ci_model_mix
-  brute_force_ci_helper <- function(m, x_vec, tol = 1e-6) {
-    if (m <= 0) {
-      m <- tol
-    }
-    if (m + ci_model$baseline_obj$delta_upper >= 1) {
-      m <- 1 - ci_model$baseline_obj$delta_upper - tol
-    }
-    edcp_model <- build_edcp_exp(
-      alpha,
-      m,
-      ci_model$baseline_obj$delta_lower,
-      ci_model$baseline_obj$delta_upper,
-      is_test = TRUE,
-      psi_fn_list_generator(m),
-      s_fn = function(x) {
-        x - m
-      },
-      v_min = v_min,
-      k_max = k_max
-    )
-    e_val <- run_edcp(x_vec, edcp_model)
-    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$edcp_obj$log_one_over_alpha)
-  }
-  # Warning::This code is very slow O(n^2)
-  n_bf_vec <- c(seq(1, length(x_vec), by = 10L), length(x_vec))
-  ci_bf <-
-    sapply(n_bf_vec, function(n) {
-      compute_bf_ci_single(
-        x_vec[1:n],
-        brute_force_ci_helper,
-        width_upper = 100,
-        ci_lower_trivial = 0
-      )
-    })
+  bf_ci_model <- build_bf_ci_exp(alpha,
+                                 n_upper,
+                                 n_lower,
+                                 psi_fn_list_generator,
+                                 v_min = v_min,
+                                 k_max = k_max)
+
+  bf_ci <- compute_bf_ci(x_vec,
+                         bf_ci_model,
+                         ci_lower_trivial = 0,
+                         max_num_ci = 100)
 
   ratio_vec <-
-    (x_bar[n_bf_vec] - ci_mix$ci_lower[n_bf_vec]) / (x_bar[n_bf_vec] - ci_bf)
+    (x_bar[bf_ci$n] - ci_mix$ci_lower[bf_ci$n]) / ( bf_ci$x_bar -  bf_ci$ci_lower)
   print(ratio_vec)
-  # Note in general bf method yields tighter bound by trading off increased computations.
+
+  graphics::lines(bf_ci$n,
+                  (bf_ci$x_bar -  bf_ci$ci_lower) / (x_bar[bf_ci$n] - ci_fixed[bf_ci$n]),
+                  col = 5)
+
 }

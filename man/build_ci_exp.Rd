@@ -30,7 +30,7 @@ build_ci_exp(
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }
 \value{
-A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+\code{EDCP_CI} Object
 }
 \description{
 Build a generator of lower bound of always-valid confidence intervals

@@ -6,7 +6,7 @@
 #' @param psi_fn_list_generator Function operator generating \code{psi_fn_list}
 #' @inheritParams compute_baseline_for_sample_size
 #'
-#' @return A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{EDCP_CI} Object
 #' @export
 #'
 build_ci_exp <- function(alpha,
@@ -54,7 +54,7 @@ build_ci_exp <- function(alpha,
 #' @inheritParams compute_baseline_for_sample_size
 #' @param  bound_lower  Lower bound of observations.
 #'
-#' @return A list of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{EDCP_BF_CI} object
 #' @export
 #'
 build_bf_ci_bounded <- function(alpha,
@@ -107,6 +107,69 @@ build_bf_ci_bounded <- function(alpha,
               n_upper = n_upper,
               n_lower = n_lower,
               bound_lower = bound_lower
+  )
+
+  class(out) <- "EDCP_BF_CI"
+  return(out)
+}
+
+#' Build a brute-force generator of lower bound of always-valid confidence intervals for simple exponential e-values.
+#'
+#' Build a brute-force generator of lower bound of always-valid confidence intervals
+#' for simple exponential e-values given target range of numbers of observations.
+#'
+#' @inheritParams build_ci_exp
+#'
+#' @return \code{EDCP_BF_CI} object
+#' @export
+#'
+build_bf_ci_exp <- function(alpha,
+                            n_upper,
+                            n_lower,
+                            psi_fn_list_generator = generate_sub_G_fn,
+                            v_min = 1,
+                            k_max = 200,
+                            tol = 1e-6) {
+
+  psi_fn_list <- psi_fn_list_generator()
+  baseline_obj <- compute_baseline_for_sample_size(alpha,
+                                                   n_upper,
+                                                   n_lower,
+                                                   psi_fn_list,
+                                                   v_min,
+                                                   k_max,
+                                                   tol)
+
+  bf_ci_helper <- function(m, x_vec, tol = 1e-6) {
+    if (psi_fn_list$is_psi_depend_on_m){
+      psi_fn_list_inner <- psi_fn_list_generator(m)
+    } else {
+      psi_fn_list_inner <- baseline_obj$psi_fn_list
+    }
+    edcp_model <- build_edcp_exp(
+      alpha,
+      m,
+      baseline_obj$delta_lower,
+      baseline_obj$delta_upper,
+      is_test = TRUE,
+      psi_fn_list_inner,
+      s_fn = function(x) {
+        x - m
+      },
+      v_min = v_min,
+      k_max = k_max
+    )
+    e_val <- run_edcp(x_vec, edcp_model)
+    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$edcp_obj$log_one_over_alpha)
+  }
+
+  out <- list(bf_ci_helper = bf_ci_helper,
+              baseline_obj = baseline_obj,
+              family_name = psi_fn_list$family_name,
+              # Input Details
+              n_upper = n_upper,
+              n_lower = n_lower,
+              v_min = v_min
   )
 
   class(out) <- "EDCP_BF_CI"

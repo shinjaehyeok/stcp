@@ -205,10 +205,10 @@ compute_ci <- function(x_vec,
 #' @export
 #'
 compute_bf_ci_single <- function(x_vec,
-                                   bf_ci_helper,
-                                   width_upper = 100,
-                                   ci_lower_trivial = -Inf,
-                                   tol = 1e-6) {
+                                 bf_ci_helper,
+                                 width_upper = 100,
+                                 ci_lower_trivial = -Inf,
+                                 tol = 1e-6) {
   f <- function(m) {
     bf_ci_helper(m, x_vec)
   }
@@ -244,11 +244,11 @@ compute_bf_ci_single <- function(x_vec,
 #' @export
 #'
 compute_bf_ci <- function(x_vec,
-                       edcp_bf_ci_obj,
-                       width_upper = 100,
-                       ci_lower_trivial = -Inf,
-                       max_num_ci = 100,
-                       tol = 1e-6) {
+                          edcp_bf_ci_obj,
+                          width_upper = 100,
+                          ci_lower_trivial = -Inf,
+                          max_num_ci = 100,
+                          tol = 1e-6) {
   if (class(edcp_bf_ci_obj) != "EDCP_BF_CI") {
     stop("edcp_bf_ci_obj must be an output of the build_bf_ci_bounded function.")
   }
@@ -270,8 +270,10 @@ compute_bf_ci <- function(x_vec,
   ci_lower_vec <-
     sapply(n_ci_vec, function(n) {
       compute_bf_ci_single(x_vec[1:n],
-                                    bf_ci_helper,
-                                    width_upper = width_upper)
+                           bf_ci_helper,
+                           width_upper = width_upper,
+                           ci_lower_trivial = ci_lower_trivial,
+                           tol = tol)
     })
 
   x_bar_vec <- cumsum(x_vec) / seq_along(x_vec)

@@ -15,7 +15,7 @@ generate_sub_G_fn <- function(sig = 1){
     psi_star = function(x){x^2 / 2 / sig^2},
     psi_star_div = function(x){x / sig^2},
     psi_star_inv = function(x){sig * sqrt(2 * x)}
-    )
+  )
   return(G_fn_list)
 }
 

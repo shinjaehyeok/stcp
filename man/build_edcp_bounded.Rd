@@ -42,7 +42,7 @@ build_edcp_bounded(
 \item{var_upper}{Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.}
 }
 \value{
-\code{EDCP} Object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+\code{EDCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 }
 \description{
 Build EDCP model for bounded random variables to detect up-crossing mean-shift.

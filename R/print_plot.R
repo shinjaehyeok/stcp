@@ -9,10 +9,10 @@
 #' @export
 #'
 plot.EDCP_RUNNED <- function(x,
-                          n = seq_along(x$log_mix_e_vec),
-                          draw_detect_line = TRUE,
-                          add = FALSE,
-                          ...) {
+                             n = seq_along(x$log_mix_e_vec),
+                             draw_detect_line = TRUE,
+                             add = FALSE,
+                             ...) {
   if (x$edcp_obj$is_test) {
     ylab_ = "log e-value"
   } else {

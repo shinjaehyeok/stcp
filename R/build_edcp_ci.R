@@ -40,7 +40,7 @@ build_ci_exp <- function(alpha,
               n_upper = n_upper,
               n_lower = n_lower,
               v_min = v_min
-              )
+  )
 
   class(out) <- "EDCP_CI"
   return(out)
@@ -65,12 +65,12 @@ build_bf_ci_bounded <- function(alpha,
                                 tol = 1e-6) {
 
   baseline_obj <- compute_baseline_for_sample_size(alpha,
-                                                 n_upper,
-                                                 n_lower,
-                                                 generate_sub_E_fn(),
-                                                 v_min = 0,
-                                                 k_max = k_max,
-                                                 tol = tol)
+                                                   n_upper,
+                                                   n_lower,
+                                                   generate_sub_E_fn(),
+                                                   v_min = 0,
+                                                   k_max = k_max,
+                                                   tol = tol)
 
   bf_ci_helper <- function(m, x_vec, tol = 1e-6) {
     if (m <= bound_lower) {

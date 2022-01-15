@@ -19,7 +19,3 @@ A function compute log of baseline process given an observation.
 \description{
 Generate logarithm of the baseline function for bounded RVs in \eqn{[0,1]} given lambda and mean parameters
 }
-\examples{
-generate_log_bounded_base_fn(1)
-generate_log_bounded_base_fn(0.5)
-}

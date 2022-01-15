@@ -14,7 +14,7 @@ update_log_mix_e_values <- function(new_x_vec,
                                     weight_vec,
                                     log_base_fn_list,
                                     prev_log_e_vec = numeric(length(log_base_fn_list))
-                                    ){
+){
   # Check weights are positive and summed to one
   if (any(weight_vec <= 0)) stop("Weights must be positive")
   w <- sum(weight_vec)
@@ -46,9 +46,9 @@ update_log_mix_e_values <- function(new_x_vec,
 
 
   log_mix_e_val_vec <- apply(log_e_val_mat, 1,
-                              function(log_e_vec){
-                                matrixStats::logSumExp(log_e_vec + log_weight_vec)
-                                })
+                             function(log_e_vec){
+                               matrixStats::logSumExp(log_e_vec + log_weight_vec)
+                             })
 
   updated_list <- list(log_mix_e_vec = log_mix_e_val_vec,
                        last_log_e_vec = prev_log_e_vec)

@@ -8,11 +8,9 @@
 #' @param v_fn R function that compute the variance process given an observation.
 #' @inheritParams compute_baseline
 #'
-#' @return \code{EDCP} Object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{EDCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
-#' @examples
-#' build_edcp_exp(0.01, 1, 2, 10)
 build_edcp_exp <- function(alpha,
                            m_pre,
                            delta_lower,
@@ -89,7 +87,7 @@ build_edcp_exp <- function(alpha,
 #' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
 #' @inheritParams compute_baseline
 #'
-#' @return \code{EDCP} Object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{EDCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
 #' @examples

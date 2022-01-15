@@ -26,7 +26,3 @@ A function compute log of baseline process given an observation.
 \description{
 Generate logarithm of the baseline function given lambda parameter, psi_star, sum and variance functions
 }
-\examples{
-generate_log_base_fn(1)
-generate_log_base_fn(1, psi_fn = function(x) x^2)
-}

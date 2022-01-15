@@ -38,6 +38,3 @@ building a custom model. Recommend to use \code{compute_baseline_simple_exp}
 for simple exponential models or \code{compute_baseline_bounded} for bounded
 random variable cases rather than build a custom model.
 }
-\examples{
-compute_baseline(0.01, 1, 2)
-}

@@ -16,8 +16,6 @@
 #' @return A list of 1. Parameters of baseline processes, 2. Mixing weights, 3. Auxiliary values for computation.
 #' @export
 #'
-#' @examples
-#' compute_baseline(0.01, 1, 2)
 compute_baseline <- function(alpha,
                              delta_lower,
                              delta_upper,

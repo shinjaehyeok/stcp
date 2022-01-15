@@ -26,7 +26,3 @@ Updated logarithm of SR- or CUSUM-type e-detector.
 \description{
 Compute logarithm of SR- or CUSUM-type e-detector based on the current observation and previous value.
 }
-\examples{
-update_log_e_detector(1, 0, is_SR_type = TRUE)
-update_log_e_detector(1, 0, is_SR_type = FALSE)
-}

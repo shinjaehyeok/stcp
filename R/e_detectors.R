@@ -10,9 +10,6 @@
 #' @return Updated logarithm of SR- or CUSUM-type e-detector.
 #' @export
 #'
-#' @examples
-#' update_log_e_detector(1, 0, is_SR_type = TRUE)
-#' update_log_e_detector(1, 0, is_SR_type = FALSE)
 update_log_e_detector <- function(x_current,
                                   prev_log_e = 0,
                                   compute_log_baseline = function(x){x - 0.5},
@@ -20,9 +17,9 @@ update_log_e_detector <- function(x_current,
 
   current_log_e_val <- compute_log_baseline(x_current)
   if (is_SR_type){
-     update <- matrixStats::logSumExp(c(prev_log_e, 0))
+    update <- matrixStats::logSumExp(c(prev_log_e, 0))
   } else{
-     update <- max(prev_log_e, 0)
+    update <- max(prev_log_e, 0)
   }
   return(current_log_e_val + update)
 }
@@ -38,9 +35,6 @@ update_log_e_detector <- function(x_current,
 #' @return A function compute log of baseline process given an observation.
 #' @export
 #'
-#' @examples
-#' generate_log_base_fn(1)
-#' generate_log_base_fn(1, psi_fn = function(x) x^2)
 generate_log_base_fn <- function(lambda,
                                  psi_fn = function(x){x^2/2},
                                  s_fn = function(x){x},
@@ -61,9 +55,6 @@ generate_log_base_fn <- function(lambda,
 #' @return A function compute log of baseline process given an observation.
 #' @export
 #'
-#' @examples
-#' generate_log_bounded_base_fn(1)
-#' generate_log_bounded_base_fn(0.5)
 generate_log_bounded_base_fn <- function(lambda,
                                          m = 0.5,
                                          bound_lower = 0){

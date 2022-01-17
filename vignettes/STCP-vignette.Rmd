@@ -1,0 +1,141 @@
+---
+title: "STCP-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{STCP-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(STCP)
+```
+
+
+## Example
+### 1. Sequential test
+
+Suppose we have a stream of observations $X_1, X_2, \dots \in [0,1]$. Before an unknown change-point $\nu$, each pre-change observation has mean less than or equal to $0.3$. But after the change-point $\nu$, each post-change observation has mean larger than $0.3$.  
+
+If $\nu$ is equal to either $0$ or $\infty$ then this setting is reduced to the following testing problem.
+
+\[
+H_0: \mu \leq 0.2~~\text{vs}~~H_1: \nu > 0.2
+\]
+
+For this example, we generate data stream from Beta distributions for simplicity.
+However, the testing algorithm itself is nonparametric and does not rely on this specific choice of the distribution.
+
+#### a) Under $H_0$ 
+```{r test_null_example}
+set.seed(1)
+library(STCP)
+# Generate a stream of observations
+# For simplicity, we use beta distributions to generate samples
+max_sample <- 1000L
+x_vec <- rbeta(max_sample, 2, 8) # H_0 dist: B(1, 3)
+plot(1:max_sample, x_vec, pch=20, 
+     xlab = "n", ylab = "X_n", main = "Simulated Data (H0)")
+```
+
+Below, we compute a mixture e-values for testing the hypothesis.
+```{r test_null_run}
+alpha <- 1e-2 # Level 0.01 test 
+m_pre <- 0.2 # Upper bound of mean of the null distribution.
+delta_lower <- 0.01  # Guess on the minimum gap between the null and alternative means
+test_model <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = TRUE)
+
+# Compute mixture of SR-type e-detectors.
+mix_SR_test <- run_stcp(x_vec, test_model)
+mix_SR_stop <- mix_SR_test$stopped_ind
+
+# Printing summary
+print(mix_SR_test)
+
+# Plot 
+plot(mix_SR_test)
+```
+As the log of mixture of e-values does not cross the threshold ($\log(1/\alpha)\sim `r round(log(1/alpha), 2)`$), 
+there is no enough evidence to reject the null hypothesis so far. 
+
+
+#### b) Under $H_1$ 
+
+```{r test_alter_example}
+# Generate a stream of observations
+# For simplicity, we use beta distributions to generate samples
+max_sample <- 1000L
+x_vec <- rbeta(max_sample, 2, 7) # H_1 dist: B(2,3)
+plot(1:max_sample, x_vec, pch=20, 
+     xlab = "n", ylab = "X_n", main = "Simulated Data (H1)")
+
+```
+
+Below, we use the same model to compute a mixture e-values for testing the hypothesis.
+```{r test_alter_run}
+# Compute mixture of SR-type e-detectors.
+mix_SR_test <- run_stcp(x_vec, test_model)
+mix_SR_stop <- mix_SR_test$stopped_ind
+
+# Printing summary
+print(mix_SR_test)
+
+# Plot 
+plot(mix_SR_test)
+```
+As the log of mixture of e-values crosses the threshold ($\log(1/\alpha)\sim `r round(log(1/alpha), 2)`$), 
+we can reject the null at $n = `r mix_SR_test$stopped_ind`$ at the earliest. 
+
+
+### 2. Change-point detection
+
+
+```{r example}
+# Generate a stream of observations
+# For simplicity, we use beta distributions to generate samples
+max_sample <- 1000L
+nu <- 500L
+x_vec <- numeric(max_sample)
+x_vec[1:nu] <- rbeta(nu, 2, 8) # Pre-change dist: B(2, 8)
+x_vec[seq(nu+1, max_sample)] <- rbeta((max_sample - nu), 2, 7) # Post-change dist: B(2, 7)
+m_pre <- 2 / (2+8)
+m_post <- 2 / (2+7)
+plot(1:max_sample, x_vec, pch=20, 
+     xlab = "n", ylab = "X_n", main = "Simulated Data")
+```
+
+Below, we compute a mixture e-detectors by which we can infer when the change of the mean happened.
+```{r stcp}
+alpha <- 1e-3 # Inverse of target ARL
+m_pre <- 0.2 # Upper bound of mean of pre-change observations
+delta_lower <- 0.01  # Guess on the minimum gap between pre- and post-change means
+stcp_model <- build_stcp_bounded(alpha, m_pre, delta_lower)
+
+# Compute mixture of SR-type e-detectors.
+mix_SR_bounded <- run_stcp(x_vec, stcp_model, is_SR_type = FALSE)
+mix_SR_stop <- mix_SR_bounded$stopped_ind
+
+# Printing summary
+print(mix_SR_bounded)
+
+# Plot 
+plot(mix_SR_bounded, main = paste0("v = ", nu, "; v_hat = ",mix_SR_stop))
+```
+
+
+```{r example2}
+plot(1:max_sample, x_vec, pch=20, 
+     xlab = "n", ylab = "X_n", main = "Simulated Data with the detected CP")
+lines(x = c(0,nu), y = c(0.3,0.3), col = 2, lwd = 2)
+lines(x = c(nu,max_sample), y = c(0.4,0.4), col = 2, lwd =2 )
+abline(v = nu, col = 1, lty = 2)
+abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
+
+```

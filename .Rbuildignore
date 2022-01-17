@@ -6,3 +6,5 @@
 ^EDCP.*\.tgz$
 ^README\.Rmd$
 ^\.github$
+^doc$
+^Meta$

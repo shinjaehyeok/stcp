@@ -1,7 +1,7 @@
-# If EDCP is not installed then run below commands
+# If STCP is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/EDCP")
-library(EDCP)
+# devtools::install_github("shinjaehyeok/STCP")
+library(STCP)
 # In this analysis, we use tidyverse to handle NBA data
 library(tidyverse)
 # Load NBA regular season log from 2011 to 2022
@@ -82,41 +82,36 @@ for (i in 1:nrow(year_summ)) {
   )
 }
 
-
+# Build model
 alpha <- 1e-3 # Inverse of target ARL
 p_pre <- 0.49
+delta_lower <- 0.02
 
-# Compute baselines
-baseline_ber <- compute_baseline_simple_exp(
+ber_model <- build_stcp_exp(
   alpha,
   p_pre,
-  delta_lower = 0.02,
-  delta_upper = 0.41,
-  psi_fn_list = generate_sub_B_fn(p = p_pre)
-)
+  delta_lower,
+  delta_upper = 1 - (p_pre + delta_lower),
+  psi_fn_list = generate_sub_B_fn(p_pre)
+  )
 
 # Compute mixture of SR-type e-detectors.
-mix_SR_ber <- edcp(CLE_dat$isWin, baseline_ber)
+mix_SR_ber <- run_stcp(CLE_dat$isWin, ber_model)
 
 # Stopping time of the mixture of SR procedure.
-mix_SR_ber_stop <-
-  CLE_dat$dateGame[mix_SR_ber$stopped_ind] %>% as.Date()
+mix_SR_stop_ber <- CLE_dat$dateGame[mix_SR_ber$stopped_ind] %>% as.Date()
 
+# Plot log e-detector
+# Size 600 * 450 for the paper
+plot(mix_SR_ber,
+     n = as.Date(CLE_dat$dateGame),
+     xlab = "Date",
+     main = paste0("CP detected at ", mix_SR_stop_ber),
+     draw_detect_line = FALSE) # unable default detection line
+# Draw customized detection line for the paper
+abline(v = mix_SR_stop_ber, col = 2, lty = 2)
 
-# Plot size 600 * 450
-plot(
-  as.Date(CLE_dat$dateGame),
-  mix_SR_ber$log_mix_e_val,
-  type = "l",
-  xlab = "Date",
-  ylab = "log e-detectors",
-  main = paste0("CP detected at ", mix_SR_ber_stop)
-)
-abline(h = mix_SR_ber$threshold, col = 2)
-# abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
-# abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
-abline(v = mix_SR_ber_stop, col = 2, lty = 2)
-
+# Draw detected line onto the original winning rate plot.
 plot(
   as.Date(CLE_dat$dateGame),
   CLE_dat$win_rate_month,
@@ -136,10 +131,12 @@ for (i in 1:nrow(year_summ)) {
     lwd = 2
   )
 }
-abline(v = mix_SR_ber_stop,
+abline(v = mix_SR_stop_ber,
        col = 2,
        lty = 2,
        lwd = 2)
+
+
 
 
 # 2. +/-  ----
@@ -166,42 +163,40 @@ for (i in 1:nrow(year_summ)) {
     lwd = 3
   )
 }
+
+# Build model
+alpha <- 1e-3 # Inverse of target ARL
 bound_lower <- -80
 bound_upper <- 80
 m_pre <- -1
 delta_lower <- 2
-delta_upper <- bound_upper - m_pre
 
-alpha <- 1e-3 # Inverse of target ARL
 
-# Compute parameters
-baseline_bounded <- compute_baseline_bounded(alpha,
-                                             m_pre,
-                                             delta_lower,
-                                             delta_upper,
-                                             bound_lower,
-                                             bound_upper)
+bounded_model <- build_stcp_bounded(
+  alpha,
+  m_pre,
+  delta_lower,
+  bound_lower = bound_lower,
+  bound_upper = bound_upper
+)
 
 # Compute mixture of SR-type e-detectors.
-mix_SR_bounded <- edcp(CLE_dat$plusminusTeam, baseline_bounded)
+mix_SR_bounded <- run_stcp(CLE_dat$plusminusTeam, bounded_model)
 
 # Stopping time of the mixture of SR procedure.
-mix_SR_bounded_stop <-
-  CLE_dat$dateGame[mix_SR_bounded$stopped_ind] %>% as.Date()
+mix_SR_stop_bounded <- CLE_dat$dateGame[mix_SR_bounded$stopped_ind] %>% as.Date()
 
-plot(
-  as.Date(CLE_dat$dateGame),
-  mix_SR_bounded$log_mix_e_val,
-  type = "l",
-  xlab = "Game Date",
-  ylab = "log e-detectors",
-  main = paste0("CP detected at ", mix_SR_bounded_stop)
-)
-abline(h = mix_SR_bounded$threshold, col = 2)
-# abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
-# abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
-abline(v = mix_SR_bounded_stop, col = 2, lty = 2)
+# Plot log e-detector
+# Size 600 * 450 for the paper
+plot(mix_SR_bounded,
+     n = as.Date(CLE_dat$dateGame),
+     xlab = "Date",
+     main = paste0("CP detected at ", mix_SR_stop_bounded),
+     draw_detect_line = FALSE) # unable default detection line
+# Draw customized detection line for the paper
+abline(v = mix_SR_stop_bounded, col = 2, lty = 2)
 
+# Draw detected line onto the original +/- plot.
 plot(
   as.Date(CLE_dat$dateGame),
   CLE_dat$plusminusTeam,
@@ -222,156 +217,7 @@ for (i in 1:nrow(year_summ)) {
   )
 }
 
-abline(v = mix_SR_bounded_stop,
+abline(v = mix_SR_stop_bounded,
        col = 2,
        lty = 2,
        lwd = 2)
-
-
-# # 3. Score ----
-# # Pre-change : PTS =< 99
-# # Post-change: PTS >= 100
-# # Assume points for each game is always between 50 and 200
-#
-# plot(as.Date(CLE_dat$dateGame), CLE_dat$ptsTeam, pch=20,
-#      xlab = "Date", ylab = "X_n", main = "Game points with seasonal averages")
-# for (i in 1:nrow(year_summ)){
-#   year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
-#   pts_year <- year_summ[i, "pts_year"] %>% as.numeric
-#   lines(x = year_date_range, y = rep(pts_year, 2), col = 2, lwd = 2)
-# }
-#
-# CLE_dat <- CLE_dat %>% dplyr::mutate(normalized_PTS = (ptsTeam - 50) / (200 - 50))
-#
-# alpha <- 1e-3 # Inverse of target ARL
-# m <- (99 - 50) / (200-50) # Upper bound of mean of pre-change observations
-# d <- 1 / 150  # Guess on the minimum gap between pre- and post-change means
-# E_fn_list <- generate_sub_E_fn()
-#
-# # Compute parameters
-# base_param <- compute_baseline(
-#   alpha = alpha,
-#   delta_lower = m * d / (1/4 + (1-m)^2), # 0.003
-#   delta_upper = m * (1-m) / d^2,  # 4949
-#   psi_fn_list = generate_sub_E_fn(),
-#   v_min = 0,
-#   k_max = 1000
-# )
-#
-# # Compute e-detectors
-# log_base_fn_list <- sapply(base_param$lambda,
-#                            generate_log_bounded_base_fn,
-#                            m = m)
-#
-# # Compute mixture of SR-type e-detectors.
-# mix_SR <- update_log_mix_e_detectors(CLE_dat$normalized_PTS,
-#                                      base_param$omega,
-#                                      log_base_fn_list)
-#
-# # Inferred change-point
-# mix_SR_stop <- min(
-#   CLE_dat$dateGame[which(mix_SR$log_mix_e_detect_val > log(1/alpha))]
-# ) %>% as.Date()
-#
-# plot(as.Date(CLE_dat$dateGame), mix_SR$log_mix_e_detect_val, type = "l",
-#      xlab = "Date", ylab = "log e-detectors", main = paste0("v_hat = ",mix_SR_stop))
-# abline(h = log(1/alpha), col = 2)
-# abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
-# abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
-# abline(v = mix_SR_stop, col = 2, lty = 2)
-#
-# plot(as.Date(CLE_dat$dateGame), CLE_dat$ptsTeam, pch=20,
-#      xlab = "Date", ylab = "X_n", main = "Game points with the detected CP")
-# for (i in 1:nrow(year_summ)){
-#   year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
-#   pts_year <- year_summ[i, "pts_year"] %>% as.numeric
-#   lines(x = year_date_range, y = rep(pts_year, 2), col = 2, lwd = 2)
-# }
-# abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
-#
-# # 3-2. Score change
-# # Pre-change : PTS =< 99
-# # Post-change: PTS >= 100
-# # Assume points for each game is always between 50 and 200
-# year_summ_after_2012 <- year_summ  %>%
-#   mutate(
-#     pts_pre_year = c(first(pts_year),
-#                      pts_year[-length(pts_year)])
-#   ) %>%
-#   filter(yearSeason > 2011)
-#
-# CLE_dat_after_2012 <- CLE_dat %>%
-#   left_join(year_summ_after_2012 %>%
-#               select(yearSeason, pts_pre_year),
-#             by = "yearSeason") %>%
-#   mutate(
-#     normalized_PTS_change = (ptsTeam - 50) / (pts_pre_year - 50),
-#     pts_year_change = pts_year / pts_pre_year) %>%
-#   filter(yearSeason > 2011)
-#
-#
-#
-# plot(as.Date(CLE_dat_after_2012$dateGame), CLE_dat_after_2012$normalized_PTS_change, pch=20,
-#      xlab = "Date", ylab = "X_n", main = "Game points with seasonal averages")
-# for (i in 1:nrow(year_summ_after_2012)){
-#   year_date_range <- year_summ_after_2012[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
-#   pts_year <- year_summ_after_2012[i, "pts_year"] %>% as.numeric()
-#   pts_pre_year <- year_summ_after_2012[i, "pts_pre_year"] %>% as.numeric()
-#   lines(x = year_date_range, y = rep(pts_year / pts_pre_year, 2), col = 2, lwd = 2)
-# }
-#
-# alpha <- 1e-3 # Inverse of target ARL
-# r_upper <- 1.02 # Upper bound of ratio of pre-change observations
-# d <- 0.01  # Guess on the minimum gap between pre- and post-change means
-# E_fn_list <- generate_sub_E_fn()
-#
-# # Compute parameters
-# base_param <- compute_baseline(
-#   alpha = alpha,
-#   delta_lower = 0.01, # 0.003
-#   delta_upper = 1,  # 4949
-#   psi_fn_list = generate_sub_E_fn(),
-#   v_min = 0,
-#   k_max = 1000
-# )
-#
-# generate_log_ratio_base_fn <- function(lambda, r = 1.03){
-#   if (r <= 0) stop("Ratio parameter must be strictly positive.")
-#   log_base_fn <- function(x){
-#     log(1 + lambda * (x / r  - 1))
-#   }
-#   return(log_base_fn)
-# }
-#
-# # Compute e-detectors
-# log_base_fn_list <- sapply(base_param$lambda,
-#                            generate_log_ratio_base_fn,
-#                            r = r_upper)
-#
-# # Compute mixture of SR-type e-detectors.
-# mix_SR <- update_log_mix_e_detectors(CLE_dat_after_2012$normalized_PTS_change,
-#                                      base_param$omega,
-#                                      log_base_fn_list)
-#
-# # Inferred change-point
-# mix_SR_stop <- min(
-#   CLE_dat_after_2012$dateGame[which(mix_SR$log_mix_e_detect_val > log(1/alpha))]
-# ) %>% as.Date()
-#
-# plot(as.Date(CLE_dat_after_2012$dateGame), mix_SR$log_mix_e_detect_val, type = "l",
-#      xlab = "Date", ylab = "log e-detectors", main = paste0("v_hat = ",mix_SR_stop))
-# abline(h = log(1/alpha), col = 2)
-# abline(v = as.Date(regular_season_start_end_date$start_date) , col = 1, lty = 2)
-# abline(v = as.Date(regular_season_start_end_date$end_date) , col = 1, lty = 3)
-# abline(v = mix_SR_stop, col = 2, lty = 2)
-#
-# plot(as.Date(CLE_dat_after_2012$dateGame), CLE_dat_after_2012$ptsTeam, pch=20,
-#      xlab = "Date", ylab = "X_n", main = "Game points with the detected CP")
-# for (i in 1:nrow(year_summ)){
-#   year_date_range <- year_summ[i,c("start_date", "end_date")] %>% as.character() %>% as.Date()
-#   pts_year <- year_summ[i, "pts_year"] %>% as.numeric
-#   lines(x = year_date_range, y = rep(pts_year, 2), col = 2, lwd = 2)
-# }
-# abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
-#
-#

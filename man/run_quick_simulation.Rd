@@ -4,16 +4,16 @@
 \alias{run_quick_simulation}
 \title{Run a quick simulation for debuging}
 \usage{
-run_quick_simulation(x_vec, edcp_mix, v = Inf, edcp_star = NULL)
+run_quick_simulation(x_vec, stcp_mix, v = Inf, stcp_star = NULL)
 }
 \arguments{
 \item{x_vec}{Simulated observations}
 
-\item{edcp_mix}{edcp object for the mixture case}
+\item{stcp_mix}{stcp object for the mixture case}
 
 \item{v}{Change-point}
 
-\item{edcp_star}{edcp object for the delta_star (optional)}
+\item{stcp_star}{stcp object for the delta_star (optional)}
 }
 \value{
 Stopped point for single and mixtures of SR- and CUSUM-type e-detectors.

@@ -1,8 +1,8 @@
-# If EDCP is not installed then run below commands
+# If STCP is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/EDCP")
+# devtools::install_github("shinjaehyeok/STCP")
 
-library(EDCP)
+library(STCP)
 
 # Bounded case ----
 # Pre-change : 5 * Beta(1, 4) - 1 (m = 0, sig^2 = 5^2 * 4 / (5^2 * 6) = 2/3)
@@ -65,7 +65,7 @@ graphics::lines(
 
 # Build CP detectors
 # When delta_lower = delta_upper = delta_star
-edcp_star <- build_edcp_bounded(
+stcp_star <- build_stcp_bounded(
   alpha,
   m_pre,
   delta_star,
@@ -80,7 +80,7 @@ edcp_star <- build_edcp_bounded(
 )
 
 # When delta_lower < delta_star < delta_upper
-edcp_mix <- build_edcp_bounded(
+stcp_mix <- build_stcp_bounded(
   alpha,
   m_pre,
   delta_lower,
@@ -93,7 +93,7 @@ edcp_mix <- build_edcp_bounded(
 )
 
 stopped_time <- run_quick_simulation(x_vec,
-                                     edcp_mix,
+                                     stcp_mix,
                                      v,
-                                     edcp_star)
+                                     stcp_star)
 print(stopped_time)

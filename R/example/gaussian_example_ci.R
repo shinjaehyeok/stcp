@@ -1,8 +1,8 @@
-# If EDCP is not installed then run below commands
+# If STCP is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/EDCP")
+# devtools::install_github("shinjaehyeok/STCP")
 
-library(EDCP)
+library(STCP)
 
 # Gaussian case ----
 # N(mu, 1)

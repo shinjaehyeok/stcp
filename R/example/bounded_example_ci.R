@@ -1,8 +1,8 @@
-# If EDCP is not installed then run below commands
+# If STCP is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/EDCP")
+# devtools::install_github("shinjaehyeok/STCP")
 
-library(EDCP)
+library(STCP)
 set.seed(1)
 # Bernoulli case ----
 # 5 * Beta(2, 3) - 1 (m = 1, sig^2 = 5^2 * 6 / (5^2 * 6) = 1)
@@ -53,7 +53,7 @@ ci_Ber <- compute_ci((x_vec - shift) / const, ci_model_Ber, ci_lower_trivial = 0
 ci_Ber$x_bar <- ci_Ber$x_bar * const + shift
 ci_Ber$ci_lower <- ci_Ber$ci_lower * const + shift
 
-#2. Brute-force based on Bounded-EDCP model. Slower but tighter in general.
+#2. Brute-force based on Bounded-STCP model. Slower but tighter in general.
 bf_ci_model <- build_bf_ci_bounded (alpha,
                                     n_upper,
                                     n_lower,

@@ -6,7 +6,7 @@
 #' @param psi_fn_list_generator Function operator generating \code{psi_fn_list}
 #' @inheritParams compute_baseline_for_sample_size
 #'
-#' @return \code{EDCP_CI} Object
+#' @return \code{STCP_CI} Object
 #' @export
 #'
 build_ci_exp <- function(alpha,
@@ -42,7 +42,7 @@ build_ci_exp <- function(alpha,
               v_min = v_min
   )
 
-  class(out) <- "EDCP_CI"
+  class(out) <- "STCP_CI"
   return(out)
 }
 
@@ -54,7 +54,7 @@ build_ci_exp <- function(alpha,
 #' @inheritParams compute_baseline_for_sample_size
 #' @param  bound_lower  Lower bound of observations.
 #'
-#' @return \code{EDCP_BF_CI} object
+#' @return \code{STCP_BF_CI} object
 #' @export
 #'
 build_bf_ci_bounded <- function(alpha,
@@ -84,7 +84,7 @@ build_bf_ci_bounded <- function(alpha,
       bound_lower = bound_lower
     )
 
-    edcp_model <- list(
+    stcp_model <- list(
       omega = baseline_obj$omega,
       log_base_fn_list =  log_base_fn_list,
       log_one_over_alpha = log(1/alpha),
@@ -94,10 +94,10 @@ build_bf_ci_bounded <- function(alpha,
       log_e_vec = numeric(length(log_base_fn_list)),
       n = 0
     )
-    class(edcp_model) <- c("Bounded", "EDCP")
+    class(stcp_model) <- c("Bounded", "STCP")
 
-    e_val <- run_edcp(x_vec, edcp_model)
-    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$edcp_obj$log_one_over_alpha)
+    e_val <- run_stcp(x_vec, stcp_model)
+    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$stcp_obj$log_one_over_alpha)
   }
 
   out <- list(bf_ci_helper = bf_ci_helper,
@@ -109,7 +109,7 @@ build_bf_ci_bounded <- function(alpha,
               bound_lower = bound_lower
   )
 
-  class(out) <- "EDCP_BF_CI"
+  class(out) <- "STCP_BF_CI"
   return(out)
 }
 
@@ -120,7 +120,7 @@ build_bf_ci_bounded <- function(alpha,
 #'
 #' @inheritParams build_ci_exp
 #'
-#' @return \code{EDCP_BF_CI} object
+#' @return \code{STCP_BF_CI} object
 #' @export
 #'
 build_bf_ci_exp <- function(alpha,
@@ -146,7 +146,7 @@ build_bf_ci_exp <- function(alpha,
     } else {
       psi_fn_list_inner <- baseline_obj$psi_fn_list
     }
-    edcp_model <- build_edcp_exp(
+    stcp_model <- build_stcp_exp(
       alpha,
       m,
       baseline_obj$delta_lower,
@@ -159,8 +159,8 @@ build_bf_ci_exp <- function(alpha,
       v_min = v_min,
       k_max = k_max
     )
-    e_val <- run_edcp(x_vec, edcp_model)
-    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$edcp_obj$log_one_over_alpha)
+    e_val <- run_stcp(x_vec, stcp_model)
+    return(e_val$log_mix_e_vec[length(e_val$log_mix_e_vec)] - e_val$stcp_obj$log_one_over_alpha)
   }
 
   out <- list(bf_ci_helper = bf_ci_helper,
@@ -172,6 +172,6 @@ build_bf_ci_exp <- function(alpha,
               v_min = v_min
   )
 
-  class(out) <- "EDCP_BF_CI"
+  class(out) <- "STCP_BF_CI"
   return(out)
 }

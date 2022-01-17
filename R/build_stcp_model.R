@@ -1,6 +1,6 @@
-#' Build EDCP model for simple exponential e-detectors.
+#' Build STCP model for simple exponential e-detectors.
 #'
-#' Build EDCP model for simple exponential e-detectors to detect up-crossing mean-shift.
+#' Build STCP model for simple exponential e-detectors to detect up-crossing mean-shift.
 #'
 #' @param m_pre Upper bound of mean of pre-change observations
 #' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
@@ -8,10 +8,10 @@
 #' @param v_fn R function that compute the variance process given an observation.
 #' @inheritParams compute_baseline
 #'
-#' @return \code{EDCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
-build_edcp_exp <- function(alpha,
+build_stcp_exp <- function(alpha,
                            m_pre,
                            delta_lower,
                            delta_upper,
@@ -69,13 +69,13 @@ build_edcp_exp <- function(alpha,
     },
     v_min = 1
   )
-  class(out) <- c("SimpleExp", "EDCP")
+  class(out) <- c("SimpleExp", "STCP")
   return(out)
 }
 
-#' Build EDCP model for bounded random variables.
+#' Build STCP model for bounded random variables.
 #'
-#' Build EDCP model for bounded random variables to detect up-crossing mean-shift.
+#' Build STCP model for bounded random variables to detect up-crossing mean-shift.
 #'
 #' @param m_pre Upper bound of mean of pre-change observations. Must be between \code{bound_lower} and \code{bound_upper}.
 #' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
@@ -87,12 +87,12 @@ build_edcp_exp <- function(alpha,
 #' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
 #' @inheritParams compute_baseline
 #'
-#' @return \code{EDCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
 #' @examples
-#' build_edcp_bounded(0.01, 0.5, 0.1, 0.4)
-build_edcp_bounded <- function(alpha,
+#' build_stcp_bounded(0.01, 0.5, 0.1, 0.4)
+build_stcp_bounded <- function(alpha,
                                m_pre,
                                delta_lower,
                                delta_upper = bound_upper - m_pre,
@@ -164,6 +164,6 @@ build_edcp_bounded <- function(alpha,
     var_lower = var_lower,
     var_upper = var_upper
   )
-  class(out) <- c("Bounded", "EDCP")
+  class(out) <- c("Bounded", "STCP")
   return(out)
 }

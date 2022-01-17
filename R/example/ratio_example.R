@@ -1,8 +1,8 @@
-# If EDCP is not installed then run below commands
+# If STCP is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/EDCP")
+# devtools::install_github("shinjaehyeok/STCP")
 
-library(EDCP)
+library(STCP)
 
 # Ratio case ----
 # log(X): N(1, 1) + log(unit)
@@ -28,8 +28,8 @@ k_max <- 1e+3
 
 # Generate sample
 x_vec <- unit * exp(rnorm(max_sample, 0,0.1))
-r_pre <- filter(rnorm(v, 0, 0.001), filter=rep(1,24), circular=TRUE) +  m_pre
-r_post <- filter(rnorm(max_sample-v, 0, 0.001), filter=rep(1,24), circular=TRUE) +  m_post
+r_pre <- stats::filter(rnorm(v, 0, 0.001), filter=rep(1,24), circular=TRUE) +  m_pre
+r_post <- stats::filter(rnorm(max_sample-v, 0, 0.001), filter=rep(1,24), circular=TRUE) +  m_post
 # r_post <- filter(rnorm(max_sample-v, 0, 0.001), filter=rep(1,24), circular=TRUE) +
 #   seq(m_pre, 2 * m_post - m_pre, length.out = max_sample - v)
 y_pre_vec <- log(r_pre) + log(x_vec[1:v]) + rnorm(v,0,sig)
@@ -37,8 +37,8 @@ y_post_vec <- log(r_post) + log(x_vec[seq(v+1, max_sample)]) + rnorm(max_sample-
 y_vec <- exp(c(y_pre_vec, y_post_vec) - sig^2 / 2)
 
 
-ma_day <- filter(y_vec / x_vec, rep(1 / 24, 24), sides = 1)
-ma_week <- filter(y_vec / x_vec, rep(1 / 24 / 7, 24 * 7), sides = 1)
+ma_day <- stats::filter(y_vec / x_vec, rep(1 / 24, 24), sides = 1)
+ma_week <- stats::filter(y_vec / x_vec, rep(1 / 24 / 7, 24 * 7), sides = 1)
 
 plot(
   1:max_sample,
@@ -111,7 +111,7 @@ delta_lower <- 0.01
 
 # Build CP detectors
 # When delta_lower = delta_upper = delta_star
-edcp_star <- build_edcp_bounded(
+stcp_star <- build_stcp_bounded(
   alpha,
   m_pre_model,
   delta_star,
@@ -126,7 +126,7 @@ edcp_star <- build_edcp_bounded(
 )
 
 # When delta_lower < delta_star < delta_upper
-edcp_mix <- build_edcp_bounded(
+stcp_mix <- build_stcp_bounded(
   alpha,
   m_pre_model,
   delta_lower,
@@ -143,9 +143,9 @@ ratio_vec[ratio_vec > bound_upper] <- bound_upper
 ratio_vec[ratio_vec < bound_lower] <- bound_lower
 
 stopped_time <- run_quick_simulation(ratio_vec,
-                                     edcp_mix,
+                                     stcp_mix,
                                      v,
-                                     edcp_star)
+                                     stcp_star)
 print(stopped_time)
 print("daily_average")
 print(min(which(ma_day > (m_pre + m_post) / 2)))

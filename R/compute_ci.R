@@ -3,7 +3,7 @@
 #' Given a vector of observations, compute lower bounds of confidence sequence.
 #'
 #' @param x_vec A vector of observations
-#' @param edcp_ci_obj EDCP_CI object, output of \code{build_ci_exp}
+#' @param stcp_ci_obj STCP_CI object, output of \code{build_ci_exp}
 #' @param x_bar_pre Sample mean of previous observations. Default is \code{0} (No pre-samples)
 #' @param n_pre Number of pre-samples. Default is \code{0}.
 #' @inheritParams compute_single_ci
@@ -12,17 +12,17 @@
 #' @export
 #'
 compute_ci <- function(x_vec,
-                       edcp_ci_obj,
+                       stcp_ci_obj,
                        width_upper = 100,
                        ci_lower_trivial = -Inf,
                        x_bar_pre = 0,
                        n_pre = 0,
                        tol = 1e-6) {
-  if (class(edcp_ci_obj) != "EDCP_CI") {
-    stop("edcp_ci_obj must be an output of build_ci_exp function.")
+  if (class(stcp_ci_obj) != "STCP_CI") {
+    stop("stcp_ci_obj must be an output of build_ci_exp function.")
   }
 
-  ci_helper <- edcp_ci_obj$ci_helper
+  ci_helper <- stcp_ci_obj$ci_helper
 
   if (n_pre < 0) {
     stop("Pre-sample size must be nonnegative.")
@@ -53,7 +53,7 @@ compute_ci <- function(x_vec,
 #' Given a vector of observations, compute lower bounds of confidence sequence.
 #'
 #' @param x_vec A vector of observations
-#' @param edcp_bf_ci_obj EDCP_BF_CI object, output of \code{build_bf_ci_bounded}
+#' @param stcp_bf_ci_obj STCP_BF_CI object, output of \code{build_bf_ci_bounded}
 #' @param max_num_ci The maximum number of CI to computes. Recomend to set it be less than 100.
 #' @inheritParams compute_bf_ci_single
 #'
@@ -61,19 +61,19 @@ compute_ci <- function(x_vec,
 #' @export
 #'
 compute_bf_ci <- function(x_vec,
-                          edcp_bf_ci_obj,
+                          stcp_bf_ci_obj,
                           width_upper = 100,
                           ci_lower_trivial = -Inf,
                           max_num_ci = 100,
                           tol = 1e-6) {
-  if (class(edcp_bf_ci_obj) != "EDCP_BF_CI") {
-    stop("edcp_bf_ci_obj must be an output of the build_bf_ci_bounded function.")
+  if (class(stcp_bf_ci_obj) != "STCP_BF_CI") {
+    stop("stcp_bf_ci_obj must be an output of the build_bf_ci_bounded function.")
   }
   if (max_num_ci < 1) {
     stop("max_num_ci must be at least 1")
   }
 
-  bf_ci_helper <- edcp_bf_ci_obj$bf_ci_helper
+  bf_ci_helper <- stcp_bf_ci_obj$bf_ci_helper
 
   if (length(x_vec) <= max_num_ci) {
     n_ci_vec <- seq_along(x_vec)

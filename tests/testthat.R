@@ -1,4 +1,4 @@
 library(testthat)
-library(EDCP)
+library(STCP)
 
-test_check("EDCP")
+test_check("STCP")

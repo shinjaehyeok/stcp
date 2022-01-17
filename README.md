@@ -1,24 +1,25 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# EDCP: E-Detector-based online Change-Point detection algorithms
+# STCP: Sequential Test and Change-Point detection algorithms based on E-values / E-detectors
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/shinjaehyeok/EDCP/workflows/R-CMD-check/badge.svg)](https://github.com/shinjaehyeok/EDCP/actions)
+[![R-CMD-check](https://github.com/shinjaehyeok/STCP/workflows/R-CMD-check/badge.svg)](https://github.com/shinjaehyeok/STCP/actions)
 <!-- badges: end -->
 
-EDCP is a R package built to run e-detector-based nonparametric online
-change-point detection algorithms in \[CITE PAPER\].
+STCP is a R package built to run nonparametric sequential tests and
+online change point detection algorithms in \[CITE SRR 21’ and SRR
+22’\].
 
 ## Installation
 
-You can install the development version of EDCP from
+You can install the development version of STCP from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("shinjaehyeok/EDCP")
+devtools::install_github("shinjaehyeok/STCP")
 ```
 
 ## Example
@@ -31,7 +32,7 @@ observation has mean larger than 0.3.
 
 ``` r
 set.seed(1)
-library(EDCP)
+library(STCP)
 # Generate a stream of observations
 # For simplicity, we use beta distributions to generate samples
 max_sample <- 1000L
@@ -54,19 +55,19 @@ change of the mean happened.
 alpha <- 1e-3 # Inverse of target ARL
 m_pre <- 0.3 # Upper bound of mean of pre-change observations
 delta_lower <- 0.01  # Guess on the minimum gap between pre- and post-change means
-edcp_model <- build_edcp_bounded(alpha, m_pre, delta_lower)
+stcp_model <- build_stcp_bounded(alpha, m_pre, delta_lower)
 
 # Compute mixture of SR-type e-detectors.
-mix_SR_bounded <- run_edcp(x_vec, edcp_model)
+mix_SR_bounded <- run_stcp(x_vec, stcp_model)
 mix_SR_stop <- mix_SR_bounded$stopped_ind
 
 # Printing summary
 print(mix_SR_bounded)
-#> EDCP Run:
+#> STCP Run:
 #> - Num. of new obs:  1000 
 #> - Stopped index:  512 
 #> 
-#> EDCP Model:
+#> STCP Model:
 #> - Family:  Bounded (sub-E based) 
 #> - alpha:  0.001 
 #> - is_test:  FALSE 
@@ -83,7 +84,7 @@ print(mix_SR_bounded)
 plot(mix_SR_bounded, main = paste0("v = ", nu, "; v_hat = ",mix_SR_stop))
 ```
 
-<img src="man/figures/README-edcp-1.png" width="100%" />
+<img src="man/figures/README-stcp-1.png" width="100%" />
 
 ``` r
 plot(1:max_sample, x_vec, pch=20, 

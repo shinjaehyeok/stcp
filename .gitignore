@@ -3,9 +3,9 @@
 .Rdata
 .httr-oauth
 .DS_Store
-EDCP.Rcheck/
-EDCP*.tar.gz
-EDCP*.tgz
+STCP.Rcheck/
+STCP*.tar.gz
+STCP*.tgz
 inst/doc
 /doc/
 /Meta/

@@ -1,9 +1,9 @@
-^EDCP\.Rproj$
+^STCP\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
-^EDCP\.Rcheck$
-^EDCP.*\.tar\.gz$
-^EDCP.*\.tgz$
+^STCP\.Rcheck$
+^STCP.*\.tar\.gz$
+^STCP.*\.tgz$
 ^README\.Rmd$
 ^\.github$
 ^doc$

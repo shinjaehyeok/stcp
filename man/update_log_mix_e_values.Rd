@@ -18,7 +18,7 @@ update_log_mix_e_values(
 
 \item{log_base_fn_list}{R function that compute the log of baseline process based on each observation.}
 
-\item{prev_log_e_vec}{A vector of logarithms of mixtures of e-values in the previous step. Default is \code{numeric(length(log_base_fn_list))}.}
+\item{prev_log_e_vec}{A vector of logarithms of mixtures of e-values in the previous step.}
 }
 \value{
 Updated logarithm of mixture of e-values and a vector of each component for the next iteration.

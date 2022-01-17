@@ -44,6 +44,13 @@ build_stcp_exp <- function(alpha,
     v_fn = v_fn
   )
 
+  # Initialize log_e_vec
+  if (is_test) {
+    log_e_vec <- numeric(length(log_base_fn_list))
+  } else {
+    log_e_vec <- rep(-Inf, length(log_base_fn_list))
+  }
+
   out <- list(
     # Model parameters
     omega = base_param$omega,
@@ -53,7 +60,7 @@ build_stcp_exp <- function(alpha,
     is_test = is_test,
     family_name = base_param$psi_fn_list$family_name,
     # Memory for log e-detectors / values
-    log_e_vec = numeric(length(log_base_fn_list)),
+    log_e_vec = log_e_vec,
     n = 0,
     # Auxiliaries for debugging
     lambda = base_param$lambda,

@@ -8,7 +8,7 @@ update_log_mix_e_detectors(
   new_x_list,
   weight_vec,
   log_base_fn_list,
-  prev_log_e_vec = numeric(length(log_base_fn_list)),
+  prev_log_e_vec = rep(-Inf, length(log_base_fn_list)),
   is_SR_type = TRUE
 )
 }
@@ -19,7 +19,7 @@ update_log_mix_e_detectors(
 
 \item{log_base_fn_list}{R function that compute the log of baseline process based on each observation.}
 
-\item{prev_log_e_vec}{A vector of logarithms of mixtures of e-detectors in the previous step. Default is \code{numeric(length(log_base_fn_list))}.}
+\item{prev_log_e_vec}{A vector of logarithms of mixtures of e-detectors in the previous step.}
 
 \item{is_SR_type}{A Boolean to indicator whether the process use SR-type update. If not, the function uses the CUSUM-type update instead of SR-type one.}
 }

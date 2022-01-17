@@ -6,7 +6,7 @@
 \usage{
 update_log_e_detector(
   x_current,
-  prev_log_e = 0,
+  prev_log_e = -Inf,
   compute_log_baseline = function(x) {     x - 0.5 },
   is_SR_type = TRUE
 )

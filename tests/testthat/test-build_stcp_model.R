@@ -109,3 +109,65 @@ test_that("Consistent with the parametric cases 2. Bernoulli", {
 
 
 })
+
+
+test_that("Type 1 error control", {
+  n_rep <- 1000
+  alpha <- 0.2
+
+  # Bounded
+  m_pre <- 0.2 # Upper bound of mean of the null distribution.
+  delta_lower <- 0.1  # Guess on the minimum gap between the null and alternative means
+  delta_upper <- 0.2
+  bounded_test_model <- build_stcp_bounded(alpha, m_pre, delta_lower, delta_upper, is_test = TRUE)
+
+  is_rejected <- function(){
+    x_vec <- rbeta(100, 2, 8) # H_0 dist: B(2, 8)
+    out <- run_stcp(x_vec, bounded_test_model)
+    return(ifelse(is.infinite(out$stopped_ind), FALSE, TRUE))
+  }
+
+  simul <- replicate(n_rep, is_rejected())
+  mean(simul)
+  expect_true(mean(simul) <= alpha)
+
+  # sub_G
+  m_pre <- 0 # Upper bound of mean of the null distribution.
+  delta_lower <- 1  # Guess on the minimum gap between the null and alternative means
+  delta_upper <- 2
+  sub_G_test_model <- build_stcp_exp(alpha, m_pre,
+                                       delta_lower, delta_upper,
+                                       is_test = TRUE)
+
+  is_rejected <- function(){
+    x_vec <- rnorm(100) # H_0 dist: B(2, 8)
+    out <- run_stcp(x_vec, sub_G_test_model)
+    return(ifelse(is.infinite(out$stopped_ind), FALSE, TRUE))
+  }
+
+  simul <- replicate(n_rep, is_rejected())
+  mean(simul)
+  expect_true(mean(simul) <= alpha)
+
+  # sub_B
+  m_pre <- 0.2 # Upper bound of mean of the null distribution.
+  delta_lower <- 0.1  # Guess on the minimum gap between the null and alternative means
+  delta_upper <- 0.2
+  sub_G_test_model <- build_stcp_exp(alpha, m_pre,
+                                     delta_lower, delta_upper,
+                                     is_test = TRUE,
+                                     psi_fn_list = generate_sub_B_fn(m_pre))
+
+  is_rejected <- function(){
+    x_vec <- rbinom(100,1,m_pre) # H_0 dist: B(2, 8)
+    out <- run_stcp(x_vec, sub_G_test_model)
+    return(ifelse(is.infinite(out$stopped_ind), FALSE, TRUE))
+  }
+
+  simul <- replicate(n_rep, is_rejected())
+  mean(simul)
+  expect_true(mean(simul) <= alpha)
+
+
+})
+

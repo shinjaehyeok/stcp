@@ -48,6 +48,7 @@ print.STCP <- function(x,...) {
   cat("STCP Model:\n",...)
   cat("- Family: ", x$family_name, "\n")
   cat("- alpha: ", x$alpha, "\n")
+  cat("- m_pre: ", x$m_pre, "\n")
   cat("- is_test: ", x$is_test, "\n")
   cat("- Num. of mixing components: ", length(x$log_base_fn_list), "\n")
   cat("- Obs. have been passed: ", x$n, "\n")

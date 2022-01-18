@@ -57,6 +57,7 @@ build_stcp_exp <- function(alpha,
     log_base_fn_list =  log_base_fn_list,
     log_one_over_alpha = log(1/alpha),
     alpha = alpha,
+    m_pre = m_pre,
     is_test = is_test,
     family_name = base_param$psi_fn_list$family_name,
     # Memory for log e-detectors / values
@@ -92,6 +93,10 @@ build_stcp_exp <- function(alpha,
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
 #' @param var_lower Lower bounds of variance of scaled post-change observations. Default is \code{0}.
 #' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
+#' @param delta_lower_sub_E Lower bound of target Delta in sub-E scale.
+#' If both upper and lower sub-E parameters are not null then these parameters will be directly used to build baseline process.
+#' @param delta_upper_sub_E Upper bound of target Delta in sub-E scale.
+#'  If both upper and lower sub-E parameters are not null then this parameter will be directly used to build baseline process.
 #' @inheritParams compute_baseline
 #'
 #' @return \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
@@ -109,7 +114,9 @@ build_stcp_bounded <- function(alpha,
                                k_max = 1000,
                                tol = 1e-6,
                                var_lower = 0,
-                               var_upper = 0.25) {
+                               var_upper = 0.25,
+                               delta_lower_sub_E = NULL,
+                               delta_upper_sub_E = NULL) {
   if (!(m_pre > bound_lower & m_pre < bound_upper)) {
     stop("m_pre must be between bound_lower and bound_upper.")
   }
@@ -128,8 +135,18 @@ build_stcp_bounded <- function(alpha,
   d_l <- delta_lower / bound_range  # scaled delta_lower
   d_u <- delta_upper / bound_range # scaled_delta_upper
 
-  delta_lower_val <- m * d_l / (var_upper + d_u ^ 2)
-  delta_upper_val <-  m * d_u / (var_lower + d_l ^ 2)
+  if (!is.null(delta_lower_sub_E) & !is.null(delta_upper_sub_E)) {
+    delta_lower_val <- delta_lower_sub_E
+    delta_upper_val <-  delta_upper_sub_E
+    var_lower <- 0
+    var_upper <- 0
+    delta_lower <- bound_range * m / (delta_lower_val * delta_upper_val^2)^(1/3)
+    delta_upper <- bound_range * m / (delta_lower_val^2 * delta_upper_val)^(1/3)
+
+  } else {
+    delta_lower_val <-  m * d_l / (var_upper + d_u ^ 2)
+    delta_upper_val <-  m * d_u / (var_lower + d_l ^ 2)
+  }
 
   base_param <- compute_baseline(
     alpha,
@@ -155,6 +172,7 @@ build_stcp_bounded <- function(alpha,
     log_base_fn_list =  log_base_fn_list,
     log_one_over_alpha = log(1/alpha),
     alpha = alpha,
+    m_pre = m_pre,
     is_test = is_test,
     family_name = "Bounded (sub-E based)",
     # Memory for log e-detectors / values

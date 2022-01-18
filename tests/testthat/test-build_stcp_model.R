@@ -35,10 +35,10 @@ test_that("Consistent with the parametric cases 1. Gaussian", {
                                is_test = TRUE)
 
   sub_G_cp <- build_stcp_exp(alpha = 0.1,
-                               m_pre = m_pre,
-                               delta_lower = delta_star,
-                               delta_upper = delta_star,
-                               is_test = FALSE)
+                             m_pre = m_pre,
+                             delta_lower = delta_star,
+                             delta_upper = delta_star,
+                             is_test = FALSE)
 
 
   x_vec <- rnorm(100)
@@ -74,18 +74,18 @@ test_that("Consistent with the parametric cases 2. Bernoulli", {
   }
 
   sub_B_test <- build_stcp_exp(alpha = 0.1,
-                          m_pre = p_pre,
-                          delta_lower = delta_star,
-                          delta_upper = delta_star,
-                          is_test = TRUE,
-                          psi_fn_list = generate_sub_B_fn(p_pre))
-
-  sub_B_cp <- build_stcp_exp(alpha = 0.1,
                                m_pre = p_pre,
                                delta_lower = delta_star,
                                delta_upper = delta_star,
-                               is_test = FALSE,
+                               is_test = TRUE,
                                psi_fn_list = generate_sub_B_fn(p_pre))
+
+  sub_B_cp <- build_stcp_exp(alpha = 0.1,
+                             m_pre = p_pre,
+                             delta_lower = delta_star,
+                             delta_upper = delta_star,
+                             is_test = FALSE,
+                             psi_fn_list = generate_sub_B_fn(p_pre))
 
   x_vec <- rbinom(100, 1, 0.5)
   lrt_B_out_test <- cumsum(lrt_B(x_vec))
@@ -113,59 +113,102 @@ test_that("Consistent with the parametric cases 2. Bernoulli", {
 
 test_that("Type 1 error control", {
   n_rep <- 1000
-  alpha <- 0.2
+  x_len <- 100
+  alpha <- 0.1
 
   # Bounded
+  # Get proper delta for test of length x_len
+  # This step is not for actual test but just for a tighter simulation
+  baseline_obj <- compute_baseline_for_sample_size(alpha,
+                                                   n_upper = x_len,
+                                                   n_lower = x_len / 10,
+                                                   psi_fn_list = generate_sub_E_fn(),
+                                                   v_min = 0)
+
   m_pre <- 0.2 # Upper bound of mean of the null distribution.
-  delta_lower <- 0.1  # Guess on the minimum gap between the null and alternative means
-  delta_upper <- 0.2
-  bounded_test_model <- build_stcp_bounded(alpha, m_pre, delta_lower, delta_upper, is_test = TRUE)
+  delta_lower_sub_E <- baseline_obj$delta_lower
+  delta_upper_sub_E <- baseline_obj$delta_upper
+  bounded_test_model <- build_stcp_bounded(alpha,
+                                           m_pre,
+                                           delta_lower = 0.1,
+                                           is_test = TRUE,
+                                           delta_lower_sub_E = delta_lower_sub_E,
+                                           delta_upper_sub_E = delta_upper_sub_E)
 
   is_rejected <- function(){
-    x_vec <- rbeta(100, 2, 8) # H_0 dist: B(2, 8)
+    x_vec <- rbeta(x_len, 2, 8) # H_0 dist: B(2, 8)
     out <- run_stcp(x_vec, bounded_test_model)
     return(ifelse(is.infinite(out$stopped_ind), FALSE, TRUE))
   }
 
   simul <- replicate(n_rep, is_rejected())
-  mean(simul)
   expect_true(mean(simul) <= alpha)
 
+  # Check Bounded delta lower and upper were recovered properly
+  bounded_test_model2 <- build_stcp_bounded(
+    alpha,
+    m_pre,
+    delta_lower = bounded_test_model$delta_lower,
+    delta_upper = bounded_test_model$delta_upper,
+    is_test = TRUE,
+    bound_lower = bounded_test_model$bound_lower,
+    bound_upper = bounded_test_model$bound_upper,
+    var_lower = bounded_test_model$var_lower,
+    var_upper = bounded_test_model$var_upper)
+
+  expect_true(
+    mean(abs(bounded_test_model$lambda - bounded_test_model2$lambda)) < 1e-8
+  )
+
   # sub_G
+  # Get proper delta for test of length x_len
+  # This step is not for actual test but just for a tighter simulation
+  baseline_obj <- compute_baseline_for_sample_size(alpha,
+                                                   n_upper = x_len * 2,
+                                                   n_lower = x_len / 10,
+                                                   psi_fn_list = generate_sub_G_fn())
+
   m_pre <- 0 # Upper bound of mean of the null distribution.
-  delta_lower <- 1  # Guess on the minimum gap between the null and alternative means
-  delta_upper <- 2
+  delta_lower <- baseline_obj$delta_lower
+  delta_upper <- baseline_obj$delta_upper
   sub_G_test_model <- build_stcp_exp(alpha, m_pre,
-                                       delta_lower, delta_upper,
-                                       is_test = TRUE)
+                                     delta_lower, delta_upper,
+                                     is_test = TRUE)
 
   is_rejected <- function(){
-    x_vec <- rnorm(100) # H_0 dist: B(2, 8)
+    x_vec <- rnorm(x_len) # H_0 dist: B(2, 8)
     out <- run_stcp(x_vec, sub_G_test_model)
     return(ifelse(is.infinite(out$stopped_ind), FALSE, TRUE))
   }
 
   simul <- replicate(n_rep, is_rejected())
-  mean(simul)
   expect_true(mean(simul) <= alpha)
 
   # sub_B
   m_pre <- 0.2 # Upper bound of mean of the null distribution.
-  delta_lower <- 0.1  # Guess on the minimum gap between the null and alternative means
-  delta_upper <- 0.2
-  sub_G_test_model <- build_stcp_exp(alpha, m_pre,
+
+  # Get proper delta for test of length x_len
+  # This step is not for actual test but just for a tighter simulation
+  baseline_obj <- compute_baseline_for_sample_size(alpha,
+                                                   n_upper = x_len,
+                                                   n_lower = x_len / 10,
+                                                   psi_fn_list = generate_sub_B_fn(m_pre))
+
+
+  delta_lower <- baseline_obj$delta_lower
+  delta_upper <- baseline_obj$delta_upper
+  sub_B_test_model <- build_stcp_exp(alpha, m_pre,
                                      delta_lower, delta_upper,
                                      is_test = TRUE,
                                      psi_fn_list = generate_sub_B_fn(m_pre))
 
   is_rejected <- function(){
-    x_vec <- rbinom(100,1,m_pre) # H_0 dist: B(2, 8)
-    out <- run_stcp(x_vec, sub_G_test_model)
+    x_vec <- rbinom(x_len,1,m_pre)
+    out <- run_stcp(x_vec, sub_B_test_model)
     return(ifelse(is.infinite(out$stopped_ind), FALSE, TRUE))
   }
 
   simul <- replicate(n_rep, is_rejected())
-  mean(simul)
   expect_true(mean(simul) <= alpha)
 
 

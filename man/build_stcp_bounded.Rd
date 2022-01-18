@@ -15,7 +15,9 @@ build_stcp_bounded(
   k_max = 1000,
   tol = 1e-06,
   var_lower = 0,
-  var_upper = 0.25
+  var_upper = 0.25,
+  delta_lower_sub_E = NULL,
+  delta_upper_sub_E = NULL
 )
 }
 \arguments{
@@ -40,6 +42,12 @@ build_stcp_bounded(
 \item{var_lower}{Lower bounds of variance of scaled post-change observations. Default is \code{0}.}
 
 \item{var_upper}{Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.}
+
+\item{delta_lower_sub_E}{Lower bound of target Delta in sub-E scale.
+If both upper and lower sub-E parameters are not null then these parameters will be directly used to build baseline process.}
+
+\item{delta_upper_sub_E}{Upper bound of target Delta in sub-E scale.
+If both upper and lower sub-E parameters are not null then this parameter will be directly used to build baseline process.}
 }
 \value{
 \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries

@@ -43,12 +43,9 @@ test_that("Sequential update works for SimpleExp test", {
     expect_true(is.infinite(B_52_100$stopped_ind))
   } else if (B_1_100$stopped_ind <= 50) {
     expect_true(B_1_50$stopped_ind == B_1_100$stopped_ind)
-    expect_true(B_51$stopped_ind == 1)
-    expect_true(B_52_100$stopped_ind == 1)
   } else if (B_1_100$stopped_ind == 51) {
     expect_true(is.infinite(B_1_50$stopped_ind))
     expect_true(B_51$stopped_ind == 1)
-    expect_true(B_52_100$stopped_ind == 1)
   } else {
     expect_true(is.infinite(B_1_50$stopped_ind))
     expect_true(is.infinite(B_51$stopped_ind))
@@ -103,12 +100,9 @@ test_that("Sequential update works for Bounded test", {
     expect_true(is.infinite(bound_52_100$stopped_ind))
   } else if (bound_1_100$stopped_ind <= 50) {
     expect_true(bound_1_50$stopped_ind == bound_1_100$stopped_ind)
-    expect_true(bound_51$stopped_ind == 1)
-    expect_true(bound_52_100$stopped_ind == 1)
   } else if (bound_1_100$stopped_ind == 51) {
     expect_true(is.infinite(bound_1_50$stopped_ind))
     expect_true(bound_51$stopped_ind == 1)
-    expect_true(bound_52_100$stopped_ind == 1)
   } else {
     expect_true(is.infinite(bound_1_50$stopped_ind))
     expect_true(is.infinite(bound_51$stopped_ind))
@@ -165,12 +159,9 @@ test_that("Sequential update works for SimpleExp CP", {
     expect_true(is.infinite(B_52_100$stopped_ind))
   } else if (B_1_100$stopped_ind <= 50) {
     expect_true(B_1_50$stopped_ind == B_1_100$stopped_ind)
-    expect_true(B_51$stopped_ind == 1)
-    expect_true(B_52_100$stopped_ind == 1)
   } else if (B_1_100$stopped_ind == 51) {
     expect_true(is.infinite(B_1_50$stopped_ind))
     expect_true(B_51$stopped_ind == 1)
-    expect_true(B_52_100$stopped_ind == 1)
   } else {
     expect_true(is.infinite(B_1_50$stopped_ind))
     expect_true(is.infinite(B_51$stopped_ind))
@@ -225,12 +216,9 @@ test_that("Sequential update works for Bounded CP", {
     expect_true(is.infinite(bound_52_100$stopped_ind))
   } else if (bound_1_100$stopped_ind <= 50) {
     expect_true(bound_1_50$stopped_ind == bound_1_100$stopped_ind)
-    expect_true(bound_51$stopped_ind == 1)
-    expect_true(bound_52_100$stopped_ind == 1)
   } else if (bound_1_100$stopped_ind == 51) {
     expect_true(is.infinite(bound_1_50$stopped_ind))
     expect_true(bound_51$stopped_ind == 1)
-    expect_true(bound_52_100$stopped_ind == 1)
   } else {
     expect_true(is.infinite(bound_1_50$stopped_ind))
     expect_true(is.infinite(bound_51$stopped_ind))

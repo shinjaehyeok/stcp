@@ -8,6 +8,7 @@
 #'
 #' @export
 generate_sub_G_fn <- function(sig = 1){
+  force(sig)
   G_fn_list <- list(
     family_name = "sub-G",
     is_psi_depend_on_m = FALSE,
@@ -29,6 +30,7 @@ generate_sub_G_fn <- function(sig = 1){
 #'
 #' @export
 generate_sub_B_fn <- function(p = 0.5, tol = 1e-6){
+  force(p)
   if (p <= 0){
     p <- tol
   }

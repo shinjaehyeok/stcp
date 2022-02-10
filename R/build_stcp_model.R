@@ -69,13 +69,9 @@ build_stcp_exp <- function(alpha,
     # Input Details
     delta_lower = delta_lower,
     delta_upper = delta_upper,
-    s_fn = function(x) {
-      x - m_pre
-    },
-    v_fn = function(x) {
-      1
-    },
-    v_min = 1
+    s_fn = s_fn,
+    v_fn = v_fn,
+    v_min = v_min
   )
   class(out) <- c("SimpleExp", "STCP")
   return(out)

@@ -43,9 +43,11 @@ run_quick_simulation <- function(x_vec,
   # Make test stcp obj
   stcp_test_mix <- stcp_mix
   stcp_test_mix$is_test <- TRUE
+  stcp_test_mix$log_e_vec <- numeric(length(stcp_test_mix$log_base_fn_list))
   if (!is.null(stcp_star)){
     stcp_test_star <- stcp_star
     stcp_test_star$is_test <- TRUE
+    stcp_test_star$log_e_vec <- numeric(length(stcp_test_star$log_base_fn_list))
   }
 
   if (!is.null(stcp_star)){
@@ -59,7 +61,6 @@ run_quick_simulation <- function(x_vec,
 
     # e-detector 2. CUSUM-type
     stcp_star_CS_out <- run_stcp(x_vec, stcp_star, is_SR_type = FALSE)
-
     plot(stcp_star_SR_out,
          xlab = "n",
          col = 2,

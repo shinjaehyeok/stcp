@@ -9,6 +9,7 @@ compute_ci(
   stcp_ci_obj,
   width_upper = 100,
   ci_lower_trivial = -Inf,
+  n_custom_vec = NULL,
   x_bar_pre = 0,
   n_pre = 0,
   tol = 1e-06
@@ -22,6 +23,8 @@ compute_ci(
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
 
 \item{ci_lower_trivial}{A trivial lower bound of confidence interval. Default is \code{-Inf}.}
+
+\item{n_custom_vec}{A vector of number of observations for each entry of \code{x_vec}. If NULL, each observation is assumed to be equal to one.}
 
 \item{x_bar_pre}{Sample mean of previous observations. Default is \code{0} (No pre-samples)}
 

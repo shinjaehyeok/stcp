@@ -4,6 +4,7 @@
 #'
 #' @param x_vec A vector of observations
 #' @param stcp_ci_obj STCP_CI object, output of \code{build_ci_exp}
+#' @param n_custom_vec A vector of number of observations for each entry of \code{x_vec}. If NULL, each observation is assumed to be equal to one.
 #' @param x_bar_pre Sample mean of previous observations. Default is \code{0} (No pre-samples)
 #' @param n_pre Number of pre-samples. Default is \code{0}.
 #' @inheritParams compute_single_ci
@@ -15,6 +16,7 @@ compute_ci <- function(x_vec,
                        stcp_ci_obj,
                        width_upper = 100,
                        ci_lower_trivial = -Inf,
+                       n_custom_vec = NULL,
                        x_bar_pre = 0,
                        n_pre = 0,
                        tol = 1e-6) {
@@ -27,7 +29,12 @@ compute_ci <- function(x_vec,
   if (n_pre < 0) {
     stop("Pre-sample size must be nonnegative.")
   }
-  n_vec <- seq_along(x_vec) + n_pre
+  if (is.null(n_custom_vec)) {
+    n_vec <- seq_along(x_vec) + n_pre
+  } else {
+    n_vec <- cumsum(n_custom_vec) + n_pre
+  }
+
   x_sum_vec <- cumsum(x_vec) + x_bar_pre * n_pre
   x_bar_vec <- x_sum_vec / n_vec
 

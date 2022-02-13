@@ -1,6 +1,6 @@
 Package: STCP
 Title: Sequential Test and Change-Point detection algorithms based on E-values / E-detectors
-Version: 0.0.1.0000
+Version: 0.9.1.
 Authors@R: 
     person(given = "Jaehyeok",
            family = "Shin",

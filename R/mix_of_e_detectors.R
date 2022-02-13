@@ -1,21 +1,23 @@
-#' Log of mixtures of SR- or CUSUM-type e-detectors
+#' Log of mixtures of e-values and SR- or CUSUM-type e-detectors
 #'
-#' Compute logarithm of mixtures of SR- or CUSUM-type e-detector based on the current observation and previous value.
+#' Compute logarithm of mixtures of e-values, SR- or CUSUM-type e-detectors based on the current observation and previous value.
 #'
 #' @param new_x_list A list of new observations. If each observation is univariate then it can be a vector instead of list of single observations.
 #' @param weight_vec A vector of mixing weights.
 #' @param log_base_fn_list R function that compute the log of baseline process based on each observation.
 #' @param prev_log_e_vec A vector of logarithms of mixtures of e-detectors in the previous step.
+#' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
 #' @param is_SR_type A Boolean to indicator whether the process use SR-type update. If not, the function uses the CUSUM-type update instead of SR-type one.
 #'
-#' @return Updated logarithm of mixture of SR- or CUSUM-type e-detectors and a vector of each component for the next iteration.
+#' @return Updated logarithm of mixture of e-values, SR- or CUSUM-type e-detectors and a vector of each component for the next iteration.
 #' @export
 #'
-update_log_mix_e_detectors <- function(new_x_list,
-                                       weight_vec,
-                                       log_base_fn_list,
-                                       prev_log_e_vec = rep(-Inf, length(log_base_fn_list)),
-                                       is_SR_type = TRUE){
+update_log_mix_e <- function(new_x_list,
+                             weight_vec,
+                             log_base_fn_list,
+                             prev_log_e_vec = rep(-Inf, length(log_base_fn_list)),
+                             is_test = FALSE,
+                             is_SR_type = TRUE){
   # Check weights are positive and summed to one
   if (any(weight_vec <= 0)) stop("Weights must be positive")
   w <- sum(weight_vec)
@@ -40,10 +42,11 @@ update_log_mix_e_detectors <- function(new_x_list,
 
   updater <- function(){
     update_log_e_for_mix_ind <- function(mix_ind){
-      update_log_e_detector(
+      update_log_e(
         x_current = new_x_list[[current_ind]],
         prev_log_e = prev_log_e_vec[mix_ind],
         compute_log_baseline = log_base_fn_list[[mix_ind]],
+        is_test = is_test,
         is_SR_type = is_SR_type
       )
     }

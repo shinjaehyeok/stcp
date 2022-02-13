@@ -15,22 +15,22 @@ run_stcp <- function(new_x,
     stop("new_x must have non-zero length.")
   }
 
-  if (!stcp_obj$is_test) {
-    # CP detection
-    mix_e_list <- update_log_mix_e_detectors(
-      new_x,
-      stcp_obj$omega,
-      stcp_obj$log_base_fn_list,
-      stcp_obj$log_e_vec,
-      is_SR_type
-    )
-
-  } else{
-    # Sequential test
+  # Faster vectorized-computation for the univariate sequential test case
+  if (is.vector(new_x) & stcp_obj$is_test) {
     mix_e_list <- update_log_mix_e_values(new_x,
                                           stcp_obj$omega,
                                           stcp_obj$log_base_fn_list,
                                           stcp_obj$log_e_vec)
+  } else {
+    mix_e_list <- update_log_mix_e(
+      new_x,
+      stcp_obj$omega,
+      stcp_obj$log_base_fn_list,
+      stcp_obj$log_e_vec,
+      stcp_obj$is_test,
+      is_SR_type
+    )
+
   }
 
   # Compute stopped index

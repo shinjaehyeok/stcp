@@ -27,3 +27,4 @@ devtools::install_github("shinjaehyeok/STCP")
 ```
 
 <!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.  -->
+<!-- TODO 1. Make test also work for list; 2. To make CI works for variance process-->

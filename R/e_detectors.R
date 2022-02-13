@@ -5,21 +5,27 @@
 #' @param x_current The current observation
 #' @param prev_log_e A numeric value of the mixture of e-detectors in the previous step. Default is \code{0}.
 #' @param compute_log_baseline R function that compute the log of baseline process based on each observation.
+#' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
 #' @param is_SR_type A Boolean indicator whether the process use SR-type update. If not, the function uses the CUSUM-type update instead of SR-type one.
 #'
 #' @return Updated logarithm of SR- or CUSUM-type e-detector.
 #' @export
 #'
-update_log_e_detector <- function(x_current,
-                                  prev_log_e = -Inf,
-                                  compute_log_baseline = function(x){x - 0.5},
-                                  is_SR_type = TRUE){
+update_log_e <- function(x_current,
+                         prev_log_e = -Inf,
+                         compute_log_baseline = function(x){x - 0.5},
+                         is_test = FALSE,
+                         is_SR_type = TRUE){
 
   current_log_e_val <- compute_log_baseline(x_current)
-  if (is_SR_type){
-    update <- matrixStats::logSumExp(c(prev_log_e, 0))
-  } else{
-    update <- max(prev_log_e, 0)
+  if (is_test) {
+    update <- prev_log_e
+  } else {
+    if (is_SR_type) {
+      update <- matrixStats::logSumExp(c(prev_log_e, 0))
+    } else{
+      update <- max(prev_log_e, 0)
+    }
   }
   return(current_log_e_val + update)
 }

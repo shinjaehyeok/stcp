@@ -95,11 +95,14 @@ ber_model <- build_stcp_exp(
   psi_fn_list = generate_sub_B_fn(p_pre)
   )
 
-# Compute mixture of SR-type e-detectors.
+# Compute mixtures of SR and CUSUM e-detectors.
 mix_SR_ber <- run_stcp(CLE_dat$isWin, ber_model)
+mix_CS_ber <- run_stcp(CLE_dat$isWin, ber_model, is_SR_type = FALSE)
 
-# Stopping time of the mixture of SR procedure.
+
+# Stopping times of mixtures of e-SR and e-CUSUM procedures
 mix_SR_stop_ber <- CLE_dat$dateGame[mix_SR_ber$stopped_ind] %>% as.Date()
+mix_CS_stop_ber <- CLE_dat$dateGame[mix_CS_ber$stopped_ind] %>% as.Date()
 
 # Plot log e-detector
 # Size 600 * 450 for the paper
@@ -107,9 +110,21 @@ plot(mix_SR_ber,
      n = as.Date(CLE_dat$dateGame),
      xlab = "Date",
      main = paste0("CP detected at ", mix_SR_stop_ber),
-     draw_detect_line = FALSE) # unable default detection line
+     draw_detect_line = FALSE,
+     col = 2) # unable default detection line
+plot(mix_CS_ber,
+     n = as.Date(CLE_dat$dateGame),
+     draw_detect_line = FALSE, # unable default detection line
+     add = TRUE,
+     lty = 3,
+     col = 3)
+
 # Draw customized detection line for the paper
+abline(h = mix_SR_ber$stcp_obj$log_one_over_alpha)
 abline(v = mix_SR_stop_ber, col = 2, lty = 2)
+abline(v = mix_CS_stop_ber, col = 3, lty = 4)
+
+
 
 # Draw detected line onto the original winning rate plot.
 plot(
@@ -180,11 +195,15 @@ bounded_model <- build_stcp_bounded(
   bound_upper = bound_upper
 )
 
-# Compute mixture of SR-type e-detectors.
+# Compute mixtures of SR and CUSUM e-detectors.
 mix_SR_bounded <- run_stcp(CLE_dat$plusminusTeam, bounded_model)
+mix_CS_bounded <- run_stcp(CLE_dat$plusminusTeam, bounded_model, is_SR_type = FALSE)
+
 
 # Stopping time of the mixture of SR procedure.
 mix_SR_stop_bounded <- CLE_dat$dateGame[mix_SR_bounded$stopped_ind] %>% as.Date()
+mix_CS_stop_bounded <- CLE_dat$dateGame[mix_CS_bounded$stopped_ind] %>% as.Date()
+
 
 # Plot log e-detector
 # Size 600 * 450 for the paper
@@ -192,9 +211,20 @@ plot(mix_SR_bounded,
      n = as.Date(CLE_dat$dateGame),
      xlab = "Date",
      main = paste0("CP detected at ", mix_SR_stop_bounded),
-     draw_detect_line = FALSE) # unable default detection line
+     draw_detect_line = FALSE, # unable default detection line
+     col = 2)
+plot(mix_CS_bounded,
+     n = as.Date(CLE_dat$dateGame),
+     draw_detect_line = FALSE,
+     add = TRUE,
+     lty = 3,
+     col = 3)
+
+
 # Draw customized detection line for the paper
+abline(h = mix_SR_bounded$stcp_obj$log_one_over_alpha)
 abline(v = mix_SR_stop_bounded, col = 2, lty = 2)
+abline(v = mix_CS_stop_bounded, col = 3, lty = 4)
 
 # Draw detected line onto the original +/- plot.
 plot(

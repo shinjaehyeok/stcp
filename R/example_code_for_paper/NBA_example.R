@@ -106,17 +106,23 @@ mix_CS_stop_ber <- CLE_dat$dateGame[mix_CS_ber$stopped_ind] %>% as.Date()
 
 # Plot log e-detector
 # Size 600 * 450 for the paper
-plot(mix_SR_ber,
-     n = as.Date(CLE_dat$dateGame),
-     xlab = "Date",
+# plot(mix_SR_ber,
+#      n = as.Date(CLE_dat$dateGame),
+#      xlab = "Date",
+#      main = paste0("CP detected at ", mix_SR_stop_ber, " (SR) / ", mix_CS_stop_ber, " (CUSUM)"),
+#      draw_detect_line = FALSE,
+#      col = 2) # unable default detection line
+
+plot(as.Date(CLE_dat$dateGame),
+     mix_SR_ber$log_mix_e_vec,
+     xlab = "n (Date scale)",
+     ylab = expression('log(M'['n']*')'),
      main = paste0("CP detected at ", mix_SR_stop_ber, " (SR) / ", mix_CS_stop_ber, " (CUSUM)"),
-     draw_detect_line = FALSE,
-     col = 2) # unable default detection line
-plot(mix_CS_ber,
-     n = as.Date(CLE_dat$dateGame),
-     draw_detect_line = FALSE, # unable default detection line
-     add = TRUE,
-     col = 3)
+     type = "l",
+     col = 2)
+lines(as.Date(CLE_dat$dateGame),
+      mix_CS_ber$log_mix_e_vec,
+      col = 3)
 
 # Draw customized detection line for the paper
 abline(h = mix_SR_ber$stcp_obj$log_one_over_alpha)
@@ -206,23 +212,53 @@ mix_CS_stop_bounded <- CLE_dat$dateGame[mix_CS_bounded$stopped_ind] %>% as.Date(
 
 # Plot log e-detector
 # Size 600 * 450 for the paper
-plot(mix_SR_bounded,
-     n = as.Date(CLE_dat$dateGame),
-     xlab = "Date",
-     main = paste0("CP detected at ", mix_SR_stop_bounded, " (SR) / ", mix_CS_stop_bounded, " (CUSUM)"),
-     draw_detect_line = FALSE, # unable default detection line
-     col = 2)
-plot(mix_CS_bounded,
-     n = as.Date(CLE_dat$dateGame),
-     draw_detect_line = FALSE,
-     add = TRUE,
-     col = 3)
+# plot(mix_SR_bounded,
+#      n = as.Date(CLE_dat$dateGame),
+#      xlab = "Date",
+#      main = paste0("CP detected at ", mix_SR_stop_bounded, " (SR) / ", mix_CS_stop_bounded, " (CUSUM)"),
+#      draw_detect_line = FALSE, # unable default detection line
+#      col = 2)
+# plot(mix_CS_bounded,
+#      n = as.Date(CLE_dat$dateGame),
+#      draw_detect_line = FALSE,
+#      add = TRUE,
+#      col = 3)
 
+plot(as.Date(CLE_dat$dateGame),
+     mix_SR_bounded$log_mix_e_vec,
+     xlab = "n (Date scale)",
+     ylab = expression('log(M'['n']*')'),
+     main = paste0("CP detected at ", mix_SR_stop_bounded, " (SR) / ", mix_CS_stop_bounded, " (CUSUM)"),
+     type = "l",
+     col = 2)
+lines(as.Date(CLE_dat$dateGame),
+      mix_CS_bounded$log_mix_e_vec,
+      col = 3)
 
 # Draw customized detection line for the paper
 abline(h = mix_SR_bounded$stcp_obj$log_one_over_alpha)
 abline(v = mix_SR_stop_bounded, col = 2, lty = 2)
 abline(v = mix_CS_stop_bounded, col = 3, lty = 2)
+
+# M_n scale
+plot(seq_along(mix_SR_bounded$log_mix_e_vec),
+     exp(mix_SR_bounded$log_mix_e_vec),
+     xlab = "n",
+     ylab = expression('M'['n']),
+     main = paste0("CP detected at ", mix_SR_bounded$stopped_ind, "-th game (SR) / ", mix_CS_bounded$stopped_ind, "-th game (CUSUM)"),
+     type = "l",
+     col = 2,
+     ylim = c(0, 4 / alpha))
+lines(seq_along(mix_CS_bounded$log_mix_e_vec),
+      exp(mix_CS_bounded$log_mix_e_vec),
+      col = 3)
+
+# Draw customized detection line for the paper
+abline(h = exp(mix_SR_bounded$stcp_obj$log_one_over_alpha))
+abline(v = mix_SR_bounded$stopped_ind, col = 2, lty = 2)
+abline(v = mix_CS_bounded$stopped_ind, col = 3, lty = 2)
+
+
 
 # Draw detected line onto the original +/- plot.
 plot(

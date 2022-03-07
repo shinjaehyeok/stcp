@@ -125,6 +125,11 @@ build_stcp_bounded <- function(alpha,
     stop("var_lower and var_upper must be positive with var_lower <= var_upper.")
   }
 
+  if (abs(delta_upper + m_pre - bound_upper) < 1e-6) {
+    # If delta_upper is equal to bound_upper - m_pre, the upper delta is given by var_upper = 0.
+    var_upper <- 0
+  }
+
   # Compute parameters
   bound_range <- bound_upper - bound_lower
   m <- (m_pre - bound_lower) / bound_range # scaled m_pre

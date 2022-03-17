@@ -15,8 +15,12 @@ run_stcp <- function(new_x,
     stop("new_x must have non-zero length.")
   }
 
+  if (is.matrix(new_x) | is.data.frame(new_x)) {
+    stop("new_x must be either vector or list of observations.")
+  }
+
   # Faster vectorized-computation for the univariate sequential test case
-  if (is.vector(new_x) & stcp_obj$is_test) {
+  if (!is.list(new_x) & stcp_obj$is_test) {
     mix_e_list <- update_log_mix_e_values(new_x,
                                           stcp_obj$omega,
                                           stcp_obj$log_base_fn_list,

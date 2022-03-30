@@ -285,3 +285,87 @@ abline(v = mix_SR_stop_bounded,
        col = 2,
        lty = 2,
        lwd = 2)
+
+
+# Uniform mixture example
+# Normalize observations
+alpha <- 1e-3 # Inverse of target ARL
+bound_lower <- -80
+bound_upper <- 80
+m_pre <- -1
+m_pre_normalized <-(m_pre - bound_lower) / (bound_upper - bound_lower)
+pm_normalized <- (CLE_dat$plusminusTeam - bound_lower) / (bound_upper - bound_lower)
+
+# Build model
+# Compute parameters
+by_gap <- 0.02
+lambda <- seq(by_gap, 1, by = by_gap)
+omega <- rep(1/length(lambda), length(lambda))
+if(sum(omega) != 1) stop()
+
+# Compute e-detectors
+log_base_fn_list <- sapply(
+  lambda,
+  generate_log_bounded_base_fn,
+  m = m_pre_normalized,
+  bound_lower = 0
+)
+
+stcp_uniform <- list(
+  # Model parameters
+  omega = omega,
+  log_base_fn_list =  log_base_fn_list,
+  log_one_over_alpha = log(1/alpha),
+  alpha = alpha,
+  m_pre = m_pre_normalized,
+  is_test = FALSE,
+  family_name = "Bounded (Uniform Mixture)",
+  # Memory for log e-detectors / values
+  log_e_vec = numeric(length(log_base_fn_list)),
+  n = 0,
+  # Auxiliaries for debugging
+  lambda = lambda,
+  g_alpha = NA,
+  # Input Details
+  delta_lower = NA,
+  delta_upper = NA,
+  bound_lower = NA,
+  bound_upper = NA,
+  var_lower = NA,
+  var_upper = NA
+)
+class(stcp_uniform) <- c("Bounded", "STCP")
+
+# Compute mixtures of SR and CUSUM e-detectors.
+uniform_SR <- run_stcp(pm_normalized, stcp_uniform)
+uniform_CS <- run_stcp(pm_normalized, stcp_uniform, is_SR_type = FALSE)
+
+
+# Stopping time of the mixture of SR procedure.
+uniform_SR_stop <- CLE_dat$dateGame[uniform_SR$stopped_ind] %>% as.Date()
+uniform_CS_stop <- CLE_dat$dateGame[uniform_CS$stopped_ind] %>% as.Date()
+
+
+plot(as.Date(CLE_dat$dateGame),
+     uniform_SR$log_mix_e_vec,
+     xlab = "n (Date scale)",
+     ylab = expression('log(M'['n']*')'),
+     main = paste0("CP detected at ", uniform_SR_stop, " (SR) / ", uniform_CS_stop, " (CUSUM)"),
+     type = "l",
+     col = 2)
+lines(as.Date(CLE_dat$dateGame),
+      uniform_CS$log_mix_e_vec,
+      col = 3)
+lines(as.Date(CLE_dat$dateGame),
+      mix_SR_bounded$log_mix_e_vec,
+      col = 4, lty = 2)
+lines(as.Date(CLE_dat$dateGame),
+      mix_CS_bounded$log_mix_e_vec,
+      col = 5, lty = 2)
+
+# Draw customized detection line for the paper
+abline(h = uniform_SR$stcp_obj$log_one_over_alpha)
+abline(v = uniform_SR_stop, col = 2, lty = 2)
+abline(v = uniform_CS_stop, col = 3, lty = 2)
+abline(v = mix_SR_stop_bounded, col = 4, lty = 2)
+abline(v = mix_CS_stop_bounded, col = 5, lty = 2)

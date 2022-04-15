@@ -1,3 +1,65 @@
+#' Build STCP model.
+#'
+#' Build STCP model to detect up-crossing mean-shift.
+#'
+#' @param alpha ARL parameter in (0,1)
+#' @param m_pre Upper bound of mean of pre-change observations
+#' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
+#' @param omega Mixing weights for baseline processes.
+#' @param lambda Parameters of baseline processes.
+#' @param log_base_fn_generator Function factory generating log baseline functions.
+#' @param ... arguments to be passed to \code{log_base_fn_generator}.
+#'
+#' @return \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values.
+#' @export
+#'
+build_stcp <- function(alpha,
+                       m_pre,
+                       is_test,
+                       omega,
+                       lambda,
+                       log_base_fn_generator,
+                       ...) {
+
+  if (length(omega) != length(lambda)) {
+    stop("Number of weights and model parameters are not matched.")
+  }
+
+  if (min(omega) < 0) stop("Mixing weights must be nonnegative.")
+
+  # Compute e-detectors
+  log_base_fn_list <- sapply(
+    lambda,
+    log_base_fn_generator,
+    ...
+  )
+
+    # Initialize log_e_vec
+  if (is_test) {
+    log_e_vec <- numeric(length(log_base_fn_list))
+  } else {
+    log_e_vec <- rep(-Inf, length(log_base_fn_list))
+  }
+
+  out <- list(
+    # Model parameters
+    omega = omega,
+    log_base_fn_list =  log_base_fn_list,
+    log_one_over_alpha = log(1/alpha),
+    alpha = alpha,
+    m_pre = m_pre,
+    is_test = is_test,
+    family_name = "Custom",
+    # Memory for log e-detectors / values
+    log_e_vec = log_e_vec,
+    n = 0,
+    # Auxiliaries for debugging
+    lambda = lambda
+  )
+  class(out) <- c("STCP")
+  return(out)
+}
+
 #' Build STCP model for simple exponential e-detectors.
 #'
 #' Build STCP model for simple exponential e-detectors to detect up-crossing mean-shift.
@@ -35,43 +97,32 @@ build_stcp_exp <- function(alpha,
                                  k_max,
                                  tol)
 
-  # Compute e-detectors
-  log_base_fn_list <- sapply(
-    base_param$lambda,
-    generate_log_base_fn,
+  # Make stcp object
+  stcp_obj <- build_stcp(
+    alpha = alpha,
+    m_pre = m_pre,
+    is_test = is_test,
+    omega = base_param$omega,
+    lambda = base_param$lambda,
+    log_base_fn_generator =generate_log_base_fn,
     psi_fn = base_param$psi_fn_list$psi,
     s_fn = s_fn,
     v_fn = v_fn
   )
 
-  # Initialize log_e_vec
-  if (is_test) {
-    log_e_vec <- numeric(length(log_base_fn_list))
-  } else {
-    log_e_vec <- rep(-Inf, length(log_base_fn_list))
-  }
+  stcp_obj$family_name <- base_param$psi_fn_list$family_name
 
-  out <- list(
-    # Model parameters
-    omega = base_param$omega,
-    log_base_fn_list =  log_base_fn_list,
-    log_one_over_alpha = log(1/alpha),
-    alpha = alpha,
-    m_pre = m_pre,
-    is_test = is_test,
-    family_name = base_param$psi_fn_list$family_name,
-    # Memory for log e-detectors / values
-    log_e_vec = log_e_vec,
-    n = 0,
-    # Auxiliaries for debugging
-    lambda = base_param$lambda,
-    g_alpha = base_param$g_alpha,
-    # Input Details
-    delta_lower = delta_lower,
-    delta_upper = delta_upper,
-    s_fn = s_fn,
-    v_fn = v_fn,
-    v_min = v_min
+  out <- c(
+    stcp_obj,
+    list(
+      g_alpha = base_param$g_alpha,
+      # Input Details
+      delta_lower = delta_lower,
+      delta_upper = delta_upper,
+      s_fn = s_fn,
+      v_fn = v_fn,
+      v_min = v_min
+    )
   )
   class(out) <- c("SimpleExp", "STCP")
   return(out)
@@ -132,7 +183,7 @@ build_stcp_bounded <- function(alpha,
 
   # Compute parameters
   bound_range <- bound_upper - bound_lower
-  m <- (m_pre - bound_lower) / bound_range # scaled m_pre
+  m_scaled <- (m_pre - bound_lower) / bound_range # scaled m_pre
   d_l <- delta_lower / bound_range  # scaled delta_lower
   d_u <- delta_upper / bound_range # scaled_delta_upper
 
@@ -141,12 +192,12 @@ build_stcp_bounded <- function(alpha,
     delta_upper_val <-  delta_upper_sub_E
     var_lower <- 0
     var_upper <- 0
-    delta_lower <- bound_range * m / (delta_lower_val * delta_upper_val^2)^(1/3)
-    delta_upper <- bound_range * m / (delta_lower_val^2 * delta_upper_val)^(1/3)
+    delta_lower <- bound_range * m_scaled / (delta_lower_val * delta_upper_val^2)^(1/3)
+    delta_upper <- bound_range * m_scaled / (delta_lower_val^2 * delta_upper_val)^(1/3)
 
   } else {
-    delta_lower_val <-  m * d_l / (var_upper + d_u ^ 2)
-    delta_upper_val <-  m * d_u / (var_lower + d_l ^ 2)
+    delta_lower_val <-  m_scaled * d_l / (var_upper + d_u ^ 2)
+    delta_upper_val <-  m_scaled * d_u / (var_lower + d_l ^ 2)
   }
 
   base_param <- compute_baseline(
@@ -159,36 +210,32 @@ build_stcp_bounded <- function(alpha,
     tol
   )
 
-  # Compute e-detectors
-  log_base_fn_list <- sapply(
-    base_param$lambda,
-    generate_log_bounded_base_fn,
+  # Make stcp object
+  stcp_obj <- build_stcp(
+    alpha = alpha,
+    m_pre = m_pre,
+    is_test = is_test,
+    omega = base_param$omega,
+    lambda = base_param$lambda,
+    log_base_fn_generator = generate_log_bounded_base_fn,
     m = m_pre,
     bound_lower = bound_lower
   )
 
-  out <- list(
-    # Model parameters
-    omega = base_param$omega,
-    log_base_fn_list =  log_base_fn_list,
-    log_one_over_alpha = log(1/alpha),
-    alpha = alpha,
-    m_pre = m_pre,
-    is_test = is_test,
-    family_name = "Bounded (sub-E based)",
-    # Memory for log e-detectors / values
-    log_e_vec = numeric(length(log_base_fn_list)),
-    n = 0,
-    # Auxiliaries for debugging
-    lambda = base_param$lambda,
-    g_alpha = base_param$g_alpha,
-    # Input Details
-    delta_lower = delta_lower,
-    delta_upper = delta_upper,
-    bound_lower = bound_lower,
-    bound_upper = bound_upper,
-    var_lower = var_lower,
-    var_upper = var_upper
+  stcp_obj$family_name <- "Bounded (sub-E based)"
+
+  out <- c(
+    stcp_obj,
+    list(
+      g_alpha = base_param$g_alpha,
+      # Input Details
+      delta_lower = delta_lower,
+      delta_upper = delta_upper,
+      bound_lower = bound_lower,
+      bound_upper = bound_upper,
+      var_lower = var_lower,
+      var_upper = var_upper
+    )
   )
   class(out) <- c("Bounded", "STCP")
   return(out)

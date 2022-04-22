@@ -23,7 +23,7 @@ alpha <- 1e-4
 # delta_star <-
 #   (m_pre - bound_lower) * (m_post - m_pre) / ((m_post - m_pre) ^ 2 + 1)
 delta_star <- m_post - m_pre
-var_star <- 1 / 6 ^ 2
+var_star <- 1
 delta_upper <- bound_upper - m_pre
 delta_lower <- 0.1
 

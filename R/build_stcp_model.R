@@ -138,8 +138,8 @@ build_stcp_exp <- function(alpha,
 #' @param bound_upper Upper bound of observations.
 #' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
-#' @param var_lower Lower bounds of variance of scaled post-change observations. Default is \code{0}.
-#' @param var_upper Upper bounds of variance of scaled post-change observations. Default is \code{0.25}.
+#' @param var_lower Lower bounds of variance of post-change observations. Default is \code{0}.
+#' @param var_upper Upper bounds of variance of post-change observations. Default is \code{(bound_upper - bound_lower)^2 / 4}.
 #' @param delta_lower_sub_E Lower bound of target Delta in sub-E scale.
 #' If both upper and lower sub-E parameters are not null then these parameters will be directly used to build baseline process.
 #' @param delta_upper_sub_E Upper bound of target Delta in sub-E scale.
@@ -161,7 +161,7 @@ build_stcp_bounded <- function(alpha,
                                k_max = 1000,
                                tol = 1e-6,
                                var_lower = 0,
-                               var_upper = 0.25,
+                               var_upper = (bound_upper - bound_lower)^2 / 4,
                                delta_lower_sub_E = NULL,
                                delta_upper_sub_E = NULL) {
   if (!(m_pre > bound_lower & m_pre < bound_upper)) {
@@ -186,6 +186,8 @@ build_stcp_bounded <- function(alpha,
   m_scaled <- (m_pre - bound_lower) / bound_range # scaled m_pre
   d_l <- delta_lower / bound_range  # scaled delta_lower
   d_u <- delta_upper / bound_range # scaled_delta_upper
+  v_l <- var_lower / bound_range^2 # scaled var_lower
+  v_u <- var_upper / bound_range^2 # scaled var_upper
 
   if (!is.null(delta_lower_sub_E) & !is.null(delta_upper_sub_E)) {
     delta_lower_val <- delta_lower_sub_E
@@ -196,8 +198,8 @@ build_stcp_bounded <- function(alpha,
     delta_upper <- bound_range * m_scaled / (delta_lower_val^2 * delta_upper_val)^(1/3)
 
   } else {
-    delta_lower_val <-  m_scaled * d_l / (var_upper + d_u ^ 2)
-    delta_upper_val <-  m_scaled * d_u / (var_lower + d_l ^ 2)
+    delta_lower_val <-  m_scaled * d_l / (v_u + d_u ^ 2)
+    delta_upper_val <-  m_scaled * d_u / (v_l + d_l ^ 2)
   }
 
   base_param <- compute_baseline(

@@ -301,40 +301,15 @@ pm_normalized <- (CLE_dat$plusminusTeam - bound_lower) / (bound_upper - bound_lo
 by_gap <- 0.02
 lambda <- seq(by_gap, 1, by = by_gap)
 omega <- rep(1/length(lambda), length(lambda))
-if(sum(omega) != 1) stop()
 
-# Compute e-detectors
-log_base_fn_list <- sapply(
-  lambda,
-  generate_log_bounded_base_fn,
-  m = m_pre_normalized,
-  bound_lower = 0
-)
-
-stcp_uniform <- list(
-  # Model parameters
-  omega = omega,
-  log_base_fn_list =  log_base_fn_list,
-  log_one_over_alpha = log(1/alpha),
-  alpha = alpha,
-  m_pre = m_pre_normalized,
-  is_test = FALSE,
-  family_name = "Bounded (Uniform Mixture)",
-  # Memory for log e-detectors / values
-  log_e_vec = numeric(length(log_base_fn_list)),
-  n = 0,
-  # Auxiliaries for debugging
-  lambda = lambda,
-  g_alpha = NA,
-  # Input Details
-  delta_lower = NA,
-  delta_upper = NA,
-  bound_lower = NA,
-  bound_upper = NA,
-  var_lower = NA,
-  var_upper = NA
-)
-class(stcp_uniform) <- c("Bounded", "STCP")
+stcp_uniform <- build_stcp(alpha,
+                           m_pre_normalized,
+                           is_test = FALSE,
+                           omega = omega,
+                           lambda = lambda,
+                           log_base_fn_generator = generate_log_bounded_base_fn,
+                           m = m_pre_normalized,
+                           bound_lower = 0)
 
 # Compute mixtures of SR and CUSUM e-detectors.
 uniform_SR <- run_stcp(pm_normalized, stcp_uniform)

@@ -18,10 +18,6 @@ v <- 500
 alpha <- 1e-4
 
 # Compute optimal delta star
-# Note delta_star for bounded case is not the same scale of delta_lower and delta_upper
-# In the future, it may be better to use different terminology to avoid confusion.
-# delta_star <-
-#   (m_pre - bound_lower) * (m_post - m_pre) / ((m_post - m_pre) ^ 2 + 1)
 delta_star <- m_post - m_pre
 var_star <- 1
 delta_upper <- bound_upper - m_pre

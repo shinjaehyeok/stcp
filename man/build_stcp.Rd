@@ -2,7 +2,7 @@
 % Please edit documentation in R/build_stcp_model.R
 \name{build_stcp}
 \alias{build_stcp}
-\title{Build STCP model.}
+\title{Build stcp model.}
 \usage{
 build_stcp(alpha, m_pre, is_test, omega, lambda, log_base_fn_generator, ...)
 }
@@ -22,8 +22,8 @@ build_stcp(alpha, m_pre, is_test, omega, lambda, log_base_fn_generator, ...)
 \item{...}{arguments to be passed to \code{log_base_fn_generator}.}
 }
 \value{
-\code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values.
+\code{stcp} object of 1. Model parameters, 2. Memory for log e-detectors / values.
 }
 \description{
-Build STCP model to detect up-crossing mean-shift.
+Build stcp model to detect up-crossing mean-shift.
 }

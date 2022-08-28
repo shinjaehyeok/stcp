@@ -1,6 +1,6 @@
-#' Build STCP model.
+#' Build stcp model.
 #'
-#' Build STCP model to detect up-crossing mean-shift.
+#' Build stcp model to detect up-crossing mean-shift.
 #'
 #' @param alpha ARL parameter in (0,1)
 #' @param m_pre Upper bound of mean of pre-change observations
@@ -10,7 +10,7 @@
 #' @param log_base_fn_generator Function factory generating log baseline functions.
 #' @param ... arguments to be passed to \code{log_base_fn_generator}.
 #'
-#' @return \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values.
+#' @return \code{stcp} object of 1. Model parameters, 2. Memory for log e-detectors / values.
 #' @export
 #'
 build_stcp <- function(alpha,
@@ -56,13 +56,13 @@ build_stcp <- function(alpha,
     # Auxiliaries for debugging
     lambda = lambda
   )
-  class(out) <- c("STCP")
+  class(out) <- c("stcp")
   return(out)
 }
 
-#' Build STCP model for simple exponential e-detectors.
+#' Build stcp model for simple exponential e-detectors.
 #'
-#' Build STCP model for simple exponential e-detectors to detect up-crossing mean-shift.
+#' Build stcp model for simple exponential e-detectors to detect up-crossing mean-shift.
 #'
 #' @param m_pre Upper bound of mean of pre-change observations
 #' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
@@ -70,7 +70,7 @@ build_stcp <- function(alpha,
 #' @param v_fn R function that compute the variance process given an observation.
 #' @inheritParams compute_baseline
 #'
-#' @return \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{stcp} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
 build_stcp_exp <- function(alpha,
@@ -124,13 +124,13 @@ build_stcp_exp <- function(alpha,
       v_min = v_min
     )
   )
-  class(out) <- c("SimpleExp", "STCP")
+  class(out) <- c("stcp_exp", "stcp")
   return(out)
 }
 
-#' Build STCP model for bounded random variables.
+#' Build stcp model for bounded random variables.
 #'
-#' Build STCP model for bounded random variables to detect up-crossing mean-shift.
+#' Build stcp model for bounded random variables to detect up-crossing mean-shift.
 #'
 #' @param m_pre Upper bound of mean of pre-change observations. Must be between \code{bound_lower} and \code{bound_upper}.
 #' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
@@ -146,7 +146,7 @@ build_stcp_exp <- function(alpha,
 #'  If both upper and lower sub-E parameters are not null then this parameter will be directly used to build baseline process.
 #' @inheritParams compute_baseline
 #'
-#' @return \code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+#' @return \code{stcp} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 #' @export
 #'
 #' @examples
@@ -239,6 +239,6 @@ build_stcp_bounded <- function(alpha,
       var_upper = var_upper
     )
   )
-  class(out) <- c("Bounded", "STCP")
+  class(out) <- c("stcp_bounded", "stcp")
   return(out)
 }

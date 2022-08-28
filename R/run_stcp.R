@@ -48,6 +48,6 @@ run_stcp <- function(new_x,
   stcp_obj$n <- stcp_obj$n + length(new_x)
   mix_e_list$last_log_e_vec <- NULL
   mix_e_list$stcp_obj <- stcp_obj
-  class(mix_e_list) <- c("STCP_RUNNED", class(stcp_obj))
+  class(mix_e_list) <- c("stcp_run", class(stcp_obj))
   return(mix_e_list)
 }

@@ -30,7 +30,7 @@ build_ci_exp(
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }
 \value{
-\code{STCP_CI} Object
+\code{stcp_ci} Object
 }
 \description{
 Build a generator of lower bound of always-valid confidence intervals

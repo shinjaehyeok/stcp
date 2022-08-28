@@ -6,7 +6,7 @@
 #' @param psi_fn_list_generator Function operator generating \code{psi_fn_list}
 #' @inheritParams compute_baseline_for_sample_size
 #'
-#' @return \code{STCP_CI} Object
+#' @return \code{stcp_ci} Object
 #' @export
 #'
 build_ci_exp <- function(alpha,
@@ -42,7 +42,7 @@ build_ci_exp <- function(alpha,
               v_min = v_min
   )
 
-  class(out) <- "STCP_CI"
+  class(out) <- "stcp_ci"
   return(out)
 }
 
@@ -54,7 +54,7 @@ build_ci_exp <- function(alpha,
 #' @inheritParams compute_baseline_for_sample_size
 #' @param  bound_lower  Lower bound of observations.
 #'
-#' @return \code{STCP_BF_CI} object
+#' @return \code{stcp_bf_ci} object
 #' @export
 #'
 build_bf_ci_bounded <- function(alpha,
@@ -109,7 +109,7 @@ build_bf_ci_bounded <- function(alpha,
               bound_lower = bound_lower
   )
 
-  class(out) <- "STCP_BF_CI"
+  class(out) <- "stcp_bf_ci"
   return(out)
 }
 
@@ -120,7 +120,7 @@ build_bf_ci_bounded <- function(alpha,
 #'
 #' @inheritParams build_ci_exp
 #'
-#' @return \code{STCP_BF_CI} object
+#' @return \code{stcp_bf_ci} object
 #' @export
 #'
 build_bf_ci_exp <- function(alpha,
@@ -172,6 +172,6 @@ build_bf_ci_exp <- function(alpha,
               v_min = v_min
   )
 
-  class(out) <- "STCP_BF_CI"
+  class(out) <- "stcp_bf_ci"
   return(out)
 }

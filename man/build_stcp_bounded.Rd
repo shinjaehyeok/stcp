@@ -2,7 +2,7 @@
 % Please edit documentation in R/build_stcp_model.R
 \name{build_stcp_bounded}
 \alias{build_stcp_bounded}
-\title{Build STCP model for bounded random variables.}
+\title{Build stcp model for bounded random variables.}
 \usage{
 build_stcp_bounded(
   alpha,
@@ -50,10 +50,10 @@ If both upper and lower sub-E parameters are not null then these parameters will
 If both upper and lower sub-E parameters are not null then this parameter will be directly used to build baseline process.}
 }
 \value{
-\code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+\code{stcp} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 }
 \description{
-Build STCP model for bounded random variables to detect up-crossing mean-shift.
+Build stcp model for bounded random variables to detect up-crossing mean-shift.
 }
 \examples{
 build_stcp_bounded(0.01, 0.5, 0.1, 0.4)

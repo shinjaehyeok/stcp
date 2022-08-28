@@ -1,8 +1,8 @@
-# If STCP is not installed then run below commands
+# If stcp is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/STCP")
+# devtools::install_github("shinjaehyeok/stcp")
 
-library(STCP)
+library(stcp)
 
 # Bernoulli case ----
 

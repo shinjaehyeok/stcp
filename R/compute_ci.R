@@ -3,7 +3,7 @@
 #' Given a vector of observations, compute lower bounds of confidence sequence.
 #'
 #' @param x_vec A vector of observations
-#' @param stcp_ci_obj STCP_CI object, output of \code{build_ci_exp}
+#' @param stcp_ci_obj stcp_ci object, output of \code{build_ci_exp}
 #' @param n_custom_vec A vector of number of observations for each entry of \code{x_vec}. If NULL, each observation is assumed to be equal to one.
 #' @param x_bar_pre Sample mean of previous observations. Default is \code{0} (No pre-samples)
 #' @param n_pre Number of pre-samples. Default is \code{0}.
@@ -20,7 +20,7 @@ compute_ci <- function(x_vec,
                        x_bar_pre = 0,
                        n_pre = 0,
                        tol = 1e-6) {
-  if (class(stcp_ci_obj) != "STCP_CI") {
+  if (class(stcp_ci_obj) != "stcp_ci") {
     stop("stcp_ci_obj must be an output of build_ci_exp function.")
   }
 
@@ -60,7 +60,7 @@ compute_ci <- function(x_vec,
 #' Given a vector of observations, compute lower bounds of confidence sequence.
 #'
 #' @param x_vec A vector of observations
-#' @param stcp_bf_ci_obj STCP_BF_CI object, output of \code{build_bf_ci_bounded}
+#' @param stcp_bf_ci_obj stcp_bf_ci object, output of \code{build_bf_ci_bounded}
 #' @param max_num_ci The maximum number of CI to computes. Recomend to set it be less than 100.
 #' @inheritParams compute_bf_ci_single
 #'
@@ -73,7 +73,7 @@ compute_bf_ci <- function(x_vec,
                           ci_lower_trivial = -Inf,
                           max_num_ci = 100,
                           tol = 1e-6) {
-  if (class(stcp_bf_ci_obj) != "STCP_BF_CI") {
+  if (class(stcp_bf_ci_obj) != "stcp_bf_ci") {
     stop("stcp_bf_ci_obj must be an output of the build_bf_ci_bounded function.")
   }
   if (max_num_ci < 1) {

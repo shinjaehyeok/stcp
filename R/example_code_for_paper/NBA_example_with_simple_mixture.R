@@ -1,7 +1,7 @@
-# If STCP is not installed then run below commands
+# If stcp is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/STCP")
-library(STCP)
+# devtools::install_github("shinjaehyeok/stcp")
+library(stcp)
 # In this analysis, we use tidyverse to handle NBA data
 library(tidyverse)
 # Load NBA regular season log from 2011 to 2022

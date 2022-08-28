@@ -16,7 +16,7 @@ compute_bf_ci(
 \arguments{
 \item{x_vec}{A vector of observations}
 
-\item{stcp_bf_ci_obj}{STCP_BF_CI object, output of \code{build_bf_ci_bounded}}
+\item{stcp_bf_ci_obj}{stcp_bf_ci object, output of \code{build_bf_ci_bounded}}
 
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
 

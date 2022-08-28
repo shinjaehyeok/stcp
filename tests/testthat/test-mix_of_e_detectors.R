@@ -7,7 +7,7 @@ test_that("update_log_mix_e and update_log_mix_e_values are matched for the univ
 
   new_x <-  rbinom(100, 1, p_post)
 
-  # SimpleExp
+  # stcp_exp
   model_exp <- build_stcp_exp(
     alpha,
     p_pre,
@@ -31,7 +31,7 @@ test_that("update_log_mix_e and update_log_mix_e_values are matched for the univ
 
   expect_equal(normal_update, faster_update)
 
-  # Bounded model
+  # stcp_bounded
   model_bounded <- build_stcp_bounded(
     alpha,
     p_pre,

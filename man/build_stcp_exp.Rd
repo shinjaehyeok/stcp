@@ -2,7 +2,7 @@
 % Please edit documentation in R/build_stcp_model.R
 \name{build_stcp_exp}
 \alias{build_stcp_exp}
-\title{Build STCP model for simple exponential e-detectors.}
+\title{Build stcp model for simple exponential e-detectors.}
 \usage{
 build_stcp_exp(
   alpha,
@@ -42,8 +42,8 @@ build_stcp_exp(
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }
 \value{
-\code{STCP} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
+\code{stcp} object of 1. Model parameters, 2. Memory for log e-detectors / values, 3. Auxiliaries
 }
 \description{
-Build STCP model for simple exponential e-detectors to detect up-crossing mean-shift.
+Build stcp model for simple exponential e-detectors to detect up-crossing mean-shift.
 }

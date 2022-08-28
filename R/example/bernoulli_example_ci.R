@@ -1,8 +1,8 @@
-# If STCP is not installed then run below commands
+# If stcp is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/STCP")
+# devtools::install_github("shinjaehyeok/stcp")
 
-library(STCP)
+library(stcp)
 set.seed(1)
 # Bernoulli case ----
 # Ber(p)
@@ -72,7 +72,7 @@ ci_helper_mix2 <- generate_ci_helper(
   is_psi_depend_on_m = FALSE
 )
 tmp <- list(ci_helper = ci_helper_mix2)
-class(tmp) <- "STCP_CI"
+class(tmp) <- "stcp_ci"
 ci_mix2 <- compute_ci(x_vec, tmp)
 
 

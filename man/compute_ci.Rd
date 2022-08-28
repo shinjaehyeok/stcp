@@ -18,7 +18,7 @@ compute_ci(
 \arguments{
 \item{x_vec}{A vector of observations}
 
-\item{stcp_ci_obj}{STCP_CI object, output of \code{build_ci_exp}}
+\item{stcp_ci_obj}{stcp_ci object, output of \code{build_ci_exp}}
 
 \item{width_upper}{Constant to compute upper bound of the width of confidence interval of the form \code{width_upper / sqrt(n)}.}
 

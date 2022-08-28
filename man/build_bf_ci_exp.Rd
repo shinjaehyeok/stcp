@@ -30,7 +30,7 @@ build_bf_ci_exp(
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }
 \value{
-\code{STCP_BF_CI} object
+\code{stcp_bf_ci} object
 }
 \description{
 Build a brute-force generator of lower bound of always-valid confidence intervals

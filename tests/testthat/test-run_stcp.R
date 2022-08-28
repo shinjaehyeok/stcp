@@ -1,11 +1,11 @@
-test_that("Sequential update works for SimpleExp test", {
+test_that("Sequential update works for stcp_exp test", {
   alpha <- 0.1
   p_pre <- 0.3
   p_post <- sample(c(0.3, 0.5, 0.6), 1)
   delta_lower <- 0.01
   delta_upper <- 0.5
 
-  # SimpleExp
+  # stcp_exp
   x <-  rbinom(100, 1, p_post)
   model_sub_B_test <- build_stcp_exp(
     alpha,
@@ -56,14 +56,14 @@ test_that("Sequential update works for SimpleExp test", {
 
 })
 
-test_that("Sequential update works for Bounded test", {
+test_that("Sequential update works for stcp_bounded test", {
   alpha <- 0.1
   p_pre <- 0.3
   p_post <- sample(c(0.3, 0.5, 0.6), 1)
   delta_lower <- 0.01
   delta_upper <- 0.5
 
-  # SimpleExp
+  # stcp_bounded
   x <-  rbinom(100, 1, p_post)
   model_bounded_test <- build_stcp_bounded(
     alpha,
@@ -114,14 +114,14 @@ test_that("Sequential update works for Bounded test", {
 })
 
 
-test_that("Sequential update works for SimpleExp CP", {
+test_that("Sequential update works for stcp_exp CP", {
   alpha <- 0.1
   p_pre <- 0.3
   p_post <- sample(c(0.3, 0.5, 0.6), 1)
   delta_lower <- 0.01
   delta_upper <- 0.5
 
-  # SimpleExp
+  # stcp_exp
   x <-  rbinom(100, 1, p_post)
   model_sub_B_test <- build_stcp_exp(
     alpha,
@@ -172,14 +172,14 @@ test_that("Sequential update works for SimpleExp CP", {
 
 })
 
-test_that("Sequential update works for Bounded CP", {
+test_that("Sequential update works for stcp_bounded CP", {
   alpha <- 0.1
   p_pre <- 0.3
   p_post <- sample(c(0.3, 0.5, 0.6), 1)
   delta_lower <- 0.01
   delta_upper <- 0.5
 
-  # SimpleExp
+  # stcp_bounded
   x <-  rbinom(100, 1, p_post)
   model_bounded_test <- build_stcp_bounded(
     alpha,

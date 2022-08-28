@@ -1,8 +1,8 @@
-# If STCP is not installed then run below commands
+# If stcp is not installed then run below commands
 # install.packages("devtools")
-# devtools::install_github("shinjaehyeok/STCP")
+# devtools::install_github("shinjaehyeok/stcp")
 
-library(STCP)
+library(stcp)
 
 # Bounded case ----
 # Pre-change : 5 * Beta(1, 4) - 1 (m = 0, sig^2 = 5^2 * 4 / (5^2 * 6) = 2/3)

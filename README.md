@@ -9,12 +9,14 @@
 <!-- badges: end -->
 
 stcp is an R package built to run nonparametric sequential tests and
-online change point detection algorithms in \[CITE SRR 21’ and SRR
-22’\]. This package supports APIs of nonparametric sequential test and
-online change-point detection for streams of univariate sub-Gaussian,
-binary, and bounded random variables. This package also provides APIs of
-general E-value based sequential test and E-detectors based change-point
-detection frameworks for advanced users.
+online change point detection algorithms in [SRR
+21’](https://arxiv.org/abs/2010.08082) and [SRR
+22’](https://arxiv.org/abs/2203.03532). This package supports APIs of
+nonparametric sequential test and online change-point detection for
+streams of univariate sub-Gaussian, binary, and bounded random
+variables. This package also provides APIs of general E-value based
+sequential test and E-detectors based change-point detection frameworks
+for advanced users.
 
 ## Installation
 

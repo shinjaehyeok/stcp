@@ -139,3 +139,5 @@ abline(v = nu, col = 1, lty = 2)
 abline(v = mix_SR_stop, col = 2, lty = 2, lwd = 2)
 
 ```
+
+<!--devtools::build_vignettes() -->

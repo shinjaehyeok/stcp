@@ -60,6 +60,53 @@ build_stcp <- function(alpha,
   return(out)
 }
 
+#' Combine two stcp objects for a given weight.
+#'
+#' Combine two stcp objects for a given weight. Only \code{stcp} objects of the same \code{is_test} can be combined.
+#' Once combined, any additional details in input objects will be discarded.
+#'
+#' @param obj1 First \code{stcp} object to combine.
+#' @param obj2 Second \code{stcp} object to combine.
+#' @param w Weight scalar to determine the importance of the first \code{stcp} object. Default is 0.5.
+#'
+#' @return Combined \code{stcp} object of 1. Model parameters, 2. Memory for log e-detectors / values.
+#' @export
+#'
+combine_stcp <- function(obj1, obj2, w = 0.5) {
+  if (w <= 0 || w >= 1 ) stop("w must be a number between (0,1)")
+  if (obj1$is_test != obj2$is_test) {
+    stop("e-value (is_test == TRUE) and e-detector (is_test != FALSE) cannot be combined")
+  }
+
+  combined_omega <- c(w * obj1$omega, (1-w) * obj2$omega)
+  combined_alpha <- w * obj1$alpha + (1-w) * obj2$alpha
+  combined_log_base_fn_list <- c(obj1$log_base_fn_list, obj2$log_base_fn_list)
+  combined_m_pre <- c(obj1$m_pre, obj2$m_pre)
+  combined_family_name <- c(obj1$family_name, obj2$family_name)
+  combined_log_e_vec <- c(obj1$log_e_vec, obj2$log_e_vec)
+  combined_lambda <- c(obj1$lambda, obj2$lambda)
+
+  out <- list(
+    # Model parameters
+    omega = combined_omega,
+    log_base_fn_list =  combined_log_base_fn_list,
+    log_one_over_alpha = log(1/combined_alpha),
+    alpha = combined_alpha,
+    m_pre = combined_m_pre,
+    is_test = obj1$is_test,
+    family_name = combined_family_name,
+    # Memory for log e-detectors / values
+    log_e_vec = combined_log_e_vec,
+    n = 0,
+    # Auxiliaries for debugging
+    lambda = combined_lambda
+  )
+  class(out) <- c("stcp")
+  return(out)
+
+}
+
+
 #' Build stcp model for simple exponential e-detectors.
 #'
 #' Build stcp model for simple exponential e-detectors to detect up-crossing mean-shift.

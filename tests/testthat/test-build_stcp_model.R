@@ -214,62 +214,64 @@ test_that("Type 1 error control", {
 
 })
 
-test_that("is_flipped automatically converts the bounded input", {
-  alpha <- 1e-2 # Level 0.01 test
-  m_pre <- 0.2 # Upper bound of mean of the null distribution.
-  delta_lower <- 0.01  # Guess on the minimum gap between the null and alternative means
+test_that("is_flipped automatically converts the bounded input - 1. test", {
+  for (is_test in c(TRUE, FALSE)) {
+    alpha <- 1e-2 # Level 0.01 test
+    m_pre <- 0.2 # Upper bound of mean of the null distribution.
+    delta_lower <- 0.01  # Guess on the minimum gap between the null and alternative means
 
-  max_sample <- 1000L
-  x_vec <- rbeta(max_sample, 2, 8) # H_0 dist: B(2, 8)
+    max_sample <- 100L
+    x_vec <- rbeta(max_sample, 2, 8) # H_0 dist: B(2, 8)
 
 
-  # Run manually flipped model (Y = 1-X, theta = 1-m)
-  theta_pre <- 1-m_pre # Upper bound of mean of the null distribution.
-  manual_flip_model <- build_stcp_bounded(alpha, theta_pre, delta_lower, is_test = TRUE)
-  manual_flip_run <- run_stcp(1-x_vec, manual_flip_model) # Note input is 1-x_vec
+    # Run manually flipped model (Y = 1-X, theta = 1-m)
+    theta_pre <- 1-m_pre # Upper bound of mean of the null distribution.
+    manual_flip_model <- build_stcp_bounded(alpha, theta_pre, delta_lower, is_test = is_test)
+    manual_flip_run <- run_stcp(1-x_vec, manual_flip_model) # Note input is 1-x_vec
 
-  # Run automatically flipped model by enabling is_flipped = TRUE
-  flip_model <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = TRUE, is_flipped = TRUE)
-  flip_run <- run_stcp(x_vec, flip_model)
+    # Run automatically flipped model by enabling is_flipped = TRUE
+    flip_model <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = is_test, is_flipped = TRUE)
+    flip_run <- run_stcp(x_vec, flip_model)
 
-  # 1. Models are the same
-  expect_true(all.equal(manual_flip_model$omega, flip_model$omega))
-  expect_true(all.equal(manual_flip_model$lambda, flip_model$lambda))
+    # 1. Models are the same
+    expect_true(all.equal(manual_flip_model$omega, flip_model$omega))
+    expect_true(all.equal(manual_flip_model$lambda, flip_model$lambda))
 
-  # 2. Runs are the same
-  expect_true(all.equal(manual_flip_run$log_mix_e_vec, flip_run$log_mix_e_vec))
+    # 2. Runs are the same
+    expect_true(all.equal(manual_flip_run$log_mix_e_vec, flip_run$log_mix_e_vec))
+  }
 })
 
 test_that("Model combinataion works", {
   # 1. Bounded case
+  for (is_test in c(TRUE, FALSE)) {
+    max_sample <- 100L
+    x_vec <- 3*rbeta(max_sample, 2, 8) + 1 # H_0 dist: B(2, 8)
+    bound_lower <- 1
+    bound_upper <- 4
+    alpha <- 1e-2 # Level 0.01 test
+    m_pre <- 0.2 * 3 + 1 # Upper bound of mean of the null distribution.
+    delta_lower <- 0.01  # Guess on the minimum gap between the null and alternative means
 
-  max_sample <- 1000L
-  x_vec <- 3*rbeta(max_sample, 2, 8) + 1 # H_0 dist: B(2, 8)
-  bound_lower <- 1
-  bound_upper <- 4
-  alpha <- 1e-2 # Level 0.01 test
-  m_pre <- 0.2 * 3 + 1 # Upper bound of mean of the null distribution.
-  delta_lower <- 0.01  # Guess on the minimum gap between the null and alternative means
+    normal_model <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = is_test, bound_lower = bound_lower, bound_upper = bound_upper)
+    flip_model <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = is_test, is_flipped = TRUE, bound_lower = bound_lower, bound_upper = bound_upper)
 
-  normal_model <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = TRUE, bound_lower = bound_lower, bound_upper = bound_upper)
-  flip_model <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = TRUE, is_flipped = TRUE, bound_lower = bound_lower, bound_upper = bound_upper)
+    combined_model <- combine_stcp(normal_model, flip_model, w = 0.5)
+    combined_model2 <- combine_stcp(normal_model, flip_model, w = 0.9)
 
-  combined_model <- combine_stcp(normal_model, flip_model, w = 0.5)
-  combined_model2 <- combine_stcp(normal_model, flip_model, w = 0.9)
+    normal_run <- run_stcp(x_vec, normal_model)
+    flip_run <- run_stcp(x_vec, flip_model)
 
-  normal_run <- run_stcp(x_vec, normal_model)
-  flip_run <- run_stcp(x_vec, flip_model)
+    combine_run <- combine_stcp_run(normal_run, flip_run, w = 0.5)
+    combine_run2 <- combine_stcp_run(normal_run, flip_run, w = 0.9)
 
-  combine_run <- combine_stcp_run(normal_run, flip_run, w = 0.5)
-  combine_run2 <- combine_stcp_run(normal_run, flip_run, w = 0.9)
+    combined_model_run <- run_stcp(x_vec, combined_model)
+    combined_model_run2 <- run_stcp(x_vec, combined_model2)
 
-  combined_model_run <- run_stcp(x_vec, combined_model)
-  combined_model_run2 <- run_stcp(x_vec, combined_model2)
-
-  expect_true(all.equal(combine_run$log_mix_e_vec, combined_model_run$log_mix_e_vec))
-  expect_true(all.equal(combine_run2$log_mix_e_vec, combined_model_run2$log_mix_e_vec))
-  expect_false(isTRUE(all.equal(combine_run$log_mix_e_vec, combined_model_run2$log_mix_e_vec)))
-
+    expect_true(all.equal(combine_run$log_mix_e_vec, combined_model_run$log_mix_e_vec))
+    expect_true(all.equal(combine_run2$log_mix_e_vec, combined_model_run2$log_mix_e_vec))
+    expect_false(isTRUE(all.equal(combine_run$log_mix_e_vec, combined_model_run2$log_mix_e_vec)))
+  }
   # 2. Gaussian case (WIP)
 
   # 3. Bernoulli case (WIP)

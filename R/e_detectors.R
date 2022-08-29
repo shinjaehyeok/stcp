@@ -58,18 +58,32 @@ generate_log_base_fn <- function(lambda,
 #' @param lambda Lambda parameter of the target baseline function.
 #' @param m Mean parameter of the target baseline function. It must be strictly larger than \code{bound_lower}.
 #' @param bound_lower Lower bound of observations. Default is \code{0}.
+#' @param bound_upper Upper bound of observations. Default is \code{1}.
+#' @param is_flipped A Boolean to indicate whether the model should take a flipped input or not. If the input \eqn{X} is in \eqn{[0,1]} then the flipped input is defined by \eqn{1-X}.
 #' @return A function compute log of baseline process given an observation.
 #' @export
 #'
 generate_log_bounded_base_fn <- function(lambda,
                                          m = 0.5,
-                                         bound_lower = 0){
-  if (m <= bound_lower){
-    stop("Mean parameter must strictly larger than bound_lower.")
-  }
-  m_gap <- m - bound_lower
-  log_base_fn <- function(x){
-    log(1 + lambda * ( (x - bound_lower) / m_gap  - 1))
+                                         bound_lower = 0,
+                                         bound_upper = 1,
+                                         is_flipped = FALSE){
+  if (is_flipped) {
+    if (m >= bound_upper){
+      stop("Mean parameter must strictly smaller than bound_upper.")
+    }
+    m_gap <- bound_upper - m
+    log_base_fn <- function(x){
+      log(1 + lambda * ( (bound_upper - x) / m_gap  - 1))
+    }
+  } else {
+    if (m <= bound_lower){
+      stop("Mean parameter must strictly larger than bound_lower.")
+    }
+    m_gap <- m - bound_lower
+    log_base_fn <- function(x){
+      log(1 + lambda * ( (x - bound_lower) / m_gap  - 1))
+    }
   }
   return(log_base_fn)
 }

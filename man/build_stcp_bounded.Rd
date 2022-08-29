@@ -10,6 +10,7 @@ build_stcp_bounded(
   delta_lower,
   delta_upper = bound_upper - m_pre,
   is_test = FALSE,
+  is_flipped = FALSE,
   bound_lower = 0,
   bound_upper = 1,
   k_max = 1000,
@@ -25,11 +26,13 @@ build_stcp_bounded(
 
 \item{m_pre}{Upper bound of mean of pre-change observations. Must be between \code{bound_lower} and \code{bound_upper}.}
 
-\item{delta_lower}{Lower bound of target Delta. It must have be positive and smaller than or equal to \code{delta_upper}.}
+\item{delta_lower}{Lower bound of target Delta. It must be positive and smaller than or equal to \code{delta_upper}.}
 
-\item{delta_upper}{Upper bound of target Delta. It must have be positive and larger than or equal to \code{delta_lower}.}
+\item{delta_upper}{Upper bound of target Delta. It must be positive and larger than or equal to \code{delta_lower}.}
 
 \item{is_test}{A Boolean to indicate whether this model is for a sequential test or not.}
+
+\item{is_flipped}{A Boolean to indicate whether the model should take a flipped input or not. If the input \eqn{X} is in \eqn{[0,1]} then the flipped input is defined by \eqn{1-X}.}
 
 \item{bound_lower}{Lower bound of observations.}
 

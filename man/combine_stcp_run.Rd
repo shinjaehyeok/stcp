@@ -17,5 +17,5 @@ combine_stcp_run(run1, run2, w = 0.5)
 Combined \code{stcp_run} object of 1. logarithm of mixture of e-detectors, 2. the first stopped point and 3. Underlying stcp objects.
 }
 \description{
-Combine two stcp runs for a given weight. Only \code{stcp_run} objects of the same \code{is_test} can be combined.
+Combine two stcp runs for a given weight. Only \code{stcp_run} objects of the same \code{is_test} and same number of new observations can be combined.
 }

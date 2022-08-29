@@ -63,6 +63,7 @@ print.stcp <- function(x,...) {
     cat("\n")
     cat("- v_min: ", x$v_min, "\n")
   } else if (class(x)[1] == "stcp_bounded") {
+    cat("- is_flipped: ", x$is_flipped, "\n")
     cat("- delta_lower: ", x$delta_lower, "\n")
     cat("- delta_upper: ", x$delta_upper, "\n")
     cat("- bound_lower: ", x$bound_lower, "\n")

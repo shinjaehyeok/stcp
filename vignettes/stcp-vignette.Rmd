@@ -116,8 +116,7 @@ Now, consider the following swapped hypotheses.
 H_0: \mu \geq 0.2~~\text{vs}~~H_1: \mu < 0.2
 \]
 
-Currently (as 2022 Q3), \code{stcp} package does not directly support this opposite directional test.
-However, we can simply define a new random variable $Y := 1-X$ with $\theta := \mathbb{E}Y = 1-\mu$ and test the corresponding hypotheses.
+To test the swapped hypothesis above, we can simply define a new random variable $Y := 1-X$ with $\theta := \mathbb{E}Y = 1-\mu$ and test the corresponding hypotheses.
 
 \[
 H_0: \theta \leq 0.8~~\text{vs}~~H_1: \theta > 0.8
@@ -149,6 +148,38 @@ if (is.infinite(test_run3$stopped_ind)) {
 ```
 As the data was generated in the switched null hypothesis ($\mu \geq 0.2$), there is no enough evidence to reject the switched null hypothesis so far. 
 
+Instead of defining a new random variable $Y$, the \code{build_stcp_bounded} function supports \code{is_flipped} argument to ``flip'' the original random variable $X$ into $Y := 1-X$ automatically.
+```{r, opposite_direction2}
+# Use is_flipped = TRUE to conduct the test for the swapped hypothesis.
+test_model3b <- build_stcp_bounded(alpha, m_pre, delta_lower, is_test = TRUE, is_flipped = TRUE)
+
+
+# Both models have same lambdas and omegas
+all.equal(test_model_op_direct$lambda, test_model3b$lambda)
+all.equal(test_model_op_direct$omega, test_model3b$omega)
+
+# Run the test
+test_run3b <- run_stcp(another_x_vec, test_model3b)
+
+# Run results are also same
+all.equal(test_run3$log_mix_e_vec, test_run3b$log_mix_e_vec)
+
+
+# Printing summary
+print(test_run3b)
+
+
+# Plot 
+if (is.infinite(test_run3b$stopped_ind)) {
+  plot(test_run3b)
+} else {
+  plot(test_run3b, main = paste0("H0 is rejected at n = ", test_run3b$stopped_ind))
+}
+
+
+```
+
+
 #### d) Two-sided test
 
 Finally, let's examine how to conduct the following two-sided test.
@@ -161,7 +192,19 @@ H_0: \mu = 0.2~~\text{vs}~~H_1: \mu \neq 0.2
 In this case, we need to [TODO:ADD explanation about combining two objects]
 
 ```{r, two_side_null}
-test_run4 <- combine_stcp_run(test_run2, test_run3)
+# Combine two existing runs
+test_run4 <- combine_stcp_run(test_run2, test_run3b)
+
+# Or we can first combine models and re-run the model. 
+# Note this method assumes both models take the same input. Thus we cannot use
+# test_model_op_direct but must use test_model3b
+
+combined_model <- combine_stcp(test_model, test_model3b)
+
+test_run4b <- run_stcp(another_x_vec, combined_model)
+
+# Two run results are same.
+all.equal(test_run4$log_mix_e_vec, test_run4b$log_mix_e_vec)
 
 # Printing summary
 print(test_run4)

@@ -184,6 +184,7 @@ build_stcp_exp <- function(alpha,
 #' @param bound_lower Lower bound of observations.
 #' @param bound_upper Upper bound of observations.
 #' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
+#' @param is_flipped A Boolean to indicate whether the model should take a flipped input or not. If the input \eqn{X} is in \eqn{[0,1]} then the flipped input is defined by \eqn{1-X}.
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
 #' @param var_lower Lower bounds of variance of post-change observations. Default is \code{0}.
 #' @param var_upper Upper bounds of variance of post-change observations. Default is \code{(bound_upper - bound_lower)^2 / 4}.
@@ -203,6 +204,7 @@ build_stcp_bounded <- function(alpha,
                                delta_lower,
                                delta_upper = bound_upper - m_pre,
                                is_test = FALSE,
+                               is_flipped = FALSE,
                                bound_lower = 0,
                                bound_upper = 1,
                                k_max = 1000,
@@ -211,6 +213,13 @@ build_stcp_bounded <- function(alpha,
                                var_upper = (bound_upper - bound_lower)^2 / 4,
                                delta_lower_sub_E = NULL,
                                delta_upper_sub_E = NULL) {
+
+  if (is_flipped) {
+    # If flipped, then build sub-E parameters based on flipped mean
+    m_pre_org <- m_pre
+    m_pre <- bound_lower + bound_upper - m_pre
+  }
+
   if (!(m_pre > bound_lower & m_pre < bound_upper)) {
     stop("m_pre must be between bound_lower and bound_upper.")
   }
@@ -259,6 +268,11 @@ build_stcp_bounded <- function(alpha,
     tol
   )
 
+  if (is_flipped) {
+    # Recover original mean parameter
+    m_pre <- m_pre_org
+  }
+
   # Make stcp object
   stcp_obj <- build_stcp(
     alpha = alpha,
@@ -268,7 +282,9 @@ build_stcp_bounded <- function(alpha,
     lambda = base_param$lambda,
     log_base_fn_generator = generate_log_bounded_base_fn,
     m = m_pre,
-    bound_lower = bound_lower
+    bound_lower = bound_lower,
+    bound_upper = bound_upper,
+    is_flipped = is_flipped
   )
 
   stcp_obj$family_name <- "Bounded (sub-E based)"
@@ -278,6 +294,7 @@ build_stcp_bounded <- function(alpha,
     list(
       g_alpha = base_param$g_alpha,
       # Input Details
+      is_flipped = is_flipped,
       delta_lower = delta_lower,
       delta_upper = delta_upper,
       bound_lower = bound_lower,

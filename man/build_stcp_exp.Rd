@@ -23,9 +23,9 @@ build_stcp_exp(
 
 \item{m_pre}{Upper bound of mean of pre-change observations}
 
-\item{delta_lower}{Lower bound of target Delta. It must have be positive and smaller than or equal to \code{delta_upper}.}
+\item{delta_lower}{Lower bound of target Delta. It must be positive and smaller than or equal to \code{delta_upper}.}
 
-\item{delta_upper}{Upper bound of target Delta. It must have be positive and larger than or equal to \code{delta_lower}.}
+\item{delta_upper}{Upper bound of target Delta. It must be positive and larger than or equal to \code{delta_lower}.}
 
 \item{is_test}{A Boolean to indicate whether this model is for a sequential test or not.}
 

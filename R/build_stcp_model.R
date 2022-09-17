@@ -184,7 +184,7 @@ build_stcp_exp <- function(alpha,
 #' @param bound_lower Lower bound of observations.
 #' @param bound_upper Upper bound of observations.
 #' @param is_test A Boolean to indicate whether this model is for a sequential test or not.
-#' @param is_flipped A Boolean to indicate whether the model should take a flipped input or not. If the input \eqn{X} is in \eqn{[0,1]} then the flipped input is defined by \eqn{1-X}.
+#' @param is_flipped A Boolean to indicate whether the model should take a flipped input or not. If the input \eqn{X} is uppder bounded by \eqn{U} then the flipped input is defined by \eqn{U-X}.
 #' @param k_max Positive integer to determine the maximum number of baselines. Default is \code{1000}.
 #' @param var_lower Lower bounds of variance of post-change observations. Default is \code{0}.
 #' @param var_upper Upper bounds of variance of post-change observations. Default is \code{(bound_upper - bound_lower)^2 / 4}.

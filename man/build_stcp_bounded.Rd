@@ -32,7 +32,7 @@ build_stcp_bounded(
 
 \item{is_test}{A Boolean to indicate whether this model is for a sequential test or not.}
 
-\item{is_flipped}{A Boolean to indicate whether the model should take a flipped input or not. If the input \eqn{X} is in \eqn{[0,1]} then the flipped input is defined by \eqn{1-X}.}
+\item{is_flipped}{A Boolean to indicate whether the model should take a flipped input or not. If the input \eqn{X} is uppder bounded by \eqn{U} then the flipped input is defined by \eqn{U-X}.}
 
 \item{bound_lower}{Lower bound of observations.}
 

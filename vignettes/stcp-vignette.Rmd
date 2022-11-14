@@ -189,7 +189,7 @@ Finally, let's examine how to conduct the following two-sided test.
 H_0: \mu = 0.2~~\text{vs}~~H_1: \mu \neq 0.2
 \]
 
-In this case, we need to [TODO:ADD explanation about combining two objects]
+In this case, we need to combine two 'one-sided' tests into a single 'two-sided' test. In general, we can combine any two test runs into a single test run. The combined test run controls type-1 error under the intersection of two null hypotheses, which is equal to $\mu = 0.2$ in this example. If two tests share a common input then we can also combine two stcp models into a single model and then run a test based on the combined model. 
 
 ```{r, two_side_null}
 # Combine two existing runs
@@ -218,6 +218,8 @@ if (is.infinite(test_run4$stopped_ind)) {
 plot(test_run2, lty = 2, col = 2, add = TRUE)
 plot(test_run3, lty = 2, col = 3, add = TRUE)
 ```
+
+
 
 ### 2. Change-point detection
 

@@ -14,7 +14,7 @@ online change point detection algorithms in [SRR
 22’](https://arxiv.org/abs/2203.03532). This package supports APIs of
 nonparametric sequential test and online change-point detection for
 streams of univariate sub-Gaussian, binary, and bounded random
-variables. This package also provides APIs of general E-value based
+variables. This package also provides APIs for general E-value based
 sequential test and E-detectors based change-point detection frameworks
 for advanced users.
 
@@ -30,3 +30,4 @@ devtools::install_github("shinjaehyeok/stcp")
 
 <!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.  -->
 <!-- TODO Write vignettes for CP and other families-->
+<!-- TODO Implement asymptotic CS via sub-G CS with sample variance-->

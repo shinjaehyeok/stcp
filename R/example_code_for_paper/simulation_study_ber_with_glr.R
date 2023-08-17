@@ -322,14 +322,28 @@ exact_cusum <- run_ber_cusum_with_memory(x_vec, p_pre, p_post,
 exact_glr_cusum <- run_ber_glr_cusum_with_memory(x_vec, p_pre, p_post,
                                          thres = exact_glr_cusum_thres,
                                          window_size = 30L)
-eSR <- run_stcp(x_vec, stcp_mix)
+eSR_star <- run_stcp(x_vec, stcp_star)
+eSR_mix <- run_stcp(x_vec, stcp_mix)
 
 plot(seq_along(x_vec), exact_cusum$m_vec, type = "l", ylim = c(0, 3 * log(ARL_target)))
 abline(h=exact_cusum_thres)
 lines(seq_along(x_vec), exact_glr_cusum$m_vec, col = 2)
 abline(h=exact_glr_cusum_thres, col = 2)
-lines(seq_along(x_vec), eSR$log_mix_e_vec, col = 3)
-abline(h=eSR$stcp_obj$log_one_over_alpha, col = 3)
+lines(seq_along(x_vec), eSR_star$log_mix_e_vec, col = 3)
+abline(h=eSR_star$stcp_obj$log_one_over_alpha, col = 3)
+lines(seq_along(x_vec), eSR_mix$log_mix_e_vec, col = 4)
+abline(h=eSR_mix$stcp_obj$log_one_over_alpha, col = 4)
+
+
+plot(seq_along(x_vec), eSR_star$log_mix_e_vec - exact_cusum$m_vec, type = "l", ylim = c(0, 10))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_cusum_thres)
+
+
+plot(seq_along(x_vec), eSR_mix$log_mix_e_vec - exact_cusum$m_vec, type = "l", ylim = c(0, 10))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_cusum_thres)
+
+plot(seq_along(x_vec), eSR_mix$log_mix_e_vec - exact_glr_cusum$m_vec, type = "l", ylim = c(0, 10))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_glr_cusum_thres)
 
 # plot(seq_along(x_vec), exact_glr_cusum$p_hat, type = "l")
 
@@ -353,7 +367,14 @@ abline(h=eSR_star$stcp_obj$log_one_over_alpha, col = 3)
 lines(seq_along(x_vec), eSR_mix$log_mix_e_vec, col = 4)
 abline(h=eSR_mix$stcp_obj$log_one_over_alpha, col = 4)
 
+plot(seq_along(x_vec), eSR_star$log_mix_e_vec - exact_cusum$m_vec, type = "l", ylim = c(0, 5))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_cusum_thres)
 
+plot(seq_along(x_vec), eSR_mix$log_mix_e_vec - exact_cusum$m_vec, type = "l", ylim = c(0, 5))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_cusum_thres)
+
+plot(seq_along(x_vec), eSR_mix$log_mix_e_vec - exact_glr_cusum$m_vec, type = "l", ylim = c(0, 5))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_glr_cusum_thres)
 
 # Change at v = 200 Favorable for SR-type detector
 v <- 200
@@ -376,6 +397,14 @@ lines(seq_along(x_vec), eSR_mix$log_mix_e_vec, col = 4)
 abline(h=eSR_mix$stcp_obj$log_one_over_alpha, col = 4)
 
 
+plot(seq_along(x_vec), eSR_star$log_mix_e_vec - exact_cusum$m_vec, type = "l", ylim = c(0, 5))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_cusum_thres)
+
+
 plot(seq_along(x_vec), eSR_mix$log_mix_e_vec - exact_cusum$m_vec, type = "l", ylim = c(0, 5))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_cusum_thres)
+
+plot(seq_along(x_vec), eSR_mix$log_mix_e_vec - exact_glr_cusum$m_vec, type = "l", ylim = c(0, 5))
+abline(h = eSR_mix$stcp_obj$log_one_over_alpha - exact_glr_cusum_thres)
 
 # plot(seq_along(x_vec), exact_glr_cusum$p_hat, type = "l")

@@ -47,6 +47,8 @@ run_stcp <- function(new_x,
   stcp_obj$log_e_vec <- mix_e_list$last_log_e_vec
   stcp_obj$n <- stcp_obj$n + length(new_x)
   mix_e_list$last_log_e_vec <- NULL
+  # TODO: This copy is very expensive.
+  # We need to make the run_stcp as a method of R6 stcp_obj object.
   mix_e_list$stcp_obj <- stcp_obj
   class(mix_e_list) <- c("stcp_run", class(stcp_obj))
   return(mix_e_list)

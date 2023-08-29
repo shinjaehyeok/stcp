@@ -8,10 +8,10 @@
 [![R-CMD-check](https://github.com/shinjaehyeok/stcp/workflows/R-CMD-check/badge.svg)](https://github.com/shinjaehyeok/stcp/actions)
 <!-- badges: end -->
 
-stcp is an R package built to run nonparametric sequential tests and
-online change point detection algorithms in [SRR
+stcp is a prototyped R package built to run nonparametric sequential
+tests and online change point detection algorithms in [SRR
 21’](https://arxiv.org/abs/2010.08082) and [SRR
-22’](https://arxiv.org/abs/2203.03532). This package supports APIs of
+23’](https://arxiv.org/abs/2203.03532). This package supports APIs of
 nonparametric sequential test and online change-point detection for
 streams of univariate sub-Gaussian, binary, and bounded random
 variables. This package also provides APIs for general E-value based

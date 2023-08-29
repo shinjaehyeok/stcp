@@ -22,7 +22,7 @@ compute_bf_ci(
 
 \item{ci_lower_trivial}{A trivial lower bound of confidence interval. Default is \code{-Inf}.}
 
-\item{max_num_ci}{The maximum number of CI to computes. Recomend to set it be less than 100.}
+\item{max_num_ci}{The maximum number of CI to computes. Recommend to set it be less than 100.}
 
 \item{tol}{Tolerance of root-finding, positive numeric. Default is 1e-6.}
 }

@@ -16,7 +16,7 @@ Description: An implementation of sequential tests and online change-point
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Imports:
     matrixStats (>= 0.6),
     stats,

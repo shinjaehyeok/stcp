@@ -6,9 +6,15 @@
 \usage{
 generate_log_base_fn(
   lambda,
-  psi_fn = function(x) {     x^2/2 },
-  s_fn = function(x) {     x },
-  v_fn = function(x) {     1 }
+  psi_fn = function(x) {
+     x^2/2
+ },
+  s_fn = function(x) {
+     x
+ },
+  v_fn = function(x) {
+     1
+ }
 )
 }
 \arguments{

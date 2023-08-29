@@ -7,7 +7,9 @@
 update_log_e(
   x_current,
   prev_log_e = -Inf,
-  compute_log_baseline = function(x) {     x - 0.5 },
+  compute_log_baseline = function(x) {
+     x - 0.5
+ },
   is_test = FALSE,
   is_SR_type = TRUE
 )

@@ -11,8 +11,12 @@ build_stcp_exp(
   delta_upper,
   is_test = FALSE,
   psi_fn_list = generate_sub_G_fn(sig = 1),
-  s_fn = function(x) {     x - m_pre },
-  v_fn = function(x) {     1 },
+  s_fn = function(x) {
+     x - m_pre
+ },
+  v_fn = function(x) {
+     1
+ },
   v_min = 1,
   k_max = 200,
   tol = 1e-06

@@ -27,6 +27,8 @@ and bounded random variables. This package also provides APIs for general
 E-value based sequential test and E-detectors based change-point detection
 frameworks for advanced users. 
 
+Disclaimer: This R package is a personal project and is not affiliated with my company. It is provided "as is" without warranty of any kind, express or implied. The author does not assume any liability for any errors or omissions in this package.
+
 ## Installation
 
 You can install the development version of stcp from [GitHub](https://github.com/) with:

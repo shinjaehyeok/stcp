@@ -1,9 +1,9 @@
-^STCP\.Rproj$
+^stcp\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
-^STCP\.Rcheck$
-^STCP.*\.tar\.gz$
-^STCP.*\.tgz$
+^stcp\.Rcheck$
+^stcp.*\.tar\.gz$
+^stcp.*\.tgz$
 ^README\.Rmd$
 ^\.github$
 ^doc$

@@ -1,11 +1,12 @@
+.Rproj
 .Rproj.user
 .Rhistory
 .Rdata
 .httr-oauth
 .DS_Store
-STCP.Rcheck/
-STCP*.tar.gz
-STCP*.tgz
+stcp.Rcheck/
+stcp*.tar.gz
+stcp*.tgz
 inst/doc
 /doc/
 /Meta/

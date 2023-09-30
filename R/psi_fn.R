@@ -45,36 +45,35 @@ generate_sub_B_fn <- function(p = 0.5, tol = 1e-6){
     },
     psi_star = function(x){
       d <- x + p
-      if (!(d > 0 & d < 1)) return(Inf)
-      val <- d * log(d / p) + (1-d) * log((1-d) / (1-p))
+      if (d >= 1) {
+        val <- log(1/p)
+      } else if (d <= 0) {
+        val <- log(1/(1-p))
+      } else {
+        val <- d * log(d / p) + (1-d) * log((1-d) / (1-p))
+      }
       return(val)
     },
     psi_star_div = function(x){
       d <- x + p
-      if (!(d > 0 & d < 1)) return(Inf)
-      div <- log(d * (1-p) / p / (1-d))
-      return(div)
-    },
-    psi_star_inv = function(y, is_pos = TRUE){
-      tol <- 1e-6
-      right_end <- 1 - tol
-      if (is_pos){
-        bound <- B_fn_list$psi_star(right_end)
-        if (y >= bound) return(right_end)
-        f <- function(x) B_fn_list$psi_star(x) - y
-        x <- stats::uniroot(f,
-                            c(0, 1-p-tol),
-                            tol = 1e-6)$root
-        return(x)
-      } else{
-        bound <- B_fn_list$psi_star(tol)
-        if (y >= bound) return(tol)
-        f <- function(x) B_fn_list$psi_star(x) - y
-        x <- stats::uniroot(f,
-                            c(0, 1-p-tol),
-                            tol = 1e-6)$root
-        return(x)
+      if (d >= 1) {
+        return(Inf)
+      } else if (d <= 0) {
+        return(-Inf)
+      } else {
+        div <- log(d * (1-p) / p / (1-d))
+        return(div)
       }
+    },
+    psi_star_inv = function(y){
+      right_end <- 1-p
+      bound <- B_fn_list$psi_star(right_end)
+      if (y >= bound) return(right_end)
+      f <- function(x) B_fn_list$psi_star(x) - y
+      x <- stats::uniroot(f,
+                          c(0, 1-p),
+                          tol = 1e-12)$root
+      return(x)
     }
   )
   return(B_fn_list)
@@ -106,7 +105,7 @@ generate_sub_E_fn <- function(){
       if (f(max_bound) <= 0) return(max_bound)
       x <- stats::uniroot(f,
                           c(0, max_bound),
-                          tol = 1e-6)$root
+                          tol = 1e-12)$root
       return(x)
     }
   )
